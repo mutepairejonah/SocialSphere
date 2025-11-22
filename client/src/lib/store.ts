@@ -13,6 +13,8 @@ export interface User {
   followers: number;
   following: number;
   highlights?: { id: string; image: string; title: string }[];
+  website?: string;
+  isFollowing?: boolean;
 }
 
 export interface Post {
@@ -55,12 +57,68 @@ const MOCK_USER: User = {
   bio: 'Digital explorer 📸 | Coffee enthusiast ☕️ | Travels 🌍\nSan Francisco, CA',
   followers: 1250,
   following: 450,
+  website: 'johndoe.com',
   highlights: [
     { id: '1', title: 'Travels', image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&fit=crop' },
     { id: '2', title: 'Food', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&fit=crop' },
     { id: '3', title: 'Friends', image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&fit=crop' },
   ]
 };
+
+const MOCK_USERS: User[] = [
+  {
+    id: 'alex_travels',
+    username: 'alex_travels',
+    fullName: 'Alex Johnson',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop',
+    bio: 'Travel photographer 🌍',
+    followers: 3421,
+    following: 234,
+    website: 'alextravel.com',
+    isFollowing: false
+  },
+  {
+    id: 'sarah.styles',
+    username: 'sarah.styles',
+    fullName: 'Sarah Chen',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&fit=crop',
+    bio: 'Fashion & lifestyle 👗\nBased in Paris',
+    followers: 8942,
+    following: 1123,
+    website: 'sarahstyles.com',
+    isFollowing: true
+  },
+  {
+    id: 'nature_lover',
+    username: 'nature_lover',
+    fullName: 'Mike Roberts',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&fit=crop',
+    bio: 'Nature & outdoor enthusiast 🏔️',
+    followers: 5623,
+    following: 456,
+    isFollowing: false
+  },
+  {
+    id: 'mike_photos',
+    username: 'mike_photos',
+    fullName: 'Michael Zhang',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop',
+    bio: 'Street photography',
+    followers: 2341,
+    following: 789,
+    isFollowing: true
+  },
+  {
+    id: 'jessica_w',
+    username: 'jessica_w',
+    fullName: 'Jessica Williams',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&fit=crop',
+    bio: 'Designer & creative 🎨',
+    followers: 4125,
+    following: 567,
+    isFollowing: false
+  }
+];
 
 const MOCK_POSTS: Post[] = [
   {
@@ -152,23 +210,29 @@ interface StoreState {
   posts: Post[];
   notifications: Notification[];
   stories: Story[];
+  allUsers: User[];
   isAuthenticated: boolean;
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
   setUser: (user: User) => void;
+  updateProfile: (updates: Partial<User>) => void;
+  toggleFollow: (userId: string) => void;
+  getUser: (userId: string) => User | undefined;
+  getFollowing: () => User[];
   addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'timestamp' | 'isLiked' | 'isSaved'>) => void;
   toggleLike: (postId: string) => void;
   toggleSave: (postId: string) => void;
   markStoryViewed: (storyId: string) => void;
 }
 
-export const useStore = create<StoreState>((set) => ({
+export const useStore = create<StoreState>((set, get) => ({
   currentUser: null,
   posts: MOCK_POSTS,
   notifications: MOCK_NOTIFICATIONS,
   stories: MOCK_STORIES,
+  allUsers: MOCK_USERS,
   isAuthenticated: false,
   
   loginWithGoogle: async () => {
@@ -221,6 +285,33 @@ export const useStore = create<StoreState>((set) => ({
   },
 
   setUser: (user) => set({ currentUser: user, isAuthenticated: true }),
+
+  updateProfile: (updates) => set((state) => ({
+    currentUser: state.currentUser ? { ...state.currentUser, ...updates } : null
+  })),
+
+  toggleFollow: (userId) => set((state) => {
+    const updatedUsers = state.allUsers.map(u => 
+      u.id === userId ? { 
+        ...u, 
+        isFollowing: !u.isFollowing,
+        followers: u.isFollowing ? u.followers - 1 : u.followers + 1
+      } : u
+    );
+    const newFollowing = updatedUsers.filter(u => u.isFollowing).length;
+    return {
+      allUsers: updatedUsers,
+      currentUser: state.currentUser ? { ...state.currentUser, following: newFollowing } : null
+    };
+  }),
+
+  getUser: (userId) => {
+    return get().allUsers.find(u => u.id === userId);
+  },
+
+  getFollowing: () => {
+    return get().allUsers.filter(u => u.isFollowing);
+  },
 
   addPost: (newPost) => set((state) => ({
     posts: [{

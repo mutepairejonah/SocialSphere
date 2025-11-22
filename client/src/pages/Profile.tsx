@@ -1,8 +1,7 @@
 import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
-import { Grid, Settings, MapPin, User as UserIcon, Bookmark, Menu } from "lucide-react";
+import { Grid, Settings, Bookmark, Menu, User as UserIcon } from "lucide-react";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -24,10 +23,8 @@ export default function Profile() {
       <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-[50px] flex items-center justify-between">
         <div className="flex items-center gap-1 cursor-pointer">
            <h1 className="font-bold text-xl">{currentUser.username}</h1>
-           {/* Badge could go here */}
         </div>
         <div className="flex gap-5">
-           <PlusIcon className="w-6 h-6" />
            <Menu className="w-6 h-6 cursor-pointer" onClick={() => { logout(); setLocation("/login"); }} />
         </div>
       </header>
@@ -40,15 +37,24 @@ export default function Profile() {
               <img src={currentUser.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
             </div>
             <div className="flex-1 flex justify-around text-center ml-4">
-              <div className="cursor-pointer">
+              <div 
+                className="cursor-pointer hover:opacity-70"
+                onClick={() => setLocation("/followers")}
+              >
                 <div className="font-bold text-lg leading-tight">12</div>
                 <div className="text-sm text-foreground">Posts</div>
               </div>
-              <div className="cursor-pointer">
+              <div 
+                className="cursor-pointer hover:opacity-70"
+                onClick={() => setLocation("/followers")}
+              >
                 <div className="font-bold text-lg leading-tight">{currentUser.followers}</div>
                 <div className="text-sm text-foreground">Followers</div>
               </div>
-              <div className="cursor-pointer">
+              <div 
+                className="cursor-pointer hover:opacity-70"
+                onClick={() => setLocation("/following")}
+              >
                 <div className="font-bold text-lg leading-tight">{currentUser.following}</div>
                 <div className="text-sm text-foreground">Following</div>
               </div>
@@ -58,11 +64,22 @@ export default function Profile() {
           <div className="space-y-1 mb-5">
             <h2 className="font-bold text-sm">{currentUser.fullName}</h2>
             <p className="text-sm whitespace-pre-line leading-snug">{currentUser.bio}</p>
+            {currentUser.website && (
+              <a href="#" className="text-xs text-blue-600 hover:underline">{currentUser.website}</a>
+            )}
           </div>
 
           <div className="flex gap-2">
-            <Button className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">Edit Profile</Button>
-            <Button className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">Share Profile</Button>
+            <Button 
+              className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80" 
+              variant="secondary"
+              onClick={() => setLocation("/edit-profile")}
+            >
+              Edit Profile
+            </Button>
+            <Button className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
+              Share Profile
+            </Button>
             <Button size="icon" className="h-8 w-8 bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
                <UserIcon className="w-4 h-4" />
             </Button>
@@ -84,7 +101,7 @@ export default function Profile() {
               ))}
               <div className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer">
                  <div className="w-16 h-16 rounded-full border border-border flex items-center justify-center">
-                    <PlusIcon className="w-6 h-6 text-foreground" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                  </div>
                  <span className="text-xs">New</span>
               </div>
@@ -153,13 +170,4 @@ export default function Profile() {
       <BottomNav />
     </div>
   );
-}
-
-function PlusIcon({ className, onClick }: { className?: string, onClick?: () => void }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} onClick={onClick}>
-      <path d="M5 12h14" />
-      <path d="M12 5v14" />
-    </svg>
-  )
 }
