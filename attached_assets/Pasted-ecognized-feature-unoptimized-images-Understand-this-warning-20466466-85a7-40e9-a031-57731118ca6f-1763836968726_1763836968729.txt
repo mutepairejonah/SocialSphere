@@ -1,0 +1,19 @@
+ecognized feature: 'unoptimized-images'.Understand this warning
+20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Ar5b%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Ar5b%3A:32 Unrecognized feature: 'web-share'.Understand this warning
+20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Ar5b%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Ar5b%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+4a0df91602a414c03.js:2 [Coframe] failed to send event beacon
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+iframe.js:311 Info: The current domain is not authorized for OAuth operations. This will prevent signInWithPopup, signInWithRedirect, linkWithPopup and linkWithRedirect from working. Add your domain (20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev) to the OAuth redirect domains list in the Firebase console -> Authentication -> Settings -> Authorized domains tab.
+kl @ iframe.js:311Understand this warning
+a0df91602a414c03.js:2 [Coframe] failed to send event beacon
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+stallwart.build.js:1 stallwart: failed ping 1
+4a0df91602a414c03.js:2 [Coframe] failed to send event beacon
+(anonymous) @ a0df91602a414c03.js:2
+q @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1763835923889%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252F%7E%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+M @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1763835923889%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252F%7E%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+(anonymous) @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1763835923889%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252F%7E%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+o @ a0df91602a414c03.js:2Understand this warning
+Warning: Don’t paste code into the DevTools Console that you don’t understand or haven’t reviewed yourself. This could allow attackers to steal your identity or take con
