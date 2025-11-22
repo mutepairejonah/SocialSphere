@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { ArrowLeft, MapPin, Image as ImageIcon, X, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 export default function Create() {
   const [, setLocation] = useLocation();
@@ -15,6 +16,8 @@ export default function Create() {
   const [locationTag, setLocationTag] = useState("");
   const [step, setStep] = useState<'picker' | 'details'>('picker');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [recentImages, setRecentImages] = useState<string[]>([]);
 
   const handlePost = () => {
     if (!currentUser || !selectedImage) return;
@@ -26,6 +29,20 @@ export default function Create() {
       location: locationTag || undefined,
     });
     setLocation("/");
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageData = event.target?.result as string;
+        setSelectedImage(imageData);
+        setRecentImages([imageData, ...recentImages.slice(0, 19)]);
+        setStep('details');
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Mock image picker flow
@@ -46,7 +63,10 @@ export default function Create() {
            </header>
            
            {/* Preview Area */}
-           <div className="aspect-square bg-muted relative flex items-center justify-center overflow-hidden">
+           <motion.div 
+             className="aspect-square bg-muted relative flex items-center justify-center overflow-hidden"
+             layoutId="imagePreview"
+           >
               {selectedImage ? (
                  <img src={selectedImage} className="w-full h-full object-cover" />
               ) : (
@@ -55,32 +75,71 @@ export default function Create() {
                     <span>Select a photo</span>
                  </div>
               )}
-           </div>
+           </motion.div>
 
-           {/* Gallery Grid */}
+           {/* Gallery and Upload */}
            <div className="flex-1 overflow-y-auto bg-background">
-              <div className="flex items-center justify-between p-3 border-b border-border">
-                 <span className="font-bold flex items-center gap-1">Gallery <ChevronRight className="w-4 h-4" /></span>
-                 <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                    <ImageIcon className="w-4 h-4" />
-                 </div>
+              <div className="p-3 border-b border-border space-y-3">
+                 <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors"
+                 >
+                    <ImageIcon className="w-5 h-5" />
+                    Upload from Device
+                 </button>
+                 <input 
+                    ref={fileInputRef}
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileSelect}
+                    className="hidden"
+                 />
               </div>
-              <div className="grid grid-cols-4 gap-0.5">
-                 {[...Array(20)].map((_, i) => {
-                    const imgUrl = `https://images.unsplash.com/photo-${1500000000000 + (i * 10)}?w=800&auto=format&fit=crop&q=60`;
-                    return (
-                       <div 
-                         key={i} 
-                         className={`aspect-square bg-muted cursor-pointer relative ${selectedImage === imgUrl ? 'opacity-50' : ''}`}
-                         onClick={() => setSelectedImage(imgUrl)}
-                       >
-                          <img src={imgUrl} className="w-full h-full object-cover" loading="lazy" />
-                       </div>
-                    )
-                 })}
+
+              {/* Recent/Suggested */}
+              {recentImages.length > 0 && (
+                <div className="p-3 border-b border-border">
+                  <h4 className="text-sm font-semibold mb-2">Recent</h4>
+                  <div className="grid grid-cols-4 gap-1">
+                    {recentImages.map((img, i) => (
+                      <button
+                        key={i}
+                        className={`aspect-square rounded-sm overflow-hidden border-2 transition-all ${
+                          selectedImage === img ? 'border-blue-500' : 'border-border'
+                        }`}
+                        onClick={() => setSelectedImage(img)}
+                      >
+                        <img src={img} className="w-full h-full object-cover" loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Suggested Gallery */}
+              <div className="p-3">
+                <h4 className="text-sm font-semibold mb-2">Suggestions</h4>
+                <div className="grid grid-cols-4 gap-1">
+                   {[...Array(20)].map((_, i) => {
+                      const imgUrl = `https://images.unsplash.com/photo-${1500000000000 + (i * 10)}?w=800&auto=format&fit=crop&q=60`;
+                      return (
+                         <button 
+                           key={i} 
+                           className={`aspect-square bg-muted rounded-sm overflow-hidden border-2 transition-all ${
+                             selectedImage === imgUrl ? 'border-blue-500' : 'border-border'
+                           }`}
+                           onClick={() => {
+                             setSelectedImage(imgUrl);
+                             setStep('details');
+                           }}
+                         >
+                            <img src={imgUrl} className="w-full h-full object-cover" loading="lazy" />
+                         </button>
+                      )
+                   })}
+                </div>
               </div>
            </div>
-           <BottomNav />
         </div>
      )
   }
@@ -101,9 +160,12 @@ export default function Create() {
 
       <main className="p-4 space-y-6">
         <div className="flex gap-4 items-start">
-          <div className="w-16 h-16 bg-muted rounded-sm flex-shrink-0 overflow-hidden">
+          <motion.div 
+            className="w-16 h-16 bg-muted rounded-sm flex-shrink-0 overflow-hidden"
+            layoutId="imagePreview"
+          >
              <img src={selectedImage!} className="w-full h-full object-cover" />
-          </div>
+          </motion.div>
           <Textarea 
             placeholder="Write a caption..." 
             className="flex-1 border-0 resize-none focus-visible:ring-0 p-0 h-20 text-base"

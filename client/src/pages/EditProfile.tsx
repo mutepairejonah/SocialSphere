@@ -1,10 +1,10 @@
-import { ArrowLeft, Camera, X } from "lucide-react";
+import { ArrowLeft, Camera, X, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const AVATAR_OPTIONS = [
   "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&fit=crop",
@@ -21,6 +21,7 @@ export default function EditProfile() {
   const { currentUser, updateProfile } = useStore();
   const [, setLocation] = useLocation();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     fullName: currentUser?.fullName || "",
     username: currentUser?.username || "",
@@ -39,6 +40,19 @@ export default function EditProfile() {
   const handleAvatarSelect = (avatar: string) => {
     setFormData({ ...formData, avatar });
     setShowAvatarPicker(false);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageData = event.target?.result as string;
+        setFormData({ ...formData, avatar: imageData });
+        setShowAvatarPicker(false);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = () => {
@@ -69,7 +83,7 @@ export default function EditProfile() {
             </div>
             <button 
               onClick={() => setShowAvatarPicker(true)}
-              className="absolute bottom-0 right-0 bg-blue-500 border-4 border-background rounded-full p-2.5 hover:bg-blue-600 transition-colors text-white shadow-lg"
+              className="absolute bottom-0 right-0 bg-blue-500 border-4 border-background rounded-full p-2.5 hover:bg-blue-600 transition-colors text-white shadow-lg group-hover:scale-110"
             >
               <Camera className="w-5 h-5" strokeWidth={2} />
             </button>
@@ -82,7 +96,7 @@ export default function EditProfile() {
           </button>
         </div>
 
-        {/* Avatar Picker */}
+        {/* Avatar Picker Modal */}
         {showAvatarPicker && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-end animate-in fade-in">
             <div className="w-full bg-background rounded-t-2xl p-4 space-y-3 max-h-96 overflow-y-auto">
@@ -92,18 +106,41 @@ export default function EditProfile() {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <div className="grid grid-cols-4 gap-3">
-                {AVATAR_OPTIONS.map((avatar, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleAvatarSelect(avatar)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                      formData.avatar === avatar ? "border-blue-500 scale-95" : "border-border"
-                    }`}
-                  >
-                    <img src={avatar} alt={`Avatar ${idx}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
+
+              {/* Upload from Device */}
+              <div className="space-y-2 pb-4 border-b border-border">
+                <input 
+                  ref={fileInputRef}
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  <ImageIcon className="w-5 h-5" />
+                  Upload from Device
+                </button>
+              </div>
+
+              {/* Preset Avatars */}
+              <div>
+                <h4 className="text-sm font-semibold text-muted-foreground mb-3">Suggested Photos</h4>
+                <div className="grid grid-cols-4 gap-3">
+                  {AVATAR_OPTIONS.map((avatar, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleAvatarSelect(avatar)}
+                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                        formData.avatar === avatar ? "border-blue-500 scale-95" : "border-border"
+                      }`}
+                    >
+                      <img src={avatar} alt={`Avatar ${idx}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
