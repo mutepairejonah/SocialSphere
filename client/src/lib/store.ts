@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
+import { auth } from './firebase';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, User as FirebaseUser } from 'firebase/auth';
 
 // Types
 export interface User {
@@ -151,8 +153,11 @@ interface StoreState {
   notifications: Notification[];
   stories: Story[];
   isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
+  loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, pass: string) => Promise<void>;
+  signupWithEmail: (email: string, pass: string) => Promise<void>;
+  logout: () => Promise<void>;
+  setUser: (user: User) => void;
   addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'timestamp' | 'isLiked' | 'isSaved'>) => void;
   toggleLike: (postId: string) => void;
   toggleSave: (postId: string) => void;
@@ -165,8 +170,58 @@ export const useStore = create<StoreState>((set) => ({
   notifications: MOCK_NOTIFICATIONS,
   stories: MOCK_STORIES,
   isAuthenticated: false,
-  login: () => set({ currentUser: MOCK_USER, isAuthenticated: true }),
-  logout: () => set({ currentUser: null, isAuthenticated: false }),
+  
+  loginWithGoogle: async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    set({ 
+      currentUser: {
+        ...MOCK_USER,
+        id: user.uid,
+        username: user.displayName?.split(' ')[0].toLowerCase() || 'user',
+        fullName: user.displayName || 'User',
+        avatar: user.photoURL || MOCK_USER.avatar
+      }, 
+      isAuthenticated: true 
+    });
+  },
+
+  loginWithEmail: async (email, pass) => {
+    const result = await signInWithEmailAndPassword(auth, email, pass);
+    const user = result.user;
+    set({ 
+      currentUser: {
+        ...MOCK_USER,
+        id: user.uid,
+        username: email.split('@')[0],
+        fullName: email.split('@')[0],
+      }, 
+      isAuthenticated: true 
+    });
+  },
+
+  signupWithEmail: async (email, pass) => {
+    const result = await createUserWithEmailAndPassword(auth, email, pass);
+    const user = result.user;
+    set({ 
+      currentUser: {
+        ...MOCK_USER,
+        id: user.uid,
+        username: email.split('@')[0],
+        fullName: email.split('@')[0],
+      }, 
+      isAuthenticated: true 
+    });
+  },
+
+  logout: async () => {
+    await signOut(auth);
+    set({ currentUser: null, isAuthenticated: false });
+  },
+
+  setUser: (user) => set({ currentUser: user, isAuthenticated: true }),
+
   addPost: (newPost) => set((state) => ({
     posts: [{
       ...newPost,
