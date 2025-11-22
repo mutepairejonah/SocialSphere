@@ -1,13 +1,17 @@
-import { ArrowLeft, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { useLocation, useRoute } from "wouter";
 import { BottomNav } from "@/components/BottomNav";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 export default function UserProfile() {
   const [, params] = useRoute("/user/:id");
   const { getUser, toggleFollow } = useStore();
   const [, setLocation] = useLocation();
+  const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
 
   const user = getUser(params?.id || "");
 
@@ -18,6 +22,16 @@ export default function UserProfile() {
       </div>
     );
   }
+
+  const handleFollowToggle = () => {
+    setIsFollowing(!user.isFollowing);
+    setTimeout(() => {
+      toggleFollow(user.id);
+      setIsFollowing(null);
+    }, 200);
+  };
+
+  const currentFollowState = isFollowing !== null ? isFollowing : user.isFollowing;
 
   return (
     <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
@@ -35,15 +49,31 @@ export default function UserProfile() {
         {/* Profile Info */}
         <div className="px-4 pt-6 pb-4">
           <div className="flex items-center justify-between mb-6">
-            <div className="w-20 h-20 rounded-full p-[2px] border border-border">
-              <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
+            <div className="relative">
+              <Avatar className="h-24 w-24 border-4 border-border">
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
+              </Avatar>
+              {currentFollowState && (
+                <motion.div 
+                  className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center border-4 border-background text-white"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring" }}
+                >
+                  <span className="text-xs font-bold">✓</span>
+                </motion.div>
+              )}
             </div>
             <div className="flex-1 flex justify-around text-center ml-4">
               <div>
                 <div className="font-bold text-lg leading-tight">8</div>
                 <div className="text-sm text-foreground">Posts</div>
               </div>
-              <div>
+              <div 
+                className="cursor-pointer hover:opacity-70"
+                onClick={() => {}}
+              >
                 <div className="font-bold text-lg leading-tight">{user.followers}</div>
                 <div className="text-sm text-foreground">Followers</div>
               </div>
@@ -63,14 +93,28 @@ export default function UserProfile() {
           </div>
 
           <div className="flex gap-2">
-            <Button 
-              className="flex-1 font-semibold h-8 text-sm"
-              onClick={() => toggleFollow(user.id)}
-              variant={user.isFollowing ? "secondary" : "default"}
+            <motion.div 
+              className="flex-1"
+              whileTap={{ scale: 0.95 }}
             >
-              {user.isFollowing ? "Following" : "Follow"}
-            </Button>
-            <Button className="flex-1 font-semibold h-8 text-sm" variant="secondary">
+              <Button 
+                className="w-full font-semibold h-10 text-sm"
+                onClick={handleFollowToggle}
+                variant={currentFollowState ? "secondary" : "default"}
+              >
+                <motion.span
+                  key={currentFollowState ? "following" : "follow"}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {currentFollowState ? "Following" : "Follow"}
+                </motion.span>
+              </Button>
+            </motion.div>
+            <Button className="flex-1 font-semibold h-10 text-sm" variant="secondary">
+              <MessageCircle className="w-4 h-4 mr-1" />
               Message
             </Button>
           </div>
@@ -80,13 +124,17 @@ export default function UserProfile() {
         <div className="border-t border-border mt-2" />
         <div className="grid grid-cols-3 gap-0.5 pb-4">
           {[...Array(9)].map((_, i) => (
-            <div key={i} className="aspect-square bg-muted relative group cursor-pointer">
+            <motion.div 
+              key={i}
+              className="aspect-square bg-muted relative group cursor-pointer overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+            >
               <img 
                 src={`https://images.unsplash.com/photo-${1500000000000 + (i * 5)}?w=300&auto=format&fit=crop&q=60`} 
-                className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
+                className="w-full h-full object-cover group-hover:brightness-75 transition-all"
                 loading="lazy"
               />
-            </div>
+            </motion.div>
           ))}
         </div>
       </main>
