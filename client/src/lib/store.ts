@@ -105,13 +105,32 @@ export const useStore = create<StoreState>((set, get) => ({
               } as User,
               isAuthenticated: true
             });
-            // Load posts and users
-            await get().loadPosts();
-            await get().loadUsers();
-            await get().loadNotifications();
+            // Load posts and users (don't block on these)
+            get().loadPosts().catch(err => console.error('Error loading posts:', err));
+            get().loadUsers().catch(err => console.error('Error loading users:', err));
+            get().loadNotifications().catch(err => console.error('Error loading notifications:', err));
           }
-        } catch (error) {
-          console.error('Error loading user data:', error);
+        } catch (error: any) {
+          // Handle offline or other errors gracefully
+          if (error?.code === 'unavailable' || error?.code === 'failed-precondition') {
+            // Still allow login even if Firestore is temporarily unavailable
+            console.warn('Firestore temporarily unavailable, app will work with cached data');
+            set({
+              currentUser: {
+                id: firebaseUser.uid,
+                username: firebaseUser.displayName?.split(' ')[0].toLowerCase() || firebaseUser.email?.split('@')[0] || 'user',
+                fullName: firebaseUser.displayName || 'User',
+                email: firebaseUser.email || '',
+                avatar: firebaseUser.photoURL || '',
+                bio: '',
+                followers: 0,
+                following: 0
+              },
+              isAuthenticated: true
+            });
+          } else {
+            console.error('Error loading user data:', error);
+          }
         }
       } else {
         set({ currentUser: null, isAuthenticated: false });
@@ -124,55 +143,96 @@ export const useStore = create<StoreState>((set, get) => ({
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     
-    const userRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userRef);
-    
-    if (!userDoc.exists()) {
-      const newUser = {
-        username: user.displayName?.split(' ')[0].toLowerCase() || 'user',
-        fullName: user.displayName || 'User',
-        email: user.email,
-        avatar: user.photoURL || '',
-        bio: '',
-        followers: 0,
-        following: 0,
-        createdAt: Timestamp.now()
-      };
-      await setDoc(userRef, newUser);
-      set({
-        currentUser: {
-          id: user.uid,
-          ...newUser,
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (!userDoc.exists()) {
+        const newUser = {
+          username: user.displayName?.split(' ')[0].toLowerCase() || 'user',
+          fullName: user.displayName || 'User',
+          email: user.email,
+          avatar: user.photoURL || '',
+          bio: '',
           followers: 0,
-          following: 0
-        } as User,
-        isAuthenticated: true
-      });
-    } else {
-      const userData = userDoc.data();
-      set({
-        currentUser: {
-          id: user.uid,
-          ...userData
-        } as User,
-        isAuthenticated: true
-      });
+          following: 0,
+          createdAt: Timestamp.now()
+        };
+        await setDoc(userRef, newUser);
+        set({
+          currentUser: {
+            id: user.uid,
+            ...newUser,
+            followers: 0,
+            following: 0
+          } as User,
+          isAuthenticated: true
+        });
+      } else {
+        const userData = userDoc.data();
+        set({
+          currentUser: {
+            id: user.uid,
+            ...userData
+          } as User,
+          isAuthenticated: true
+        });
+      }
+    } catch (error: any) {
+      // If Firestore is unavailable, still log them in
+      if (error?.code === 'unavailable' || error?.code === 'failed-precondition') {
+        set({
+          currentUser: {
+            id: user.uid,
+            username: user.displayName?.split(' ')[0].toLowerCase() || 'user',
+            fullName: user.displayName || 'User',
+            email: user.email || '',
+            avatar: user.photoURL || '',
+            bio: '',
+            followers: 0,
+            following: 0
+          },
+          isAuthenticated: true
+        });
+      } else {
+        throw error;
+      }
     }
   },
 
   loginWithEmail: async (email, pass) => {
     const result = await signInWithEmailAndPassword(auth, email, pass);
     const user = result.user;
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      set({
-        currentUser: {
-          id: user.uid,
-          ...userData
-        } as User,
-        isAuthenticated: true
-      });
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        set({
+          currentUser: {
+            id: user.uid,
+            ...userData
+          } as User,
+          isAuthenticated: true
+        });
+      }
+    } catch (error: any) {
+      if (error?.code === 'unavailable' || error?.code === 'failed-precondition') {
+        set({
+          currentUser: {
+            id: user.uid,
+            username: email.split('@')[0],
+            fullName: email.split('@')[0],
+            email,
+            avatar: '',
+            bio: '',
+            followers: 0,
+            following: 0
+          },
+          isAuthenticated: true
+        });
+      } else {
+        throw error;
+      }
     }
   },
 
@@ -189,7 +249,15 @@ export const useStore = create<StoreState>((set, get) => ({
       following: 0,
       createdAt: Timestamp.now()
     };
-    await setDoc(doc(db, 'users', user.uid), newUser);
+    try {
+      await setDoc(doc(db, 'users', user.uid), newUser);
+    } catch (error: any) {
+      if (error?.code === 'unavailable' || error?.code === 'failed-precondition') {
+        console.warn('Firestore unavailable, user profile will sync when connection restored');
+      } else {
+        throw error;
+      }
+    }
     set({
       currentUser: {
         id: user.uid,
@@ -212,16 +280,30 @@ export const useStore = create<StoreState>((set, get) => ({
     const currentUser = get().currentUser;
     if (!currentUser) return;
     
+    // Always update local state first
+    set(state => ({
+      currentUser: state.currentUser ? { ...state.currentUser, ...updates } : null
+    }));
+
+    // Try to sync with Firestore (but don't block if offline)
     try {
       const userRef = doc(db, 'users', currentUser.id);
       const updateData: any = {};
       
       // Handle avatar upload if it's a data URL
       if (updates.avatar && updates.avatar.startsWith('data:')) {
-        const blob = await (await fetch(updates.avatar)).blob();
-        const storageRef = ref(storage, `avatars/${currentUser.id}`);
-        await uploadBytes(storageRef, blob);
-        updateData.avatar = await getDownloadURL(storageRef);
+        try {
+          const blob = await (await fetch(updates.avatar)).blob();
+          const storageRef = ref(storage, `avatars/${currentUser.id}`);
+          await uploadBytes(storageRef, blob);
+          updateData.avatar = await getDownloadURL(storageRef);
+        } catch (storageError: any) {
+          if (storageError?.code !== 'unavailable') {
+            throw storageError;
+          }
+          // Use data URL if storage is offline
+          updateData.avatar = updates.avatar;
+        }
       } else if (updates.avatar) {
         updateData.avatar = updates.avatar;
       }
@@ -232,12 +314,12 @@ export const useStore = create<StoreState>((set, get) => ({
       if (updates.website) updateData.website = updates.website;
       
       await updateDoc(userRef, updateData);
-      set(state => ({
-        currentUser: state.currentUser ? { ...state.currentUser, ...updates } : null
-      }));
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      throw error;
+    } catch (error: any) {
+      if (error?.code === 'unavailable' || error?.code === 'failed-precondition') {
+        console.warn('Profile updated locally, will sync to database when connection restored');
+      } else {
+        console.error('Error updating profile:', error);
+      }
     }
   },
 
@@ -313,6 +395,22 @@ export const useStore = create<StoreState>((set, get) => ({
     const currentUser = get().currentUser;
     if (!currentUser) return;
 
+    // Add to local state immediately
+    const localPost: Post = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...newPost,
+      timestamp: new Date().toLocaleString(),
+      likes: 0,
+      comments: 0,
+      isLiked: false,
+      isSaved: false
+    };
+
+    set(state => ({
+      posts: [localPost, ...state.posts]
+    }));
+
+    // Try to sync with Firestore
     try {
       const postRef = await addDoc(collection(db, 'posts'), {
         ...newPost,
@@ -321,20 +419,14 @@ export const useStore = create<StoreState>((set, get) => ({
         comments: 0,
       });
 
-      const postData = await getDoc(postRef);
-      if (postData.exists()) {
-        set(state => ({
-          posts: [{
-            id: postData.id,
-            ...postData.data(),
-            timestamp: new Date(postData.data().timestamp.toDate()).toLocaleString(),
-            isLiked: false,
-            isSaved: false
-          } as Post, ...state.posts]
-        }));
+      // Update local state with actual Firebase ID
+      set(state => ({
+        posts: state.posts.map(p => p.id === localPost.id ? { ...p, id: postRef.id } : p)
+      }));
+    } catch (error: any) {
+      if (error?.code !== 'unavailable' && error?.code !== 'failed-precondition') {
+        console.error('Error adding post:', error);
       }
-    } catch (error) {
-      console.error('Error adding post:', error);
     }
   },
 
@@ -342,17 +434,22 @@ export const useStore = create<StoreState>((set, get) => ({
     try {
       const postsQuery = query(collection(db, 'posts'));
       const snapshot = await getDocs(postsQuery);
-      const posts = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: new Date(doc.data().timestamp.toDate()).toLocaleString(),
-        isLiked: false,
-        isSaved: false
-      } as Post)).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      const posts = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          timestamp: data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString() : new Date().toLocaleString(),
+          isLiked: false,
+          isSaved: false
+        } as Post;
+      }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
       set({ posts });
-    } catch (error) {
-      console.error('Error loading posts:', error);
+    } catch (error: any) {
+      if (error?.code !== 'unavailable') {
+        console.error('Error loading posts:', error);
+      }
     }
   },
 
@@ -370,8 +467,10 @@ export const useStore = create<StoreState>((set, get) => ({
         } as User));
       
       set({ allUsers: users });
-    } catch (error) {
-      console.error('Error loading users:', error);
+    } catch (error: any) {
+      if (error?.code !== 'unavailable') {
+        console.error('Error loading users:', error);
+      }
     }
   },
 
@@ -385,17 +484,22 @@ export const useStore = create<StoreState>((set, get) => ({
         where('userId', '==', currentUser.id)
       );
       const snapshot = await getDocs(notifQuery);
-      const notifications = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: new Date(doc.data().createdAt.toDate()).toLocaleString(),
-        userAvatar: '',
-        postImage: ''
-      } as Notification));
+      const notifications = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          timestamp: data.createdAt?.toDate ? new Date(data.createdAt.toDate()).toLocaleString() : new Date().toLocaleString(),
+          userAvatar: '',
+          postImage: ''
+        } as Notification;
+      });
       
       set({ notifications });
-    } catch (error) {
-      console.error('Error loading notifications:', error);
+    } catch (error: any) {
+      if (error?.code !== 'unavailable') {
+        console.error('Error loading notifications:', error);
+      }
     }
   },
 
