@@ -1,12 +1,14 @@
 import { PostCard } from "@/components/PostCard";
 import { useStore } from "@/lib/store";
-import { Heart, Send, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings, PlusSquare } from "lucide-react";
+import { Heart, Send, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings, PlusSquare, X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "wouter";
+import { useState } from "react";
 
 export default function Home() {
   const { posts, stories, markStoryViewed, currentUser, allUsers, logout } = useStore();
   const [location, setLocation] = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleNavigation = (path: string) => {
     setLocation(path);
@@ -19,9 +21,19 @@ export default function Home() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* White Sidebar */}
-      <aside className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-200 flex flex-col z-40">
-        <div className="p-6 border-b border-gray-200">
+      <aside className={cn(
+        "fixed left-0 top-0 h-screen bg-white border-r border-gray-200 flex flex-col z-40 transition-all duration-300",
+        sidebarOpen ? "w-64" : "w-0"
+      )}>
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h1 className="font-bold text-2xl text-primary">Authentic</h1>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            data-testid="button-close-sidebar"
+          >
+            <X className="w-5 h-5 text-gray-700" />
+          </button>
         </div>
 
         <nav className="flex-1 py-6 px-4 space-y-2">
@@ -102,8 +114,22 @@ export default function Home() {
         </div>
       </aside>
 
+      {/* Toggle Sidebar Button */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed left-4 top-4 z-30 p-2 hover:bg-muted rounded-lg transition-colors"
+          data-testid="button-open-sidebar"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      )}
+
       {/* Main Content Area */}
-      <div className="ml-64 flex-1 flex flex-col">
+      <div className={cn(
+        "flex-1 flex flex-col transition-all duration-300",
+        sidebarOpen ? "ml-64" : "ml-0"
+      )}>
         {/* Header */}
         <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
           <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Authentic</h1>
