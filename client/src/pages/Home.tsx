@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/BottomNav";
 import { PostCard } from "@/components/PostCard";
 import { useStore } from "@/lib/store";
 import { Heart, Send, PlusSquare } from "lucide-react";
@@ -9,7 +10,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="max-w-2xl mx-auto min-h-screen bg-background">
+    <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-[60px] flex items-center justify-between">
         <h1 className="font-logo text-3xl mt-1 select-none cursor-pointer">InstaClone</h1>
@@ -89,6 +90,8 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      <BottomNav />
     </div>
   );
 }
