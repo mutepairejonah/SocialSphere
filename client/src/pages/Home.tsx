@@ -6,13 +6,13 @@ import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 
 export default function Home() {
-  const { posts, userPosts, stories, markStoryViewed, currentUser, logout, loadUserPosts } = useStore();
+  const { posts, userPosts, stories, markStoryViewed, currentUser, logout, loadUserPosts, loadPosts } = useStore();
   const [, setLocation] = useLocation();
   const [allPostsLoaded, setAllPostsLoaded] = useState(false);
 
   useEffect(() => {
-    loadUserPosts().then(() => setAllPostsLoaded(true));
-  }, [loadUserPosts]);
+    Promise.all([loadPosts(), loadUserPosts()]).then(() => setAllPostsLoaded(true));
+  }, [loadPosts, loadUserPosts]);
 
   const handleLogout = async () => {
     await logout();
