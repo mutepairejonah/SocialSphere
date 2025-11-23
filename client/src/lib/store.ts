@@ -249,8 +249,20 @@ export const useStore = create<StoreState>((set, get) => ({
   signupWithEmail: async (email, pass, fullName) => {
     const result = await createUserWithEmailAndPassword(auth, email, pass);
     const user = result.user;
+    
+    // Generate unique username from email
+    let baseUsername = email.split('@')[0].toLowerCase();
+    let username = baseUsername;
+    let counter = 1;
+    
+    // Ensure username is unique
+    while (!(await get().checkUsernameAvailable(username))) {
+      username = `${baseUsername}${counter}`;
+      counter++;
+    }
+    
     const newUser = {
-      username: email.split('@')[0],
+      username,
       fullName,
       email,
       avatar: '',
@@ -294,9 +306,10 @@ export const useStore = create<StoreState>((set, get) => ({
       
       // Handle avatar upload separately (non-blocking)
       if (updates.avatar && typeof updates.avatar === 'string' && updates.avatar.startsWith('data:')) {
+        const avatarDataUrl = updates.avatar;
         (async () => {
           try {
-            const response = await fetch(updates.avatar);
+            const response = await fetch(avatarDataUrl);
             const blob = await response.blob();
             const storageRef = ref(storage, `avatars/${currentUser.id}`);
             await uploadBytes(storageRef, blob);
