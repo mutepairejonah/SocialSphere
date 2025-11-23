@@ -541,9 +541,9 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) return;
 
     try {
-      // For Instagram posts (start with 'ig_' or long numeric IDs), just toggle local state
+      // For Instagram posts (long numeric IDs), just toggle local state
       const post = get().posts.find(p => p.id === postId);
-      if (post?.id.toString().length > 20 || post?.userId.startsWith('ig_')) {
+      if (post && (post.id.toString().length > 20 || (post.userId && typeof post.userId === 'string' && post.userId.startsWith('ig_')))) {
         // Instagram post - toggle locally
         set(state => ({
           posts: state.posts.map(p =>

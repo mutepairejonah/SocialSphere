@@ -186,8 +186,9 @@ export default function EditProfile() {
         {/* Form */}
         <div className="space-y-4">
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-muted-foreground">Name</label>
+            <label htmlFor="edit-fullname" className="text-sm font-semibold text-muted-foreground">Name</label>
             <Input 
+              id="edit-fullname"
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
@@ -198,8 +199,9 @@ export default function EditProfile() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-muted-foreground">Username</label>
+            <label htmlFor="edit-username" className="text-sm font-semibold text-muted-foreground">Username</label>
             <Input 
+              id="edit-username"
               name="username"
               value={formData.username}
               onChange={handleChange}
@@ -210,8 +212,9 @@ export default function EditProfile() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-muted-foreground">Bio</label>
+            <label htmlFor="edit-bio" className="text-sm font-semibold text-muted-foreground">Bio</label>
             <Textarea 
+              id="edit-bio"
               name="bio"
               value={formData.bio}
               onChange={handleChange}
@@ -223,8 +226,9 @@ export default function EditProfile() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-muted-foreground">Website</label>
+            <label htmlFor="edit-website" className="text-sm font-semibold text-muted-foreground">Website</label>
             <Input 
+              id="edit-website"
               name="website"
               value={formData.website}
               onChange={handleChange}

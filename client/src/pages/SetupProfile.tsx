@@ -109,9 +109,10 @@ export default function SetupProfile() {
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-2">
-            <label className="text-sm font-semibold">Username</label>
+            <label htmlFor="setup-username" className="text-sm font-semibold">Username</label>
             <div className="relative">
               <Input 
+                id="setup-username"
                 placeholder="username" 
                 className="bg-muted/50 border-0 focus-visible:ring-0 h-11 px-3"
                 value={username}

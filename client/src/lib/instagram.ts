@@ -120,4 +120,18 @@ export async function getUserInsights(userId: string = 'me'): Promise<any> {
   }
 }
 
+/**
+ * Get user profile data
+ */
+export async function getUserProfile(userId: string = 'me'): Promise<any> {
+  try {
+    const response = await makeInstagramRequest(`${userId}?fields=id,name,biography,website,profile_picture_url,followers_count,follows_count,media_count`);
+    console.log('Profile response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    return null;
+  }
+}
+
 export default INSTAGRAM_API_CONFIG;
