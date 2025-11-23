@@ -131,6 +131,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/search/users", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      if (!query) return res.json([]);
+      
+      const results = await storage.searchUsers(query);
+      res.json(results);
+    } catch (error) {
+      console.error("Search users error:", error);
+      res.json([]);
+    }
+  });
+
   app.post("/api/follow/:userId", async (req, res) => {
     try {
       const { followerId } = req.body;
