@@ -433,7 +433,7 @@ export const useStore = create<StoreState>((set, get) => ({
     try {
       const postRef = await addDoc(collection(db, 'posts'), {
         ...newPost,
-        timestamp: Timestamp.now(),
+        createdAt: Timestamp.now(),
         likes: 0,
         comments: 0,
       });
@@ -444,7 +444,7 @@ export const useStore = create<StoreState>((set, get) => ({
           posts: [{
             id: postData.id,
             ...postData.data(),
-            timestamp: new Date(postData.data().timestamp.toDate()).toLocaleString(),
+            timestamp: new Date(postData.data().createdAt.toDate()).toLocaleString(),
             isLiked: false,
             isSaved: false
           } as Post, ...state.posts]
