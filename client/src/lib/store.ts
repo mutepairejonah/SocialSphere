@@ -501,12 +501,55 @@ export const useStore = create<StoreState>((set, get) => ({
       const snapshot = await getDocs(usersQuery);
       const currentUserId = get().currentUser?.id;
       
+      // Create demo users if database is empty
+      if (snapshot.empty && currentUserId) {
+        const demoUsers = [
+          { username: 'alex_photo', fullName: 'Alex Johnson', bio: 'Travel photographer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alex123' },
+          { username: 'sophia_art', fullName: 'Sophia Martinez', bio: 'Digital artist & designer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sophia456' },
+          { username: 'mike_tech', fullName: 'Mike Chen', bio: 'Tech enthusiast & coder', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=mike789' },
+          { username: 'emma_fitness', fullName: 'Emma Wilson', bio: 'Fitness coach & wellness', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma101' },
+          { username: 'ryan_music', fullName: 'Ryan Blake', bio: 'Musician & producer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ryan202' },
+        ];
+
+        const users: User[] = [];
+        for (const demo of demoUsers) {
+          const demoId = `demo_${demo.username}`;
+          await setDoc(doc(db, 'users', demoId), {
+            ...demo,
+            email: `${demo.username}@demo.com`,
+            followers: Math.floor(Math.random() * 5000) + 100,
+            following: Math.floor(Math.random() * 500) + 50,
+            createdAt: Timestamp.now()
+          });
+          users.push({
+            id: demoId,
+            ...demo,
+            email: `${demo.username}@demo.com`,
+            followers: Math.floor(Math.random() * 5000) + 100,
+            following: Math.floor(Math.random() * 500) + 50,
+            isFollowing: false
+          } as User);
+        }
+        set({ allUsers: users });
+        return;
+      }
+
       const users = snapshot.docs
         .filter(doc => doc.id !== currentUserId)
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as User));
+        .map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            username: data.username || `user_${doc.id.substring(0, 8)}`,
+            fullName: data.fullName || 'User',
+            email: data.email || '',
+            avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${doc.id}`,
+            bio: data.bio || '',
+            followers: data.followers || 0,
+            following: data.following || 0,
+            website: data.website
+          } as User;
+        });
 
       // Load follow status for each user
       const usersWithFollowStatus = await Promise.all(
@@ -658,19 +701,12 @@ export const useStore = create<StoreState>((set, get) => ({
 
     try {
       const searchLower = searchTerm.toLowerCase();
-      const usersQuery = query(collection(db, 'users'));
-      const snapshot = await getDocs(usersQuery);
-      const currentUserId = get().currentUser?.id;
+      const allUsers = get().allUsers;
       
-      const users = snapshot.docs
-        .filter(doc => doc.id !== currentUserId)
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as User))
+      const users = allUsers
         .filter(user => 
-          user.username.toLowerCase().includes(searchLower) || 
-          user.fullName.toLowerCase().includes(searchLower)
+          (user.username && user.username.toLowerCase().includes(searchLower)) || 
+          (user.fullName && user.fullName.toLowerCase().includes(searchLower))
         );
 
       // Load follow status for each user
