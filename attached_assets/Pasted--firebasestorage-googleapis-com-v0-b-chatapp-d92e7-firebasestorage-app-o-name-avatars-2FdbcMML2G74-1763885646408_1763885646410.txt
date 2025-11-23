@@ -1,0 +1,98 @@
+://firebasestorage.googleapis.com/v0/b/chatapp-d92e7.firebasestorage.app/o?name=avatars%2FdbcMML2G74Rl4YKhT8VupNOSlDo1 net::ERR_FAILED
+send @ firebase_storage.js?v=157e3e05:1498
+doTheRequest @ firebase_storage.js?v=157e3e05:456
+(anonymous) @ firebase_storage.js?v=157e3e05:279
+setTimeout
+callWithDelay @ firebase_storage.js?v=157e3e05:277
+start @ firebase_storage.js?v=157e3e05:337
+start_ @ firebase_storage.js?v=157e3e05:510
+(anonymous) @ firebase_storage.js?v=157e3e05:432
+NetworkRequest @ firebase_storage.js?v=157e3e05:429
+makeRequest @ firebase_storage.js?v=157e3e05:562
+_makeRequest @ firebase_storage.js?v=157e3e05:2417
+makeRequestWithTokens @ firebase_storage.js?v=157e3e05:2430
+await in makeRequestWithTokens
+uploadBytes$1 @ firebase_storage.js?v=157e3e05:2146
+uploadBytes @ firebase_storage.js?v=157e3e05:2442
+(anonymous) @ store.ts:297
+await in (anonymous)
+updateProfile @ store.ts:306
+handleSave @ EditProfile.tsx:72
+executeDispatch @ react-dom_client.js?v=157e3e05:13622
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+processDispatchQueue @ react-dom_client.js?v=157e3e05:13658
+(anonymous) @ react-dom_client.js?v=157e3e05:14071
+batchedUpdates$1 @ react-dom_client.js?v=157e3e05:2626
+dispatchEventForPluginEventSystem @ react-dom_client.js?v=157e3e05:13763
+dispatchEvent @ react-dom_client.js?v=157e3e05:16784
+dispatchDiscreteEvent @ react-dom_client.js?v=157e3e05:16765
+<button>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=157e3e05:247
+_c @ button.tsx:55
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18509
+renderWithHooks @ react-dom_client.js?v=157e3e05:5654
+updateForwardRef @ react-dom_client.js?v=157e3e05:7198
+beginWork @ react-dom_client.js?v=157e3e05:8735
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+performUnitOfWork @ react-dom_client.js?v=157e3e05:12561
+workLoopSync @ react-dom_client.js?v=157e3e05:12424
+renderRootSync @ react-dom_client.js?v=157e3e05:12408
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11766
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+processRootScheduleInMicrotask @ react-dom_client.js?v=157e3e05:13437
+(anonymous) @ react-dom_client.js?v=157e3e05:13531
+<Button>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=157e3e05:247
+EditProfile @ EditProfile.tsx:98
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18509
+renderWithHooks @ react-dom_client.js?v=157e3e05:5654
+updateFunctionComponent @ react-dom_client.js?v=157e3e05:7475
+beginWork @ react-dom_client.js?v=157e3e05:8525
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+performUnitOfWork @ react-dom_client.js?v=157e3e05:12561
+workLoopSync @ react-dom_client.js?v=157e3e05:12424
+renderRootSync @ react-dom_client.js?v=157e3e05:12408
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11766
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+processRootScheduleInMicrotask @ react-dom_client.js?v=157e3e05:13437
+(anonymous) @ react-dom_client.js?v=157e3e05:13531
+<EditProfile>
+exports.createElement @ chunk-KMU3Z7QX.js?v=157e3e05:793
+h_route @ wouter.js?v=157e3e05:181
+Route @ wouter.js?v=157e3e05:200
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18509
+renderWithHooks @ react-dom_client.js?v=157e3e05:5654
+updateFunctionComponent @ react-dom_client.js?v=157e3e05:7475
+beginWork @ react-dom_client.js?v=157e3e05:8525
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+performUnitOfWork @ react-dom_client.js?v=157e3e05:12561
+workLoopSync @ react-dom_client.js?v=157e3e05:12424
+renderRootSync @ react-dom_client.js?v=157e3e05:12408
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11766
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+processRootScheduleInMicrotask @ react-dom_client.js?v=157e3e05:13437
+(anonymous) @ react-dom_client.js?v=157e3e05:13531
+<Route>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=157e3e05:247
+App @ App.tsx:45
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18509
+renderWithHooks @ react-dom_client.js?v=157e3e05:5654
+updateFunctionComponent @ react-dom_client.js?v=157e3e05:7475
+beginWork @ react-dom_client.js?v=157e3e05:8525
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+performUnitOfWork @ react-dom_client.js?v=157e3e05:12561
+workLoopSync @ react-dom_client.js?v=157e3e05:12424
+renderRootSync @ react-dom_client.js?v=157e3e05:12408
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11766
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+processRootScheduleInMicrotask @ react-dom_client.js?v=157e3e05:13437
+(anonymous) @ react-dom_client.js?v=157e3e05:13531
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=157e3e05:247
+(anonymous) @ main.tsx:5Understand this error
+20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/profile/edit:1 Access to XMLHttpRequest at 'https://firebasestorage.googleapis.com/v0/b/chatapp-d92e7.firebasestorage.app/o?name=avatars%2FdbcMML2G74Rl4YKhT8VupNOSlDo1' from origin 'https://20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.Understand this error
+store.ts:297  POST https://firebasestorage.googleapis.com/v0/b/chatapp-d92e7.firebasestorage.app/o?name=avatars%2FdbcMML2G74Rl4YKhT8VupNOSlDo1 net::ERR_FAILED

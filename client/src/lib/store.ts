@@ -85,6 +85,10 @@ interface StoreState {
   completeGoogleSignup: (username: string) => Promise<void>;
   searchUsers: (searchTerm: string) => Promise<User[]>;
   loadFollowStatus: (userId: string) => Promise<boolean>;
+  sendMessage: (recipientId: string, message: string) => Promise<void>;
+  getMessages: (recipientId: string) => Promise<any[]>;
+  startCall: (recipientId: string, callType: 'audio' | 'video') => Promise<string>;
+  endCall: (callId: string) => Promise<void>;
 }
 
 export const useStore = create<StoreState>((set, get) => ({
@@ -292,7 +296,8 @@ export const useStore = create<StoreState>((set, get) => ({
       if (updates.avatar && updates.avatar.startsWith('data:')) {
         (async () => {
           try {
-            const blob = await (await fetch(updates.avatar)).blob();
+            const response = await fetch(updates.avatar);
+            const blob = await response.blob();
             const storageRef = ref(storage, `avatars/${currentUser.id}`);
             await uploadBytes(storageRef, blob);
             const downloadURL = await getDownloadURL(storageRef);

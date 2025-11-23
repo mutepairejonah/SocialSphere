@@ -188,7 +188,7 @@ export default function Messages() {
               >
                 <p className="text-sm">{msg.message}</p>
                 <p className={`text-xs mt-1 ${msg.senderId === currentUser.id ? 'text-blue-100' : 'text-muted-foreground'}`}>
-                  {new Date(msg.timestamp?.toDate?.()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {msg.timestamp?.toDate ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'}
                 </p>
               </div>
             </div>
