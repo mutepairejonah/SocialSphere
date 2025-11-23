@@ -220,11 +220,13 @@ export default function Messages() {
               }
             }}
             className="bg-muted/50 border-0 focus-visible:ring-0 h-10"
+            data-testid="input-message"
           />
           <Button
             size="icon"
             onClick={handleSendMessage}
             disabled={!messageInput.trim()}
+            data-testid="button-send"
           >
             <Send className="w-4 h-4" />
           </Button>
