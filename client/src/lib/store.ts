@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { auth, db, storage } from './firebase';
+import { auth, db, storage, rtdb } from './firebase';
 import { 
   signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, signOut, User as FirebaseUser, onAuthStateChanged 
@@ -9,6 +9,7 @@ import {
   deleteDoc, arrayUnion, arrayRemove, Timestamp, writeBatch
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref as dbRef, push, set, get as getDbValue, onValue, off } from 'firebase/database';
 
 export interface User {
   id: string;
@@ -296,7 +297,8 @@ export const useStore = create<StoreState>((set, get) => ({
       if (updates.avatar && updates.avatar.startsWith('data:')) {
         (async () => {
           try {
-            const response = await fetch(updates.avatar);
+            const avatarUrl = updates.avatar;
+            const response = await fetch(avatarUrl);
             const blob = await response.blob();
             const storageRef = ref(storage, `avatars/${currentUser.id}`);
             await uploadBytes(storageRef, blob);
@@ -636,21 +638,20 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   },
 
-  // Messaging functions
+  // Messaging functions - Using Firebase Realtime Database
   sendMessage: async (recipientId: string, message: string) => {
     const currentUser = get().currentUser;
     if (!currentUser) throw new Error('Not authenticated');
 
     try {
       const conversationId = [currentUser.id, recipientId].sort().join('_');
-      const messagesRef = collection(db, 'messages');
+      const messagesRef = dbRef(rtdb, `messages/${conversationId}`);
       
-      await addDoc(messagesRef, {
-        conversationId,
+      await push(messagesRef, {
         senderId: currentUser.id,
         recipientId,
         message,
-        timestamp: Timestamp.now(),
+        timestamp: Date.now(),
         read: false
       });
     } catch (error) {
@@ -665,16 +666,20 @@ export const useStore = create<StoreState>((set, get) => ({
 
     try {
       const conversationId = [currentUser.id, recipientId].sort().join('_');
-      const messagesRef = query(
-        collection(db, 'messages'),
-        where('conversationId', '==', conversationId)
-      );
+      const messagesRef = dbRef(rtdb, `messages/${conversationId}`);
       
-      const snapshot = await getDocs(messagesRef);
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })).sort((a: any, b: any) => a.timestamp?.toDate?.() - b.timestamp?.toDate?.());
+      const snapshot = await getDbValue(messagesRef);
+      if (!snapshot.exists()) return [];
+      
+      const messages: any[] = [];
+      snapshot.forEach(childSnapshot => {
+        messages.push({
+          id: childSnapshot.key,
+          ...childSnapshot.val()
+        });
+      });
+      
+      return messages.sort((a, b) => a.timestamp - b.timestamp);
     } catch (error) {
       console.error('Error fetching messages:', error);
       return [];
@@ -686,15 +691,17 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) throw new Error('Not authenticated');
 
     try {
-      const callRef = await addDoc(collection(db, 'calls'), {
+      const callsRef = dbRef(rtdb, 'calls');
+      const callData = {
         callerId: currentUser.id,
         recipientId,
         callType,
         status: 'ringing',
-        createdAt: Timestamp.now()
-      });
-
-      return callRef.id;
+        createdAt: Date.now()
+      };
+      
+      const newCallRef = await push(callsRef, callData);
+      return newCallRef.key || '';
     } catch (error) {
       console.error('Error starting call:', error);
       throw error;
@@ -703,10 +710,11 @@ export const useStore = create<StoreState>((set, get) => ({
 
   endCall: async (callId: string) => {
     try {
-      await updateDoc(doc(db, 'calls', callId), {
+      const callRef = dbRef(rtdb, `calls/${callId}`);
+      await set(callRef, {
         status: 'ended',
-        endedAt: Timestamp.now()
-      });
+        endedAt: Date.now()
+      }, { merge: true });
     } catch (error) {
       console.error('Error ending call:', error);
     }
