@@ -1,4 +1,5 @@
 import { PostCard } from "@/components/PostCard";
+import { BottomNav } from "@/components/BottomNav";
 import { useStore } from "@/lib/store";
 import { Heart, Send, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings, PlusSquare, X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,7 +9,7 @@ import { useState } from "react";
 export default function Home() {
   const { posts, stories, markStoryViewed, currentUser, allUsers, logout } = useStore();
   const [location, setLocation] = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleNavigation = (path: string) => {
     setLocation(path);
@@ -220,6 +221,9 @@ export default function Home() {
           )}
         </main>
       </div>
+
+      {/* Bottom Navigation */}
+      <BottomNav onMenuClick={() => setSidebarOpen(true)} />
     </div>
   );
 }

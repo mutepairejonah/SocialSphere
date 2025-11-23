@@ -1,9 +1,9 @@
 import { Link, useLocation } from "wouter";
-import { House, Search, PlusSquare, Heart, MessageCircle } from "lucide-react";
+import { House, Search, PlusSquare, Heart, MessageCircle, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 
-export function BottomNav() {
+export function BottomNav({ onMenuClick }: { onMenuClick?: () => void }) {
   const [location] = useLocation();
   const currentUser = useStore((state) => state.currentUser);
 
@@ -38,6 +38,15 @@ export function BottomNav() {
           );
         })}
         
+        {/* Menu Button */}
+        <button 
+          onClick={onMenuClick}
+          className="p-2 cursor-pointer transition-all flex items-center justify-center w-10 h-10"
+          data-testid="button-footer-menu"
+        >
+          <Menu className="w-5 h-5 text-foreground/60 hover:text-foreground transition-colors" />
+        </button>
+
         {/* Profile Icon Special Case */}
         <Link href="/profile">
            <div className="p-2 cursor-pointer transition-all flex items-center justify-center w-10 h-10">
