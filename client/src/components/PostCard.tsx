@@ -1,10 +1,10 @@
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal } from "lucide-react";
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Volume2, VolumeX } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Post, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface PostCardProps {
   post: Post;
@@ -13,8 +13,9 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
   const { toggleLike, toggleSave } = useStore();
   const [isLikedAnim, setIsLikedAnim] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const videoRef = useState<HTMLVideoElement | null>(null)[1];
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
 
   const handleLike = () => {
     toggleLike(post.id);
@@ -24,8 +25,15 @@ export function PostCard({ post }: PostCardProps) {
     }
   };
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+  const handleVideoClick = () => {
+    if (post.mediaType === 'VIDEO' && post.videoUrl) {
+      setIsFullscreen(true);
+      setIsMuted(false);
+    }
+  };
+
+  const handleToggleMute = () => {
+    setIsMuted(!isMuted);
   };
 
   return (
@@ -53,11 +61,10 @@ export function PostCard({ post }: PostCardProps) {
       </div>
 
       {/* Media - Image or Video */}
-      <div className="relative aspect-square bg-muted overflow-hidden group" onDoubleClick={handleLike}>
+      <div className="relative aspect-square bg-muted overflow-hidden group cursor-pointer" onDoubleClick={handleLike} onClick={handleVideoClick}>
         {post.mediaType === 'VIDEO' && post.videoUrl ? (
           <>
             <video 
-              ref={videoRef as any}
               src={post.videoUrl}
               autoPlay
               loop
@@ -65,34 +72,13 @@ export function PostCard({ post }: PostCardProps) {
               playsInline
               className="w-full h-full object-cover bg-black"
             />
-            {/* Video overlay with play/pause and mute buttons */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-3">
-              <div className="flex justify-end">
-                <button 
-                  className="bg-white/30 hover:bg-white/50 backdrop-blur-sm rounded-full p-2 transition-all"
-                  aria-label="Mute"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (videoRef) (videoRef as any).muted = !(videoRef as any).muted;
-                  }}
-                >
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.31-2.5-4.06v8.12c1.48-.75 2.5-2.28 2.5-4.06zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                  </svg>
-                </button>
-              </div>
-              <button 
-                className="bg-white/30 hover:bg-white/50 backdrop-blur-sm rounded-full p-4 transition-all self-center"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePlayPause();
-                }}
-                aria-label="Play/Pause"
-              >
+            {/* Video overlay hint */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+              <div className="bg-white/30 hover:bg-white/50 backdrop-blur-sm rounded-full p-4">
                 <svg className="w-8 h-8 text-white fill-white" viewBox="0 0 24 24">
                   <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
-              </button>
+              </div>
             </div>
             {/* Video badge */}
             <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-2 py-1 rounded pointer-events-none">
@@ -120,6 +106,55 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         )}
       </div>
+
+      {/* Fullscreen Video Modal */}
+      {isFullscreen && post.mediaType === 'VIDEO' && post.videoUrl && (
+        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center" onClick={() => setIsFullscreen(false)}>
+          <div className="w-full h-full flex flex-col items-center justify-center relative" onClick={(e) => e.stopPropagation()}>
+            <video 
+              ref={fullscreenVideoRef}
+              src={post.videoUrl}
+              autoPlay
+              controls={false}
+              muted={isMuted}
+              playsInline
+              className="w-full h-full object-contain bg-black"
+            />
+            
+            {/* Fullscreen Controls */}
+            <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleMute();
+                }}
+                className="bg-white/30 hover:bg-white/50 backdrop-blur-sm rounded-full p-3 transition-all"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? (
+                  <VolumeX className="w-6 h-6 text-white" />
+                ) : (
+                  <Volume2 className="w-6 h-6 text-white" />
+                )}
+              </button>
+            </div>
+
+            {/* Close button */}
+            <button 
+              onClick={() => setIsFullscreen(false)}
+              className="absolute top-4 right-4 bg-white/30 hover:bg-white/50 backdrop-blur-sm rounded-full p-2 transition-all"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Tap to close hint */}
+            <div className="absolute top-4 left-4 text-white/60 text-sm">
+              Click to close
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="p-3">
