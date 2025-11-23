@@ -154,5 +154,6 @@ export default function Explore() {
       </main>
 
       <BottomNav />
+    </div>
   );
 }

@@ -223,7 +223,7 @@ export default function Home() {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav onMenuClick={() => setSidebarOpen(true)} />
+      <BottomNav />
     </div>
   );
 }
