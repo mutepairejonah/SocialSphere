@@ -67,6 +67,10 @@ export default function Messages() {
       await sendMessage(selectedUserId, messageInput);
       setMessageInput("");
       loadMessages();
+      toast({
+        title: "Message Sent",
+        description: `Message sent to ${selectedUser?.username}`
+      });
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -105,7 +109,7 @@ export default function Messages() {
 
   if (!selectedUserId) {
     return (
-      <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
+      <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
         <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-14 flex items-center">
           <h1 className="font-bold text-xl">{currentUser.username}</h1>
         </header>
@@ -149,7 +153,7 @@ export default function Messages() {
   const selectedUser = followingUsers.find(u => u.id === selectedUserId);
 
   return (
-    <div className="pb-20 max-w-md mx-auto min-h-screen bg-background flex flex-col">
+    <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background flex flex-col">
       <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={() => setSelectedUserId(null)}>

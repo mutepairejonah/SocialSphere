@@ -43,10 +43,11 @@ export interface Post {
 
 export interface Notification {
   id: string;
-  type: 'like' | 'comment' | 'follow';
+  type: 'like' | 'comment' | 'follow' | 'message';
   userId: string;
   fromUserId?: string;
   postId?: string;
+  messageText?: string;
   timestamp: string;
   read: boolean;
   userAvatar: string;
@@ -702,6 +703,7 @@ export const useStore = create<StoreState>((set, get) => ({
       const conversationId = [currentUser.id, recipientId].sort().join('_');
       const messagesRef = collection(db, 'messages');
       
+      // Send the message
       await addDoc(messagesRef, {
         conversationId,
         senderId: currentUser.id,
@@ -709,6 +711,20 @@ export const useStore = create<StoreState>((set, get) => ({
         message,
         timestamp: Timestamp.now(),
         read: false
+      });
+
+      // Create a notification for the recipient
+      const recipientDoc = await getDoc(doc(db, 'users', recipientId));
+      const recipientData = recipientDoc.data();
+      
+      await addDoc(collection(db, 'notifications'), {
+        type: 'message',
+        userId: recipientId,
+        fromUserId: currentUser.id,
+        messageText: message.substring(0, 100),
+        timestamp: Timestamp.now(),
+        read: false,
+        userAvatar: currentUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.id}`
       });
     } catch (error) {
       console.error('Error sending message:', error);
