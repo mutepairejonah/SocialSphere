@@ -195,6 +195,7 @@ export default function EditProfile() {
               className="bg-muted/50 border-0 focus-visible:ring-0 h-10 px-3"
               placeholder="Full Name"
               disabled={loading}
+              required
             />
           </div>
 
@@ -208,6 +209,7 @@ export default function EditProfile() {
               className="bg-muted/50 border-0 focus-visible:ring-0 h-10 px-3"
               placeholder="username"
               disabled={loading}
+              required
             />
           </div>
 
@@ -222,6 +224,7 @@ export default function EditProfile() {
               placeholder="Bio"
               rows={3}
               disabled={loading}
+              aria-label="Bio"
             />
           </div>
 
@@ -235,6 +238,7 @@ export default function EditProfile() {
               className="bg-muted/50 border-0 focus-visible:ring-0 h-10 px-3"
               placeholder="Website"
               disabled={loading}
+              type="url"
             />
           </div>
         </div>

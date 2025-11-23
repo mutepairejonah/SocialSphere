@@ -113,6 +113,7 @@ export default function SetupProfile() {
             <div className="relative">
               <Input 
                 id="setup-username"
+                name="username"
                 placeholder="username" 
                 className="bg-muted/50 border-0 focus-visible:ring-0 h-11 px-3"
                 value={username}
@@ -120,6 +121,7 @@ export default function SetupProfile() {
                 disabled={loading}
                 autoFocus
                 minLength={3}
+                required
               />
               {username && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">

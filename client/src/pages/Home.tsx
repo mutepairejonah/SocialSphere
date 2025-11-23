@@ -9,20 +9,22 @@ export default function Home() {
   const { posts, stories, markStoryViewed, currentUser } = useStore();
 
   return (
-    <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
+    <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-[60px] flex items-center justify-between">
         <h1 className="font-logo text-3xl mt-1 select-none cursor-pointer">InstaClone</h1>
         <div className="flex items-center gap-6">
           <Link href="/activity">
-             <Heart className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform" />
+             <Heart className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform" data-testid="button-notifications" />
           </Link>
-          <div className="relative cursor-pointer hover:scale-105 transition-transform">
-            <Send className="w-6 h-6 -rotate-[15deg] mb-1" />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border-[2px] border-background">
-              2
-            </span>
-          </div>
+          <Link href="/messages">
+            <div className="relative cursor-pointer hover:scale-105 transition-transform" data-testid="button-messages">
+              <Send className="w-6 h-6 -rotate-[15deg] mb-1" />
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border-[2px] border-background">
+                2
+              </span>
+            </div>
+          </Link>
         </div>
       </header>
 
