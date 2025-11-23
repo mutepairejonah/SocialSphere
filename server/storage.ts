@@ -1,6 +1,6 @@
 import { db } from "../shared/db";
 import { users, posts, stories, follows, messages, comments } from "../shared/schema";
-import { eq, like, and, desc, sql } from "drizzle-orm";
+import { eq, like, and, desc, sql, inArray } from "drizzle-orm";
 import type { InsertUser, InsertPost, InsertStory, User, Post, Story } from "../shared/schema";
 
 export interface IStorage {
@@ -145,7 +145,7 @@ export class PostgresStorage implements IStorage {
     if (followingIds.length === 0) return [];
     
     return db.select().from(posts)
-      .where(sql`${posts.userId} IN (${sql.raw(followingIds.map(id => `'${id}'`).join(','))})`)
+      .where(inArray(posts.userId, followingIds))
       .orderBy(desc(posts.createdAt));
   }
 
@@ -156,7 +156,7 @@ export class PostgresStorage implements IStorage {
     const oneDay = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return db.select().from(stories)
       .where(and(
-        sql`${stories.userId} IN (${sql.raw(followingIds.map(id => `'${id}'`).join(','))})`,
+        inArray(stories.userId, followingIds),
         sql`${stories.createdAt} > ${oneDay}`
       ))
       .orderBy(desc(stories.createdAt));
@@ -169,7 +169,7 @@ export class PostgresStorage implements IStorage {
     if (followerIds.length === 0) return [];
     
     return db.select().from(users)
-      .where(sql`${users.id} IN (${sql.raw(followerIds.map(f => `'${f.followerId}'`).join(','))})`);
+      .where(inArray(users.id, followerIds.map(f => f.followerId)));
   }
 
   async getFollowing(userId: string): Promise<User[]> {
@@ -179,7 +179,7 @@ export class PostgresStorage implements IStorage {
     if (followingIds.length === 0) return [];
     
     return db.select().from(users)
-      .where(sql`${users.id} IN (${sql.raw(followingIds.map(f => `'${f.followingId}'`).join(','))})`);
+      .where(inArray(users.id, followingIds.map(f => f.followingId)));
   }
 
   async getMessages(senderId: string, recipientId: string): Promise<any[]> {
