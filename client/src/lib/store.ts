@@ -442,8 +442,8 @@ export const useStore = create<StoreState>((set, get) => ({
 
   loadPosts: async () => {
     try {
-      // Load posts from Instagram API
-      console.log('Starting loadPosts from Instagram API...');
+      // Load posts from Instagram API with real engagement data
+      console.log('Starting loadPosts from Instagram API with real metrics...');
       const instagramPosts = await getUserMedia();
       console.log('Instagram posts received:', instagramPosts);
       
@@ -451,27 +451,39 @@ export const useStore = create<StoreState>((set, get) => ({
         const currentUser = get().currentUser;
         const posts = instagramPosts.map((igPost: any, index: number) => {
           const timestamp = igPost.timestamp || new Date().toISOString();
-          const mediaUrl = igPost.media_type === 'IMAGE' ? igPost.media_url : (igPost.thumbnail_url || 'https://via.placeholder.com/500?text=Instagram+Post');
+          
+          // Use HD quality image URLs with proper sizing
+          let imageUrl = 'https://via.placeholder.com/1080x1350?text=Post';
+          if (igPost.media_type === 'IMAGE' && igPost.media_url) {
+            // Add quality parameters for HD display
+            imageUrl = `${igPost.media_url}?quality=95&format=auto`;
+          } else if (igPost.media_type === 'VIDEO' && igPost.thumbnail_url) {
+            imageUrl = `${igPost.thumbnail_url}?quality=95&format=auto`;
+          }
+          
+          // Use real Instagram engagement metrics
+          const realLikes = igPost.like_count || 0;
+          const realComments = igPost.comments_count || 0;
           
           return {
             id: igPost.id || `ig_${index}`,
             userId: currentUser?.id || 'instagram',
             username: currentUser?.username || 'Instagram',
             userAvatar: currentUser?.avatar,
-            imageUrl: mediaUrl,
+            imageUrl: imageUrl,
             videoUrl: igPost.media_type === 'VIDEO' ? igPost.media_url : undefined,
             mediaType: igPost.media_type as 'IMAGE' | 'VIDEO',
             caption: igPost.caption || '(No caption)',
-            likes: 0,
+            likes: realLikes,
             location: '',
             timestamp: new Date(timestamp).toLocaleString(),
-            comments: 0,
+            comments: realComments,
             isLiked: false,
             isSaved: false
           } as Post;
         });
         
-        console.log('Transformed posts:', posts);
+        console.log('Transformed posts with real Instagram metrics:', posts);
         set({ posts });
       } else {
         console.log('No Instagram posts found or invalid response');

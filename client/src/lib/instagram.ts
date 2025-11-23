@@ -78,14 +78,18 @@ export async function makeInstagramRequest(
 }
 
 /**
- * Get user media from Instagram
+ * Get user media from Instagram with engagement metrics
  */
 export async function getUserMedia(userId?: string): Promise<any> {
   try {
     // Use business account ID if available, otherwise use 'me'
     const accountId = userId || INSTAGRAM_API_CONFIG.businessAccountId || 'me';
     console.log('Fetching media for account:', accountId);
-    const response = await makeInstagramRequest(`${accountId}?fields=id,name,media.limit(10){id,caption,media_type,media_url,thumbnail_url,timestamp}`);
+    
+    // Fetch media with engagement metrics (like_count, comments_count)
+    const response = await makeInstagramRequest(
+      `${accountId}?fields=id,name,media.limit(25){id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count,insights.metric(engagement,impressions,reach){values}}`
+    );
     console.log('Instagram API response:', response);
     
     // Handle nested response format: response.media.data
@@ -104,6 +108,21 @@ export async function getUserMedia(userId?: string): Promise<any> {
   } catch (error) {
     console.error('Error fetching user media:', error);
     return [];
+  }
+}
+
+/**
+ * Get media insights for engagement data
+ */
+export async function getMediaInsights(mediaId: string): Promise<any> {
+  try {
+    const response = await makeInstagramRequest(
+      `${mediaId}?fields=like_count,comments_count,engagement,impressions,reach`
+    );
+    return response;
+  } catch (error) {
+    console.error('Error fetching media insights:', error);
+    return null;
   }
 }
 
