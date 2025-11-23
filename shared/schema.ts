@@ -1,256 +1,128 @@
+import { pgTable, varchar, text, timestamp, boolean, integer, decimal, json, uuid, unique } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { z } from "zod";
 
-// ========== USERS ==========
-export const userSchema = z.object({
-  id: z.string().uuid(),
-  username: z.string().min(3).max(30).unique("Username already taken"),
-  email: z.string().email().unique("Email already registered"),
-  fullName: z.string().max(100),
+// ========== USERS TABLE ==========
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey(),
+  username: varchar("username", { length: 30 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  fullName: varchar("full_name", { length: 100 }),
+  bio: text("bio"),
+  avatar: varchar("avatar", { length: 500 }),
+  website: varchar("website", { length: 500 }),
+  isPrivate: boolean("is_private").default(false),
+  isVerified: boolean("is_verified").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ========== STORIES TABLE ==========
+export const stories = pgTable("stories", {
+  id: varchar("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  imageUrl: varchar("image_url", { length: 500 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+  isViewed: boolean("is_viewed").default(false),
+});
+
+// ========== POSTS TABLE ==========
+export const posts = pgTable("posts", {
+  id: varchar("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  caption: text("caption"),
+  imageUrl: varchar("image_url", { length: 500 }),
+  videoUrl: varchar("video_url", { length: 500 }),
+  mediaType: varchar("media_type", { length: 20 }).default("IMAGE"),
+  location: varchar("location", { length: 255 }),
+  likes: integer("likes").default(0),
+  commentCount: integer("comment_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ========== FOLLOWS TABLE ==========
+export const follows = pgTable("follows", {
+  id: varchar("id").primaryKey(),
+  followerId: varchar("follower_id").notNull().references(() => users.id),
+  followingId: varchar("following_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  unique("unique_follow").on(table.followerId, table.followingId)
+]);
+
+// ========== MESSAGES TABLE ==========
+export const messages = pgTable("messages", {
+  id: varchar("id").primaryKey(),
+  senderId: varchar("sender_id").notNull().references(() => users.id),
+  recipientId: varchar("recipient_id").notNull().references(() => users.id),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ========== COMMENTS TABLE ==========
+export const comments = pgTable("comments", {
+  id: varchar("id").primaryKey(),
+  postId: varchar("post_id").notNull().references(() => posts.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  text: text("text").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+  stories: many(stories),
+  messagesFrom: many(messages, { relationName: "sender" }),
+  messagesTo: many(messages, { relationName: "recipient" }),
+  followedBy: many(follows, { relationName: "follower" }),
+  following: many(follows, { relationName: "following" }),
+}));
+
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  user: one(users, { fields: [posts.userId], references: [users.id] }),
+  comments: many(comments),
+}));
+
+export const storiesRelations = relations(stories, ({ one }) => ({
+  user: one(users, { fields: [stories.userId], references: [users.id] }),
+}));
+
+// Zod schemas for validation
+export const insertUserSchema = z.object({
+  id: z.string(),
+  username: z.string().min(3).max(30),
+  email: z.string().email(),
+  fullName: z.string().max(100).optional(),
   bio: z.string().max(500).optional(),
-  avatarUrl: z.string().url().optional(),
+  avatar: z.string().url().optional(),
   website: z.string().url().optional(),
-  isPrivate: z.boolean().default(false),
-  isVerified: z.boolean().default(false),
-  isActive: z.boolean().default(true),
-  accountType: z.enum(["personal", "creator", "business"]).default("personal"),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  lastLoginAt: z.date().optional(),
 });
 
-export const insertUserSchema = userSchema.omit({ id: true, createdAt: true, updatedAt: true });
-export type User = z.infer<typeof userSchema>;
-export type InsertUser = z.infer<typeof insertUserSchema>;
-
-// ========== POSTS ==========
-export const postSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
+export const insertPostSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
   caption: z.string().max(2200).optional(),
-  postType: z.enum(["photo", "video", "text", "audio", "poll", "collaborative"]),
-  mediaUrls: z.array(z.string().url()).optional(),
-  thumbnailUrl: z.string().url().optional(),
-  aspectRatio: z.string().optional(),
-  durationSeconds: z.number().optional(),
-  visibility: z.enum(["public", "friends", "private", "custom"]).default("public"),
-  allowComments: z.boolean().default(true),
-  allowReactions: z.boolean().default(true),
-  locationName: z.string().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
-  reactionCount: z.number().default(0),
-  commentCount: z.number().default(0),
-  shareCount: z.number().default(0),
-  viewCount: z.number().default(0),
-  isArchived: z.boolean().default(false),
-  isDeleted: z.boolean().default(false),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  publishedAt: z.date(),
+  imageUrl: z.string().url().optional(),
+  videoUrl: z.string().url().optional(),
+  mediaType: z.string().optional(),
+  location: z.string().optional(),
 });
 
-export const insertPostSchema = postSchema.omit({ 
-  id: true, createdAt: true, updatedAt: true, 
-  reactionCount: true, commentCount: true, shareCount: true, viewCount: true
+export const insertStorySchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  imageUrl: z.string().url(),
 });
-export type Post = z.infer<typeof postSchema>;
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Post = typeof posts.$inferSelect;
 export type InsertPost = z.infer<typeof insertPostSchema>;
-
-// ========== REACTIONS (Mood-Based) ==========
-export const reactionSchema = z.object({
-  id: z.string().uuid(),
-  postId: z.string().uuid(),
-  userId: z.string().uuid(),
-  reactionType: z.enum(["inspired", "grateful", "curious", "excited", "thoughtful"]),
-  createdAt: z.date(),
-});
-
-export const insertReactionSchema = reactionSchema.omit({ id: true, createdAt: true });
-export type Reaction = z.infer<typeof reactionSchema>;
-export type InsertReaction = z.infer<typeof insertReactionSchema>;
-
-// ========== COMMENTS ==========
-export const commentSchema = z.object({
-  id: z.string().uuid(),
-  postId: z.string().uuid(),
-  userId: z.string().uuid(),
-  content: z.string().min(1).max(2000),
-  parentCommentId: z.string().uuid().optional(),
-  threadDepth: z.number().default(0),
-  mediaUrl: z.string().url().optional(),
-  mediaType: z.enum(["image", "gif", "sticker"]).optional(),
-  likeCount: z.number().default(0),
-  replyCount: z.number().default(0),
-  isEdited: z.boolean().default(false),
-  isDeleted: z.boolean().default(false),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-export const insertCommentSchema = commentSchema.omit({ 
-  id: true, createdAt: true, updatedAt: true, likeCount: true, replyCount: true
-});
-export type Comment = z.infer<typeof commentSchema>;
-export type InsertComment = z.infer<typeof insertCommentSchema>;
-
-// ========== FOLLOWS ==========
-export const followSchema = z.object({
-  id: z.string().uuid(),
-  followerId: z.string().uuid(),
-  followingId: z.string().uuid(),
-  connectionType: z.enum(["follow", "close_friend", "blocked"]).default("follow"),
-  notifyOnPost: z.boolean().default(true),
-  createdAt: z.date(),
-});
-
-export const insertFollowSchema = followSchema.omit({ id: true, createdAt: true });
-export type Follow = z.infer<typeof followSchema>;
-export type InsertFollow = z.infer<typeof insertFollowSchema>;
-
-// ========== CONVERSATIONS ==========
-export const conversationSchema = z.object({
-  id: z.string().uuid(),
-  conversationType: z.enum(["direct", "group"]).default("direct"),
-  title: z.string().max(100).optional(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-export const insertConversationSchema = conversationSchema.omit({ id: true, createdAt: true, updatedAt: true });
-export type Conversation = z.infer<typeof conversationSchema>;
-export type InsertConversation = z.infer<typeof insertConversationSchema>;
-
-// ========== CONVERSATION PARTICIPANTS ==========
-export const conversationParticipantSchema = z.object({
-  id: z.string().uuid(),
-  conversationId: z.string().uuid(),
-  userId: z.string().uuid(),
-  isAdmin: z.boolean().default(false),
-  muted: z.boolean().default(false),
-  lastReadAt: z.date().optional(),
-  joinedAt: z.date(),
-});
-
-export const insertConversationParticipantSchema = conversationParticipantSchema.omit({ 
-  id: true, joinedAt: true 
-});
-export type ConversationParticipant = z.infer<typeof conversationParticipantSchema>;
-export type InsertConversationParticipant = z.infer<typeof insertConversationParticipantSchema>;
-
-// ========== MESSAGES ==========
-export const messageSchema = z.object({
-  id: z.string().uuid(),
-  conversationId: z.string().uuid(),
-  senderId: z.string().uuid(),
-  content: z.string().optional(),
-  messageType: z.enum(["text", "image", "video", "audio", "voice_note", "post_share"]).default("text"),
-  mediaUrl: z.string().url().optional(),
-  mediaThumbnailUrl: z.string().url().optional(),
-  isEphemeral: z.boolean().default(false),
-  expiresAt: z.date().optional(),
-  replyToMessageId: z.string().uuid().optional(),
-  isDeleted: z.boolean().default(false),
-  isEdited: z.boolean().default(false),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-export const insertMessageSchema = messageSchema.omit({ id: true, createdAt: true, updatedAt: true });
-export type Message = z.infer<typeof messageSchema>;
-export type InsertMessage = z.infer<typeof insertMessageSchema>;
-
-// ========== STORIES ==========
-export const storySchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
-  mediaUrl: z.string().url(),
-  mediaType: z.enum(["image", "video"]),
-  thumbnailUrl: z.string().url().optional(),
-  stickers: z.record(z.any()).optional(),
-  viewCount: z.number().default(0),
-  reactionCount: z.number().default(0),
-  createdAt: z.date(),
-  expiresAt: z.date(),
-});
-
-export const insertStorySchema = storySchema.omit({ 
-  id: true, createdAt: true, expiresAt: true, viewCount: true, reactionCount: true 
-});
-export type Story = z.infer<typeof storySchema>;
+export type Story = typeof stories.$inferSelect;
 export type InsertStory = z.infer<typeof insertStorySchema>;
-
-// ========== TOPICS ==========
-export const topicSchema = z.object({
-  id: z.string().uuid(),
-  topicName: z.string().max(100).unique("Topic name already exists"),
-  displayName: z.string().max(100),
-  description: z.string().optional(),
-  colorHex: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
-  iconUrl: z.string().url().optional(),
-  postCount: z.number().default(0),
-  followerCount: z.number().default(0),
-  isTrending: z.boolean().default(false),
-  isFeatured: z.boolean().default(false),
-  createdAt: z.date(),
-});
-
-export const insertTopicSchema = topicSchema.omit({ 
-  id: true, createdAt: true, postCount: true, followerCount: true 
-});
-export type Topic = z.infer<typeof topicSchema>;
-export type InsertTopic = z.infer<typeof insertTopicSchema>;
-
-// ========== POST TOPICS ==========
-export const postTopicSchema = z.object({
-  id: z.string().uuid(),
-  postId: z.string().uuid(),
-  topicId: z.string().uuid(),
-  createdAt: z.date(),
-});
-
-export const insertPostTopicSchema = postTopicSchema.omit({ id: true, createdAt: true });
-export type PostTopic = z.infer<typeof postTopicSchema>;
-export type InsertPostTopic = z.infer<typeof insertPostTopicSchema>;
-
-// ========== NOTIFICATIONS ==========
-export const notificationSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
-  notificationType: z.enum(["reaction", "comment", "follow", "mention", "message", "milestone", "system"]),
-  title: z.string().max(255),
-  message: z.string().optional(),
-  actorId: z.string().uuid().optional(),
-  postId: z.string().uuid().optional(),
-  commentId: z.string().uuid().optional(),
-  actionUrl: z.string().url().optional(),
-  isRead: z.boolean().default(false),
-  readAt: z.date().optional(),
-  createdAt: z.date(),
-});
-
-export const insertNotificationSchema = notificationSchema.omit({ id: true, createdAt: true });
-export type Notification = z.infer<typeof notificationSchema>;
-export type InsertNotification = z.infer<typeof insertNotificationSchema>;
-
-// ========== USER SETTINGS ==========
-export const userSettingsSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid().unique("User settings already exist"),
-  profileVisibility: z.enum(["public", "private", "followers"]).default("public"),
-  showActivityStatus: z.boolean().default(true),
-  allowMessagesFrom: z.enum(["everyone", "following", "no_one"]).default("everyone"),
-  emailNotifications: z.boolean().default(true),
-  pushNotifications: z.boolean().default(true),
-  notificationFrequency: z.enum(["instant", "hourly", "daily"]).default("instant"),
-  autoplayVideos: z.boolean().default(true),
-  dataSaverMode: z.boolean().default(false),
-  darkMode: z.enum(["auto", "light", "dark"]).default("auto"),
-  calmMode: z.boolean().default(false),
-  timeLimitMinutes: z.number().default(0),
-  hideMetrics: z.boolean().default(false),
-  updatedAt: z.date(),
-});
-
-export const insertUserSettingsSchema = userSettingsSchema.omit({ id: true, updatedAt: true });
-export type UserSettings = z.infer<typeof userSettingsSchema>;
-export type InsertUserSettings = z.infer<typeof insertUserSettingsSchema>;
+export type Follow = typeof follows.$inferSelect;
+export type Message = typeof messages.$inferSelect;
+export type Comment = typeof comments.$inferSelect;
