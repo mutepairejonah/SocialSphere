@@ -142,7 +142,7 @@ export default function Home() {
 
       {/* Navigation Drawer */}
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="left" className="w-64 flex flex-col bg-background backdrop-blur-md border-r border-border">
+        <SheetContent side="left" className="w-64 flex flex-col bg-background backdrop-blur-sm border-r border-border">
           <SheetHeader className="border-b border-border pb-4">
             <SheetTitle className="text-2xl font-bold text-primary">Authentic</SheetTitle>
           </SheetHeader>
