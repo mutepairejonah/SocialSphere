@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { auth, db, storage, rtdb } from './firebase';
+import { makeInstagramRequest, getUserMedia } from './instagram';
 import { 
   signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, signOut, User as FirebaseUser, onAuthStateChanged 
@@ -436,22 +437,30 @@ export const useStore = create<StoreState>((set, get) => ({
 
   loadPosts: async () => {
     try {
-      const postsQuery = query(collection(db, 'posts'));
-      const snapshot = await getDocs(postsQuery);
-      const posts = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          timestamp: data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString() : 'Just now',
+      // Load posts from Instagram API
+      const instagramPosts = await getUserMedia();
+      
+      if (instagramPosts && instagramPosts.length > 0) {
+        const posts = instagramPosts.map((igPost: any, index: number) => ({
+          id: igPost.id || `ig_${index}`,
+          userId: get().currentUser?.id || 'instagram',
+          imageUrl: igPost.media_type === 'IMAGE' ? igPost.media_url : (igPost.thumbnail_url || 'https://via.placeholder.com/500'),
+          caption: igPost.caption || '',
+          likes: 0,
+          location: '',
+          timestamp: new Date(igPost.timestamp).toLocaleString(),
+          comments: 0,
           isLiked: false,
           isSaved: false
-        } as Post;
-      }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      
-      set({ posts });
+        } as Post));
+        
+        set({ posts });
+      } else {
+        set({ posts: [] });
+      }
     } catch (error) {
-      console.warn('Error loading posts (using local data):', error);
+      console.warn('Error loading Instagram posts:', error);
+      set({ posts: [] });
     }
   },
 
