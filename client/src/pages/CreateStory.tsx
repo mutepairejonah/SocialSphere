@@ -53,16 +53,16 @@ export default function CreateStory() {
 
   return (
     <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-blue-50 to-pink-50 dark:from-background dark:to-background backdrop-blur border-b border-border px-4 h-14 flex items-center justify-between">
-        <h1 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">Your Story</h1>
-        <button onClick={() => setLocation("/")} className="text-muted-foreground hover:text-blue-500 transition-colors">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
+        <h1 className="font-bold text-lg">Your Story</h1>
+        <button onClick={() => setLocation("/")} className="text-muted-foreground hover:text-foreground transition-colors">
           <X className="w-6 h-6" />
         </button>
       </header>
 
       <main className="p-4 space-y-3">
-        {/* Story Preview - Combined design */}
-        <div className="aspect-[9/16] bg-gradient-to-b from-gradient-to-br from-blue-50 via-pink-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden flex items-center justify-center border-2 border-gradient-to-r from-blue-400 via-pink-400 to-yellow-400 shadow-lg relative">
+        {/* Story Preview */}
+        <div className="aspect-[9/16] bg-muted rounded-lg overflow-hidden flex items-center justify-center border border-border shadow-sm relative">
           {mediaUrl ? (
             <>
               {mediaType === 'video' ? (
@@ -90,7 +90,7 @@ export default function CreateStory() {
         {/* Select Image Button */}
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white rounded-lg font-semibold transition-all active:scale-95 shadow-md"
+          className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors active:scale-95"
           data-testid="button-select-image"
         >
           <Upload className="w-4 h-4 inline mr-2" />
@@ -123,7 +123,7 @@ export default function CreateStory() {
           <Button
             onClick={handlePostStory}
             disabled={!mediaUrl || loading}
-            className="w-full bg-gradient-to-r from-blue-500 via-pink-500 to-yellow-500 hover:from-blue-600 hover:via-pink-600 hover:to-yellow-600 text-white font-semibold h-12 rounded-lg shadow-md"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold h-12 rounded-lg"
             data-testid="button-post-story"
           >
             {loading ? (

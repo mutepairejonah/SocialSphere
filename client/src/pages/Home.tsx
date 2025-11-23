@@ -10,23 +10,18 @@ export default function Home() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-gradient-to-b from-background via-background to-background/95">
-      {/* Header - Combined Instagram/Facebook/Telegram design */}
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-background/98 via-background/95 to-background/98 backdrop-blur-xl border-b-2 border-gradient-to-r from-blue-400/30 via-pink-400/30 to-yellow-400/30 px-4 h-[65px] flex items-center justify-between">
-        <div className="relative">
-          <h1 className="font-logo text-4xl mt-1 select-none cursor-pointer bg-gradient-to-r from-blue-600 via-pink-500 to-yellow-400 bg-clip-text text-transparent font-black tracking-tight drop-shadow-lg">InstaClone</h1>
-          <div className="absolute -bottom-1 left-0 h-1 bg-gradient-to-r from-blue-400 via-pink-400 to-yellow-400 rounded-full" style={{width: '80%'}}></div>
-        </div>
-        <div className="flex items-center gap-6">
+    <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
+        <h1 className="font-logo text-2xl mt-1 select-none cursor-pointer font-bold">InstaClone</h1>
+        <div className="flex items-center gap-4">
           <Link href="/activity">
-             <div className="p-2 rounded-full hover:bg-blue-100/20 dark:hover:bg-blue-900/20 transition-colors">
-               <Heart className="w-6 h-6 cursor-pointer hover:scale-110 hover:text-red-500 transition-all" data-testid="button-notifications" />
-             </div>
+             <Heart className="w-6 h-6 cursor-pointer hover:text-red-500 transition-colors" data-testid="button-notifications" />
           </Link>
           <Link href="/messages">
-            <div className="relative cursor-pointer p-2 rounded-full hover:bg-pink-100/20 dark:hover:bg-pink-900/20 transition-colors" data-testid="button-messages">
+            <div className="relative cursor-pointer" data-testid="button-messages">
               <Send className="w-6 h-6 -rotate-[15deg]" />
-              <span className="absolute top-0 right-0 bg-gradient-to-br from-blue-500 to-pink-500 text-white text-[10px] font-bold px-1.5 h-5 flex items-center justify-center rounded-full border-[2px] border-background shadow-lg">
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border border-background">
                 2
               </span>
             </div>
@@ -34,29 +29,26 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Stories Rail - Unique Design */}
-      <div className="relative pt-4 pb-3 px-4 flex gap-3 overflow-x-auto no-scrollbar bg-gradient-to-b from-blue-50/20 via-pink-50/20 to-transparent dark:from-blue-900/5 dark:via-pink-900/5 dark:to-transparent">
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent"></div>
-        
+      {/* Stories Rail */}
+      <div className="pt-3 pb-2 px-4 flex gap-4 overflow-x-auto no-scrollbar border-b border-border">
         {/* My Story */}
         <div 
-          className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group"
+          className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer group"
           onClick={() => setLocation("/stories/create")}
           data-testid="button-create-story"
         >
-          <div className="relative w-[76px] h-[76px]">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400/30 to-pink-400/30 blur-lg group-hover:from-blue-400/50 group-hover:to-pink-400/50 transition-all duration-300"></div>
-            <div className="relative w-full h-full rounded-full border-[3px] border-gradient-to-r from-blue-400 to-pink-400 overflow-hidden p-[1px] shadow-lg group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all duration-300">
+          <div className="relative w-[64px] h-[64px]">
+            <div className="w-full h-full rounded-full border-2 border-border overflow-hidden p-[2px] group-hover:border-foreground transition-colors">
               <img 
                 src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"} 
-                className="w-full h-full object-cover rounded-full bg-muted" 
+                className="w-full h-full object-cover rounded-full" 
               />
             </div>
-            <div className="absolute bottom-0 right-0 bg-gradient-to-br from-blue-500 to-pink-500 rounded-full w-7 h-7 flex items-center justify-center border-3 border-background text-white group-hover:scale-125 transition-transform shadow-lg">
-              <PlusSquare size={14} strokeWidth={3} />
+            <div className="absolute bottom-0 right-0 bg-foreground rounded-full w-5 h-5 flex items-center justify-center border-2 border-background text-background group-hover:scale-110 transition-transform">
+              <PlusSquare size={12} strokeWidth={3} />
             </div>
           </div>
-          <span className="text-xs font-semibold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Your story</span>
+          <span className="text-xs text-muted-foreground group-hover:text-foreground text-center">Your story</span>
         </div>
 
         {/* Other Stories */}
@@ -82,10 +74,10 @@ export default function Home() {
                 data-testid={`story-${story.id}`}
               >
                 <div className={cn(
-                  "w-[72px] h-[72px] rounded-full p-[2px]",
-                  story.isViewed ? "bg-border" : "bg-gradient-to-tr from-blue-500 via-pink-500 to-yellow-400"
+                  "w-[64px] h-[64px] rounded-full p-[2px]",
+                  story.isViewed ? "bg-border" : "bg-foreground"
                 )}>
-                  <div className="w-full h-full rounded-full border-[2px] border-background overflow-hidden bg-muted group-hover:scale-110 transition-transform">
+                  <div className="w-full h-full rounded-full border-2 border-background overflow-hidden bg-muted group-hover:scale-105 transition-transform">
                     <img 
                       src={story.imageUrl} 
                       className="w-full h-full object-cover" 
