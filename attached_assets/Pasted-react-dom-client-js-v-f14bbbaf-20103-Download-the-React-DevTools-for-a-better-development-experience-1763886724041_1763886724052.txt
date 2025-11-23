@@ -1,0 +1,50 @@
+react-dom_client.js?v=f14bbbaf:20103 Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+store.ts:144 Error loading user data: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ store.ts:144
+await in (anonymous)
+(anonymous) @ firebase_auth.js?v=f14bbbaf:2748
+Promise.then
+registerStateListener @ firebase_auth.js?v=f14bbbaf:2744
+onAuthStateChanged @ firebase_auth.js?v=f14bbbaf:2607
+onAuthStateChanged @ firebase_auth.js?v=f14bbbaf:5123
+initializeAuth @ store.ts:105
+(anonymous) @ App.tsx:23
+react_stack_bottom_frame @ react-dom_client.js?v=f14bbbaf:18567
+runWithFiberInDEV @ react-dom_client.js?v=f14bbbaf:997
+commitHookEffectListMount @ react-dom_client.js?v=f14bbbaf:9411
+commitHookPassiveMountEffects @ react-dom_client.js?v=f14bbbaf:9465
+commitPassiveMountOnFiber @ react-dom_client.js?v=f14bbbaf:11040
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=f14bbbaf:11010
+commitPassiveMountOnFiber @ react-dom_client.js?v=f14bbbaf:11066
+flushPassiveEffects @ react-dom_client.js?v=f14bbbaf:13150
+(anonymous) @ react-dom_client.js?v=f14bbbaf:12776
+performWorkUntilDeadline @ react-dom_client.js?v=f14bbbaf:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=f14bbbaf:247
+(anonymous) @ main.tsx:5
+cb=gapi.loaded_0?le=scs:195 Cross-Origin-Opener-Policy policy would block the window.close call.
+close @ firebase_auth.js?v=f14bbbaf:7531
+await in close
+sendToConsumer @ firebase_auth.js?v=f14bbbaf:7287
+(anonymous) @ firebase_auth.js?v=f14bbbaf:7268
+onEvent @ firebase_auth.js?v=f14bbbaf:7265
+(anonymous) @ firebase_auth.js?v=f14bbbaf:7693
+Tm @ cb=gapi.loaded_0?le=scs:195
+(anonymous) @ cb=gapi.loaded_0?le=scs:195
+hl @ cb=gapi.loaded_0?le=scs:174
+ql @ cb=gapi.loaded_0?le=scs:174
+Lk @ cb=gapi.loaded_0?le=scs:175
+Rk.eI @ cb=gapi.loaded_0?le=scs:168
+cb=gapi.loaded_0?le=scs:195 Cross-Origin-Opener-Policy policy would block the window.close call.
+close @ firebase_auth.js?v=f14bbbaf:7531
+await in close
+sendToConsumer @ firebase_auth.js?v=f14bbbaf:7287
+(anonymous) @ firebase_auth.js?v=f14bbbaf:7268
+onEvent @ firebase_auth.js?v=f14bbbaf:7265
+(anonymous) @ firebase_auth.js?v=f14bbbaf:7693
+Tm @ cb=gapi.loaded_0?le=scs:195
+(anonymous) @ cb=gapi.loaded_0?le=scs:195
+hl @ cb=gapi.loaded_0?le=scs:174
+ql @ cb=gapi.loaded_0?le=scs:174
+Lk @ cb=gapi.loaded_0?le=scs:175
+Rk.eI @ cb=gapi.loaded_0?le=scs:168
