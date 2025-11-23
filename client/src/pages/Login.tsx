@@ -65,9 +65,9 @@ export default function Login() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 max-w-md mx-auto bg-background">
       <div className="w-full max-w-xs space-y-6">
         <div className="text-center mb-8">
-          <h1 className="font-logo text-5xl mb-4">InstaClone</h1>
+          <h1 className="font-bold text-5xl mb-4 text-primary">Authentic</h1>
           <p className="text-muted-foreground">
-            {isSignUp ? "Sign up to see photos and videos from your friends." : "Log in to see photos and videos from your friends."}
+            {isSignUp ? "Connect authentically with people you care about." : "Log in to connect authentically."}
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button type="submit" className="w-full font-semibold mt-2" disabled={loading}>
+          <Button type="submit" className="w-full font-semibold mt-2 bg-primary hover:bg-primary/90 text-white" disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSignUp ? "Sign Up" : "Log In")}
           </Button>
         </form>

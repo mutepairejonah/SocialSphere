@@ -97,7 +97,7 @@ export default function EditProfile() {
         </div>
         <Button 
           variant="ghost" 
-          className="text-blue-500 font-bold hover:text-blue-600 disabled:opacity-50" 
+          className="text-primary font-bold hover:text-primary/80 disabled:opacity-50" 
           onClick={handleSave}
           disabled={loading}
         >

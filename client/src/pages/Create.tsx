@@ -96,8 +96,8 @@ export default function Create() {
           <X className="w-7 h-7 cursor-pointer hover:opacity-70" onClick={() => setLocation("/")} />
           <h1 className="font-bold text-lg">New Post</h1>
           <Button 
-            variant="ghost" 
-            className="text-blue-500 font-bold hover:text-blue-600" 
+            className="text-primary font-bold hover:text-primary/80" 
+            variant="ghost"
             disabled={!selectedMedia}
             onClick={() => setStep('details')}
           >

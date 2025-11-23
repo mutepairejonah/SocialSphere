@@ -65,7 +65,7 @@ export default function Explore() {
               key={cat} 
               className={`flex-shrink-0 px-5 py-1.5 rounded-lg font-semibold text-sm whitespace-nowrap border cursor-pointer transition-colors ${
                 activeCategory === cat 
-                  ? 'border-foreground bg-foreground text-background' 
+                  ? 'border-primary bg-primary text-white' 
                   : 'border-border hover:bg-muted'
               }`}
               onClick={() => setActiveCategory(cat)}
@@ -99,8 +99,7 @@ export default function Explore() {
                 </div>
                 <Button
                   size="sm"
-                  variant={user.isFollowing ? "secondary" : "default"}
-                  className="flex-shrink-0 h-8 font-semibold"
+                  className={`flex-shrink-0 h-8 font-semibold ${user.isFollowing ? 'bg-muted text-foreground hover:bg-muted/80' : 'bg-primary text-white hover:bg-primary/90'}`}
                   onClick={() => handleFollowToggle(user.id)}
                 >
                   {user.isFollowing ? (
