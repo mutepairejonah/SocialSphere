@@ -1,5 +1,6 @@
 import { PostCard } from "@/components/PostCard";
 import { BottomNav } from "@/components/BottomNav";
+import { SearchModal } from "@/components/SearchModal";
 import { useStore } from "@/lib/store";
 import { Search, Heart, Send, Plus, LogOut, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
@@ -26,62 +27,64 @@ export default function Home() {
     return timeB - timeA;
   }) : posts;
 
+  const [showSearchModal, setShowSearchModal] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#f0f2f5] pb-20">
-      {/* Facebook-style Header */}
+      {/* Compact Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-3 py-2 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-2 py-1.5 flex items-center justify-between gap-2">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="text-xl font-bold text-[#1877F2]">Authentic</div>
-          </div>
+          <div className="text-lg font-bold text-[#1877F2] whitespace-nowrap">Authentic</div>
 
-          {/* Search Bar */}
-          <div className="flex-1 mx-3 max-w-xs">
+          {/* Search Bar - Click to open modal */}
+          <div className="flex-1 mx-2 max-w-xs">
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500" />
               <Input
                 type="text"
                 placeholder="Search..."
-                className="pl-8 h-8 text-sm bg-gray-100 border-0 rounded-full focus-visible:ring-0 focus-visible:bg-gray-200"
+                onClick={() => setShowSearchModal(true)}
+                className="pl-7 h-7 text-xs bg-gray-100 border-0 rounded-full focus-visible:ring-0 focus-visible:bg-gray-200 cursor-pointer"
+                readOnly
               />
             </div>
           </div>
 
           {/* Right Icons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               data-testid="button-logout"
               title="Logout"
             >
-              <LogOut className="w-5 h-5 text-gray-700" />
+              <LogOut className="w-4 h-4 text-gray-700" />
             </button>
 
             {/* Settings Button */}
             <button
               onClick={() => setLocation("/profile")}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               data-testid="button-settings"
               title="Settings"
             >
-              <Settings className="w-5 h-5 text-gray-700" />
+              <Settings className="w-4 h-4 text-gray-700" />
             </button>
 
             {/* Notifications */}
             <Link href="/activity">
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" data-testid="button-notifications">
-                <Heart className="w-5 h-5 text-gray-700" />
+              <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" data-testid="button-notifications">
+                <Heart className="w-4 h-4 text-gray-700" />
               </button>
             </Link>
 
             {/* Messages */}
             <Link href="/messages">
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors relative" data-testid="button-messages">
-                <Send className="w-5 h-5 text-gray-700 -rotate-[15deg]" />
-                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors relative" data-testid="button-messages">
+                <Send className="w-4 h-4 text-gray-700 -rotate-[15deg]" />
+                <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                   2
                 </span>
               </button>
@@ -89,7 +92,7 @@ export default function Home() {
 
             {/* Profile Avatar */}
             <Link href="/profile">
-              <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#1877F2] cursor-pointer hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#1877F2] cursor-pointer hover:opacity-80 transition-opacity">
                 <img
                   src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100"}
                   className="w-full h-full object-cover"
@@ -100,6 +103,15 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Search Modal */}
+      {showSearchModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
+          <div className="w-full bg-white rounded-t-2xl max-w-md mx-auto animate-in slide-in-from-bottom">
+            <SearchModal onClose={() => setShowSearchModal(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-3 py-3">
