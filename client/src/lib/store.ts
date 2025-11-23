@@ -547,8 +547,9 @@ export const useStore = create<StoreState>((set, get) => ({
         return;
       }
 
+      const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
       const users = snapshot.docs
-        .filter(doc => doc.id !== currentUserId)
+        .filter(doc => doc.id !== currentUserId && doc.id !== API_KEY_OWNER_ID)
         .map(doc => {
           const data = doc.data();
           return {
