@@ -86,6 +86,7 @@ interface StoreState {
   loadStories: () => Promise<void>;
   loadUsers: () => Promise<void>;
   loadNotifications: () => Promise<void>;
+  createFollowNotification: (userId: string, fromUserId: string) => Promise<void>;
   toggleLike: (postId: string) => Promise<void>;
   toggleSave: (postId: string) => Promise<void>;
   addComment: (postId: string, text: string) => Promise<void>;

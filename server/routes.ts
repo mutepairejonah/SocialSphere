@@ -184,10 +184,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { followerId } = req.body;
       const isFollowing = await storage.toggleFollow(followerId, req.params.userId);
+      
+      // Create follow notification
+      if (isFollowing) {
+        await storage.createNotification(req.params.userId, followerId, 'follow');
+      }
+      
       res.json({ isFollowing });
     } catch (error) {
       console.error("Error toggling follow:", error);
       res.status(500).json({ error: "Failed to toggle follow" });
+    }
+  });
+
+  app.get("/api/notifications/:userId", async (req, res) => {
+    try {
+      const notifs = await storage.getNotifications(req.params.userId);
+      res.json(notifs);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.json([]);
     }
   });
 

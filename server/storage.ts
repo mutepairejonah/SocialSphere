@@ -203,6 +203,34 @@ export class PostgresStorage implements IStorage {
     }).returning();
     return result[0];
   }
+
+  async getNotifications(userId: string): Promise<any[]> {
+    const userNotifs = await db.select().from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt))
+      .limit(50);
+    
+    const withUser = await Promise.all(userNotifs.map(async (notif) => {
+      const fromUser = await this.getUser(notif.fromUserId);
+      return {
+        ...notif,
+        fromUserUsername: fromUser?.username,
+        fromUserAvatar: fromUser?.avatar
+      };
+    }));
+    
+    return withUser;
+  }
+
+  async createNotification(userId: string, fromUserId: string, type: string, postId?: string): Promise<void> {
+    await db.insert(notifications).values({
+      id: crypto.randomUUID(),
+      userId,
+      fromUserId,
+      type,
+      postId: postId || null
+    });
+  }
 }
 
 export const storage = new PostgresStorage();
