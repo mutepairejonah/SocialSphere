@@ -86,22 +86,19 @@ export async function getUserMedia(userId?: string): Promise<any> {
     const accountId = userId || INSTAGRAM_API_CONFIG.businessAccountId || 'me';
     console.log('Fetching media for account:', accountId);
     
-    // Fetch media with engagement metrics (like_count, comments_count)
+    // Fetch media with engagement metrics using the correct endpoint format
     const response = await makeInstagramRequest(
-      `${accountId}?fields=id,name,media.limit(25){id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count,insights.metric(engagement,impressions,reach){values}}`
+      `${accountId}/media?fields=id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count`
     );
     console.log('Instagram API response:', response);
     
-    // Handle nested response format: response.media.data
-    if (response.media && response.media.data) {
-      console.log('Extracted media.data:', response.media.data);
-      return response.media.data;
-    }
-    if (response.media) {
-      return response.media;
-    }
+    // Handle response format: response.data contains the media array
     if (response.data && Array.isArray(response.data)) {
+      console.log('Extracted media array:', response.data);
       return response.data;
+    }
+    if (Array.isArray(response)) {
+      return response;
     }
     console.warn('Could not extract media from response:', response);
     return [];
