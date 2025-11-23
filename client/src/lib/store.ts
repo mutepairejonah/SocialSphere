@@ -85,6 +85,7 @@ interface StoreState {
   loadNotifications: () => Promise<void>;
   toggleLike: (postId: string) => Promise<void>;
   toggleSave: (postId: string) => Promise<void>;
+  addComment: (postId: string, text: string) => Promise<void>;
   addStory: (imageUrl: string) => Promise<void>;
   markStoryViewed: (storyId: string) => void;
   initializeAuth: () => void;
@@ -431,11 +432,33 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) return;
 
     try {
+      // Handle video uploads to Firebase Storage
+      let videoUrl = newPost.videoUrl;
+      if (newPost.videoUrl && newPost.videoUrl.startsWith('data:')) {
+        try {
+          const response = await fetch(newPost.videoUrl);
+          const blob = await response.blob();
+          const videoRef = ref(storage, `videos/${currentUser.id}/${Date.now()}`);
+          await uploadBytes(videoRef, blob);
+          videoUrl = await getDownloadURL(videoRef);
+        } catch (uploadError) {
+          console.error('Video upload error:', uploadError);
+        }
+      }
+
       const postRef = await addDoc(collection(db, 'posts'), {
-        ...newPost,
+        userId: currentUser.id,
+        username: currentUser.username,
+        userAvatar: currentUser.avatar,
+        imageUrl: newPost.imageUrl,
+        videoUrl: videoUrl,
+        caption: newPost.caption || '',
+        location: newPost.location || '',
+        mediaType: newPost.mediaType || 'IMAGE',
         createdAt: Timestamp.now(),
         likes: 0,
-        comments: 0,
+        likedBy: [],
+        commentCount: 0,
       });
 
       const postData = await getDoc(postRef);
@@ -445,6 +468,8 @@ export const useStore = create<StoreState>((set, get) => ({
             id: postData.id,
             ...postData.data(),
             timestamp: new Date(postData.data().createdAt.toDate()).toLocaleString(),
+            likes: 0,
+            comments: 0,
             isLiked: false,
             isSaved: false
           } as Post, ...state.posts]
@@ -452,6 +477,33 @@ export const useStore = create<StoreState>((set, get) => ({
       }
     } catch (error) {
       console.error('Error adding post:', error);
+    }
+  },
+
+  addComment: async (postId: string, text: string) => {
+    const currentUser = get().currentUser;
+    if (!currentUser || !text.trim()) return;
+
+    try {
+      await addDoc(collection(db, 'comments'), {
+        postId,
+        userId: currentUser.id,
+        username: currentUser.username,
+        userAvatar: currentUser.avatar,
+        text: text.trim(),
+        createdAt: Timestamp.now()
+      });
+
+      // Increment comment count
+      const postRef = doc(db, 'posts', postId);
+      const postDoc = await getDoc(postRef);
+      if (postDoc.exists()) {
+        await updateDoc(postRef, {
+          commentCount: (postDoc.data().commentCount || 0) + 1
+        });
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
     }
   },
 
