@@ -11,17 +11,17 @@ export default function Home() {
 
   return (
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-[60px] flex items-center justify-between">
-        <h1 className="font-logo text-3xl mt-1 select-none cursor-pointer">InstaClone</h1>
+      {/* Header - Combined Instagram/Facebook/Telegram design */}
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-background/95 to-background/95 backdrop-blur-sm border-b border-border px-4 h-[60px] flex items-center justify-between">
+        <h1 className="font-logo text-3xl mt-1 select-none cursor-pointer bg-gradient-to-r from-blue-600 via-pink-500 to-yellow-400 bg-clip-text text-transparent font-bold">InstaClone</h1>
         <div className="flex items-center gap-6">
           <Link href="/activity">
-             <Heart className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform" data-testid="button-notifications" />
+             <Heart className="w-6 h-6 cursor-pointer hover:scale-105 hover:text-red-500 transition-all" data-testid="button-notifications" />
           </Link>
           <Link href="/messages">
             <div className="relative cursor-pointer hover:scale-105 transition-transform" data-testid="button-messages">
               <Send className="w-6 h-6 -rotate-[15deg] mb-1" />
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border-[2px] border-background">
+              <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border-[2px] border-background">
                 2
               </span>
             </div>
@@ -75,7 +75,7 @@ export default function Home() {
               >
                 <div className={cn(
                   "w-[72px] h-[72px] rounded-full p-[2px]",
-                  story.isViewed ? "bg-border" : "bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600"
+                  story.isViewed ? "bg-border" : "bg-gradient-to-tr from-blue-500 via-pink-500 to-yellow-400"
                 )}>
                   <div className="w-full h-full rounded-full border-[2px] border-background overflow-hidden bg-muted group-hover:scale-110 transition-transform">
                     <img 
