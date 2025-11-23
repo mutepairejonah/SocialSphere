@@ -62,32 +62,37 @@ export function PostCard({ post }: PostCardProps) {
     }
   };
 
+  const moods = [
+    { icon: '✨', label: 'Inspired', color: 'text-primary' },
+    { icon: '🙏', label: 'Grateful', color: 'text-accent' },
+    { icon: '🤔', label: 'Curious', color: 'text-secondary' },
+    { icon: '🎉', label: 'Excited', color: 'text-yellow-500' },
+    { icon: '💭', label: 'Thoughtful', color: 'text-blue-500' },
+  ];
+
   return (
-    <div className="pb-2 border-b border-border last:border-0">
+    <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       {/* Header */}
-      <div className="flex items-center justify-between p-3">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full opacity-0 hover:opacity-100 transition-opacity" />
-            <Avatar className="h-8 w-8 border border-border relative z-10">
-              <AvatarImage src={post.userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`} />
-              <AvatarFallback>{post.username?.charAt(0) || 'U'}</AvatarFallback>
-            </Avatar>
-          </div>
+          <Avatar className="h-10 w-10 border-2 border-primary/20">
+            <AvatarImage src={post.userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`} />
+            <AvatarFallback>{post.username?.charAt(0) || 'U'}</AvatarFallback>
+          </Avatar>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold leading-none cursor-pointer hover:underline">{post.username || post.userId}</span>
+            <span className="text-sm font-semibold leading-none cursor-pointer hover:text-primary transition-colors">{post.username || post.userId}</span>
             {post.location && (
-              <span className="text-xs text-muted-foreground cursor-pointer">{post.location}</span>
+              <span className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors">{post.location}</span>
             )}
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
           <MoreHorizontal className="h-5 w-5" />
         </Button>
       </div>
 
       {/* Media - Image or Video */}
-      <div className="relative aspect-square bg-muted overflow-hidden group cursor-pointer" onDoubleClick={handleLike} onClick={handleVideoClick}>
+      <div className="relative aspect-square bg-muted overflow-hidden group cursor-pointer" onDoubleClick={handleLike} onClick={handleVideoClick} style={{borderRadius: '0'}}>
         {post.mediaType === 'VIDEO' && post.videoUrl ? (
           <>
             <video 
@@ -185,29 +190,47 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       )}
 
-      {/* Actions */}
-      <div className="p-3">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-4">
-            <button onClick={handleLike} data-testid="button-like" className="transition-transform active:scale-90 focus:outline-none">
-              <Heart 
-                className={cn("w-[26px] h-[26px] transition-colors", post.isLiked ? "fill-red-500 text-red-500" : "text-foreground hover:text-muted-foreground")} 
-                strokeWidth={post.isLiked ? 0 : 2}
-              />
+      {/* Mood Reactions */}
+      <div className="px-4 py-3 border-t border-border flex gap-1 justify-between items-center">
+        <div className="flex gap-1 flex-wrap">
+          {moods.map((mood) => (
+            <button
+              key={mood.label}
+              className="px-2 py-1 rounded-lg hover:bg-muted transition-colors text-sm"
+              title={mood.label}
+              data-testid={`mood-${mood.label.toLowerCase()}`}
+            >
+              {mood.icon}
             </button>
-            <button onClick={handleComment} data-testid="button-comment" className="transition-transform active:scale-90 focus:outline-none">
-              <MessageCircle className="w-[26px] h-[26px] -rotate-90 text-foreground hover:text-muted-foreground" />
-            </button>
-            <button onClick={handleShare} data-testid="button-share" className="transition-transform active:scale-90 focus:outline-none">
-              <Send className="w-[26px] h-[26px] text-foreground hover:text-muted-foreground" />
-            </button>
-          </div>
-          <button onClick={() => toggleSave(post.id)} data-testid="button-save" className="transition-transform active:scale-90 focus:outline-none">
-             <Bookmark 
-               className={cn("w-[26px] h-[26px] transition-colors", post.isSaved ? "fill-foreground text-foreground" : "text-foreground hover:text-muted-foreground")} 
-             />
+          ))}
+        </div>
+        <div className="flex gap-1">
+          <button 
+            onClick={handleComment}
+            className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+            title="Comments"
+            data-testid="button-comment"
+          >
+            <MessageCircle size={18} />
+          </button>
+          <button 
+            onClick={handleShare}
+            className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+            title="Share"
+            data-testid="button-share"
+          >
+            <Send size={18} className="-rotate-[15deg]" />
+          </button>
+          <button 
+            onClick={() => toggleSave(post.id)}
+            className={cn("p-1.5 rounded-lg hover:bg-muted transition-colors", post.isSaved && "text-primary")}
+            title="Save"
+            data-testid="button-save"
+          >
+            <Bookmark size={18} fill={post.isSaved ? "currentColor" : "none"} />
           </button>
         </div>
+      </div>
 
         {/* Likes & Caption */}
         <div className="space-y-1.5">

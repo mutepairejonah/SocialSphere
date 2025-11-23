@@ -13,15 +13,15 @@ export default function Home() {
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
-        <h1 className="font-logo text-2xl mt-1 select-none cursor-pointer font-bold">InstaClone</h1>
+        <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Authentic</h1>
         <div className="flex items-center gap-4">
           <Link href="/activity">
-             <Heart className="w-6 h-6 cursor-pointer hover:text-red-500 transition-colors" data-testid="button-notifications" />
+             <Heart className="w-6 h-6 cursor-pointer hover:text-secondary transition-colors" data-testid="button-notifications" />
           </Link>
           <Link href="/messages">
             <div className="relative cursor-pointer" data-testid="button-messages">
               <Send className="w-6 h-6 -rotate-[15deg]" />
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border border-background">
+              <span className="absolute -top-2 -right-2 bg-secondary text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border border-background">
                 2
               </span>
             </div>
@@ -90,15 +90,17 @@ export default function Home() {
           })}
       </div>
 
-      {/* Feed */}
-      <main className="min-h-[calc(100vh-150px)]">
+      {/* Feed - Grid Layout */}
+      <main className="min-h-[calc(100vh-150px)] p-4">
         {posts.length > 0 ? (
-           posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))
+          <div className="grid grid-cols-1 gap-6">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-             <p>No posts yet</p>
+             <p className="text-center">No posts yet. Follow someone to see their content!</p>
           </div>
         )}
       </main>
