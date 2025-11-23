@@ -77,6 +77,10 @@ export default function Profile() {
               <img src={currentUser.avatar} alt="Profile" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 flex justify-around text-center ml-4">
+              <div>
+                <div className="font-bold text-lg leading-tight">0</div>
+                <div className="text-xs text-muted-foreground">Posts</div>
+              </div>
               <div 
                 className="cursor-pointer hover:opacity-70 transition-opacity"
                 onClick={() => setLocation("/followers")}

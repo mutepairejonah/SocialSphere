@@ -97,6 +97,10 @@ export default function UserProfile() {
               )}
             </div>
             <div className="flex-1 flex justify-around text-center ml-4">
+              <div>
+                <div className="font-bold text-lg leading-tight">0</div>
+                <div className="text-sm text-foreground">Posts</div>
+              </div>
               <div 
                 className="cursor-pointer hover:opacity-70"
                 onClick={() => {}}
