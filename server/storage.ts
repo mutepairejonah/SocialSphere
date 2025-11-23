@@ -107,8 +107,9 @@ export class PostgresStorage implements IStorage {
   }
 
   async searchUsers(query: string): Promise<User[]> {
+    const searchPattern = `%${query.toLowerCase()}%`;
     return db.select().from(users)
-      .where(like(users.username, `%${query}%`))
+      .where(sql`LOWER(${users.username}) LIKE ${searchPattern} OR LOWER(${users.fullName}) LIKE ${searchPattern}`)
       .limit(10);
   }
 
