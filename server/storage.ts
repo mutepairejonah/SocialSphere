@@ -1,7 +1,7 @@
-import { db } from "@shared/db";
-import { users, posts, stories, follows, messages, comments } from "@shared/schema";
+import { db } from "../shared/db";
+import { users, posts, stories, follows, messages, comments } from "../shared/schema";
 import { eq, like, and, desc, sql } from "drizzle-orm";
-import type { InsertUser, InsertPost, InsertStory, User, Post, Story } from "@shared/schema";
+import type { InsertUser, InsertPost, InsertStory, User, Post, Story } from "../shared/schema";
 
 export interface IStorage {
   // Users
