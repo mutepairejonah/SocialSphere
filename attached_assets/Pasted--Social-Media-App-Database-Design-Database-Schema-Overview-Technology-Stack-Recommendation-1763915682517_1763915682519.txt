@@ -1,0 +1,667 @@
+# Social Media App Database Design
+
+## Database Schema Overview
+
+### Technology Stack Recommendation
+- **Primary Database**: PostgreSQL (for relational data)
+- **Cache Layer**: Redis (for feed caching, sessions)
+- **Media Storage**: AWS S3 / CloudFlare R2
+- **Search Engine**: Elasticsearch (for user/content search)
+- **Analytics**: ClickHouse (for engagement metrics)
+
+---
+
+## Core Tables
+
+### 1. Users Table
+Stores user account information and authentication details.
+
+```sql
+CREATE TABLE users (
+    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(30) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100),
+    bio TEXT,
+    avatar_url VARCHAR(500),
+    
+    -- Profile preferences
+    is_private BOOLEAN DEFAULT false,
+    calm_mode_enabled BOOLEAN DEFAULT false,
+    show_metrics BOOLEAN DEFAULT true,
+    
+    -- Account status
+    is_verified BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    account_type VARCHAR(20) DEFAULT 'personal', -- personal, creator, business
+    
+    -- Timestamps
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMP,
+    email_verified_at TIMESTAMP,
+    
+    -- Indexes
+    CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+);
+
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_created_at ON users(created_at);
+```
+
+---
+
+### 2. Posts Table
+Main content storage for all user posts.
+
+```sql
+CREATE TABLE posts (
+    post_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Content
+    caption TEXT,
+    post_type VARCHAR(20) NOT NULL, -- photo, video, text, audio, poll, collaborative
+    
+    -- Media references (stored in S3/CloudFlare)
+    media_urls JSONB, -- Array of media URLs
+    thumbnail_url VARCHAR(500),
+    
+    -- Metadata
+    aspect_ratio VARCHAR(10), -- 1:1, 4:5, 16:9, etc.
+    duration_seconds INTEGER, -- for video/audio
+    
+    -- Visibility & settings
+    visibility VARCHAR(20) DEFAULT 'public', -- public, friends, private, custom
+    allow_comments BOOLEAN DEFAULT true,
+    allow_reactions BOOLEAN DEFAULT true,
+    
+    -- Location (optional)
+    location_name VARCHAR(255),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    
+    -- Engagement metrics (denormalized for performance)
+    reaction_count INTEGER DEFAULT 0,
+    comment_count INTEGER DEFAULT 0,
+    share_count INTEGER DEFAULT 0,
+    view_count INTEGER DEFAULT 0,
+    
+    -- Status
+    is_archived BOOLEAN DEFAULT false,
+    is_deleted BOOLEAN DEFAULT false,
+    
+    -- Timestamps
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT valid_post_type CHECK (post_type IN ('photo', 'video', 'text', 'audio', 'poll', 'collaborative'))
+);
+
+CREATE INDEX idx_posts_user_id ON posts(user_id);
+CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
+CREATE INDEX idx_posts_published_at ON posts(published_at DESC);
+CREATE INDEX idx_posts_visibility ON posts(visibility);
+CREATE INDEX idx_posts_type ON posts(post_type);
+```
+
+---
+
+### 3. Reactions Table (Mood-Based)
+Tracks the unique mood-based reactions.
+
+```sql
+CREATE TABLE reactions (
+    reaction_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(post_id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Mood types: inspired, grateful, curious, excited, thoughtful
+    reaction_type VARCHAR(20) NOT NULL,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Ensure one reaction per user per post
+    UNIQUE(post_id, user_id),
+    CONSTRAINT valid_reaction CHECK (reaction_type IN ('inspired', 'grateful', 'curious', 'excited', 'thoughtful'))
+);
+
+CREATE INDEX idx_reactions_post_id ON reactions(post_id);
+CREATE INDEX idx_reactions_user_id ON reactions(user_id);
+CREATE INDEX idx_reactions_type ON reactions(reaction_type);
+CREATE INDEX idx_reactions_created_at ON reactions(created_at);
+```
+
+---
+
+### 4. Comments Table
+Nested comments with threading support.
+
+```sql
+CREATE TABLE comments (
+    comment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(post_id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Comment content
+    content TEXT NOT NULL,
+    
+    -- Threading support
+    parent_comment_id UUID REFERENCES comments(comment_id) ON DELETE CASCADE,
+    thread_depth INTEGER DEFAULT 0, -- 0 for top-level, 1 for replies, etc.
+    
+    -- Media attachment (optional)
+    media_url VARCHAR(500),
+    media_type VARCHAR(20), -- image, gif, sticker
+    
+    -- Engagement
+    like_count INTEGER DEFAULT 0,
+    reply_count INTEGER DEFAULT 0,
+    
+    -- Status
+    is_edited BOOLEAN DEFAULT false,
+    is_deleted BOOLEAN DEFAULT false,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT max_thread_depth CHECK (thread_depth <= 3)
+);
+
+CREATE INDEX idx_comments_post_id ON comments(post_id);
+CREATE INDEX idx_comments_user_id ON comments(user_id);
+CREATE INDEX idx_comments_parent_id ON comments(parent_comment_id);
+CREATE INDEX idx_comments_created_at ON comments(created_at DESC);
+```
+
+---
+
+### 5. Follows/Connections Table
+User relationship tracking.
+
+```sql
+CREATE TABLE follows (
+    follow_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    follower_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    following_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Relationship type
+    connection_type VARCHAR(20) DEFAULT 'follow', -- follow, close_friend, blocked
+    
+    -- Notifications
+    notify_on_post BOOLEAN DEFAULT true,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Prevent self-follow and duplicates
+    UNIQUE(follower_id, following_id),
+    CONSTRAINT no_self_follow CHECK (follower_id != following_id)
+);
+
+CREATE INDEX idx_follows_follower_id ON follows(follower_id);
+CREATE INDEX idx_follows_following_id ON follows(following_id);
+CREATE INDEX idx_follows_type ON follows(connection_type);
+```
+
+---
+
+### 6. Messages Table
+Direct messaging system.
+
+```sql
+CREATE TABLE conversations (
+    conversation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_type VARCHAR(20) DEFAULT 'direct', -- direct, group
+    title VARCHAR(100), -- for group chats
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE conversation_participants (
+    participant_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID NOT NULL REFERENCES conversations(conversation_id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Participant settings
+    is_admin BOOLEAN DEFAULT false,
+    muted BOOLEAN DEFAULT false,
+    last_read_at TIMESTAMP,
+    
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(conversation_id, user_id)
+);
+
+CREATE TABLE messages (
+    message_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID NOT NULL REFERENCES conversations(conversation_id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Message content
+    content TEXT,
+    message_type VARCHAR(20) DEFAULT 'text', -- text, image, video, audio, voice_note, post_share
+    
+    -- Media
+    media_url VARCHAR(500),
+    media_thumbnail_url VARCHAR(500),
+    
+    -- Features
+    is_ephemeral BOOLEAN DEFAULT false, -- disappearing messages
+    expires_at TIMESTAMP,
+    
+    -- Reply/thread
+    reply_to_message_id UUID REFERENCES messages(message_id) ON DELETE SET NULL,
+    
+    -- Status
+    is_deleted BOOLEAN DEFAULT false,
+    is_edited BOOLEAN DEFAULT false,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_messages_conversation_id ON messages(conversation_id);
+CREATE INDEX idx_messages_sender_id ON messages(sender_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
+```
+
+---
+
+### 7. Stories/Ephemeral Content Table
+24-hour disappearing content.
+
+```sql
+CREATE TABLE stories (
+    story_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    media_url VARCHAR(500) NOT NULL,
+    media_type VARCHAR(20) NOT NULL, -- image, video
+    thumbnail_url VARCHAR(500),
+    
+    -- Interactive elements
+    stickers JSONB, -- polls, questions, links
+    
+    -- Engagement
+    view_count INTEGER DEFAULT 0,
+    reaction_count INTEGER DEFAULT 0,
+    
+    -- Auto-expire
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL '24 hours'),
+    
+    CONSTRAINT valid_media_type CHECK (media_type IN ('image', 'video'))
+);
+
+CREATE INDEX idx_stories_user_id ON stories(user_id);
+CREATE INDEX idx_stories_expires_at ON stories(expires_at);
+```
+
+---
+
+### 8. Hashtags & Topics Table
+Content discovery and categorization.
+
+```sql
+CREATE TABLE topics (
+    topic_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    topic_name VARCHAR(100) UNIQUE NOT NULL,
+    display_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    
+    -- Visual identity
+    color_hex VARCHAR(7), -- for UI bubbles
+    icon_url VARCHAR(500),
+    
+    -- Metrics
+    post_count INTEGER DEFAULT 0,
+    follower_count INTEGER DEFAULT 0,
+    
+    -- Moderation
+    is_trending BOOLEAN DEFAULT false,
+    is_featured BOOLEAN DEFAULT false,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE post_topics (
+    post_topic_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(post_id) ON DELETE CASCADE,
+    topic_id UUID NOT NULL REFERENCES topics(topic_id) ON DELETE CASCADE,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(post_id, topic_id)
+);
+
+CREATE INDEX idx_topics_name ON topics(topic_name);
+CREATE INDEX idx_post_topics_post_id ON post_topics(post_id);
+CREATE INDEX idx_post_topics_topic_id ON post_topics(topic_id);
+```
+
+---
+
+### 9. Notifications Table
+Real-time user notifications.
+
+```sql
+CREATE TABLE notifications (
+    notification_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Notification details
+    notification_type VARCHAR(50) NOT NULL, -- reaction, comment, follow, mention, message
+    title VARCHAR(255) NOT NULL,
+    message TEXT,
+    
+    -- Related entities
+    actor_id UUID REFERENCES users(user_id) ON DELETE CASCADE, -- who triggered it
+    post_id UUID REFERENCES posts(post_id) ON DELETE CASCADE,
+    comment_id UUID REFERENCES comments(comment_id) ON DELETE CASCADE,
+    
+    -- Action URL
+    action_url VARCHAR(500),
+    
+    -- Status
+    is_read BOOLEAN DEFAULT false,
+    read_at TIMESTAMP,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT valid_notification_type CHECK (
+        notification_type IN ('reaction', 'comment', 'follow', 'mention', 'message', 'milestone', 'system')
+    )
+);
+
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX idx_notifications_created_at ON notifications(created_at DESC);
+```
+
+---
+
+### 10. User Settings & Preferences Table
+
+```sql
+CREATE TABLE user_settings (
+    setting_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- Privacy settings
+    profile_visibility VARCHAR(20) DEFAULT 'public',
+    show_activity_status BOOLEAN DEFAULT true,
+    allow_messages_from VARCHAR(20) DEFAULT 'everyone', -- everyone, following, no_one
+    
+    -- Notification preferences
+    email_notifications BOOLEAN DEFAULT true,
+    push_notifications BOOLEAN DEFAULT true,
+    notification_frequency VARCHAR(20) DEFAULT 'instant', -- instant, hourly, daily
+    
+    -- Content preferences
+    autoplay_videos BOOLEAN DEFAULT true,
+    data_saver_mode BOOLEAN DEFAULT false,
+    dark_mode VARCHAR(20) DEFAULT 'auto', -- auto, light, dark
+    
+    -- Wellness features
+    calm_mode BOOLEAN DEFAULT false,
+    time_limit_minutes INTEGER DEFAULT 0, -- 0 = no limit
+    hide_metrics BOOLEAN DEFAULT false,
+    
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+### 11. Analytics & Engagement Table
+
+```sql
+CREATE TABLE post_analytics (
+    analytics_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(post_id) ON DELETE CASCADE,
+    
+    -- Daily metrics
+    date DATE NOT NULL,
+    
+    -- Engagement breakdown
+    views INTEGER DEFAULT 0,
+    unique_views INTEGER DEFAULT 0,
+    reactions_inspired INTEGER DEFAULT 0,
+    reactions_grateful INTEGER DEFAULT 0,
+    reactions_curious INTEGER DEFAULT 0,
+    reactions_excited INTEGER DEFAULT 0,
+    reactions_thoughtful INTEGER DEFAULT 0,
+    comments INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    saves INTEGER DEFAULT 0,
+    
+    -- Audience insights
+    avg_watch_time_seconds INTEGER,
+    completion_rate DECIMAL(5, 2),
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(post_id, date)
+);
+
+CREATE INDEX idx_analytics_post_id ON post_analytics(post_id);
+CREATE INDEX idx_analytics_date ON post_analytics(date DESC);
+```
+
+---
+
+### 12. Saved/Bookmarked Content
+
+```sql
+CREATE TABLE bookmarks (
+    bookmark_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    post_id UUID NOT NULL REFERENCES posts(post_id) ON DELETE CASCADE,
+    
+    -- Organization
+    collection_name VARCHAR(100), -- optional categorization
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(user_id, post_id)
+);
+
+CREATE INDEX idx_bookmarks_user_id ON bookmarks(user_id);
+CREATE INDEX idx_bookmarks_post_id ON bookmarks(post_id);
+CREATE INDEX idx_bookmarks_collection ON bookmarks(collection_name);
+```
+
+---
+
+### 13. Reports & Moderation
+
+```sql
+CREATE TABLE reports (
+    report_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reporter_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    
+    -- What's being reported
+    reported_type VARCHAR(20) NOT NULL, -- post, comment, user, message
+    reported_id UUID NOT NULL,
+    
+    -- Report details
+    reason VARCHAR(50) NOT NULL, -- spam, harassment, inappropriate, copyright
+    description TEXT,
+    
+    -- Status
+    status VARCHAR(20) DEFAULT 'pending', -- pending, reviewed, actioned, dismissed
+    reviewed_by UUID REFERENCES users(user_id),
+    reviewed_at TIMESTAMP,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT valid_reason CHECK (
+        reason IN ('spam', 'harassment', 'inappropriate', 'copyright', 'impersonation', 'other')
+    )
+);
+
+CREATE INDEX idx_reports_status ON reports(status);
+CREATE INDEX idx_reports_created_at ON reports(created_at DESC);
+```
+
+---
+
+## Database Optimization Strategies
+
+### 1. Partitioning
+```sql
+-- Partition posts by created_at (monthly partitions)
+CREATE TABLE posts_2025_01 PARTITION OF posts
+    FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+
+-- Partition messages by created_at (monthly partitions)
+CREATE TABLE messages_2025_01 PARTITION OF messages
+    FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+```
+
+### 2. Materialized Views for Feed Generation
+```sql
+-- Pre-computed user feed
+CREATE MATERIALIZED VIEW user_feed_cache AS
+SELECT 
+    f.follower_id as user_id,
+    p.post_id,
+    p.user_id as author_id,
+    p.created_at,
+    p.reaction_count,
+    p.comment_count
+FROM follows f
+JOIN posts p ON f.following_id = p.user_id
+WHERE p.visibility = 'public'
+    AND p.is_deleted = false
+ORDER BY p.created_at DESC;
+
+CREATE INDEX idx_feed_cache_user ON user_feed_cache(user_id, created_at DESC);
+```
+
+### 3. Redis Caching Strategy
+```
+Key Structure:
+- user:{user_id}:profile - User profile data (TTL: 5 minutes)
+- feed:{user_id}:posts - Cached feed (TTL: 2 minutes)
+- post:{post_id}:reactions - Reaction counts (TTL: 30 seconds)
+- trending:topics - Trending topics list (TTL: 10 minutes)
+- user:{user_id}:notifications:unread - Unread count (Real-time)
+```
+
+---
+
+## Database Relationships Diagram
+
+```
+USERS (1) ──┬── (Many) POSTS
+            ├── (Many) FOLLOWS (follower)
+            ├── (Many) FOLLOWS (following)
+            ├── (Many) REACTIONS
+            ├── (Many) COMMENTS
+            ├── (Many) MESSAGES
+            ├── (Many) STORIES
+            ├── (Many) BOOKMARKS
+            └── (1) USER_SETTINGS
+
+POSTS (1) ──┬── (Many) REACTIONS
+            ├── (Many) COMMENTS
+            ├── (Many) POST_TOPICS
+            ├── (Many) BOOKMARKS
+            └── (1) POST_ANALYTICS
+
+CONVERSATIONS (1) ──┬── (Many) MESSAGES
+                    └── (Many) CONVERSATION_PARTICIPANTS
+
+TOPICS (1) ──── (Many) POST_TOPICS
+```
+
+---
+
+## Best Practices Implementation
+
+### 1. Soft Deletes
+Most tables use `is_deleted` flag instead of hard deletes to maintain referential integrity and allow data recovery.
+
+### 2. Denormalization for Performance
+- Reaction counts stored on posts table
+- Comment counts cached for quick display
+- Follower counts on user profiles
+
+### 3. UUID Primary Keys
+Using UUIDs instead of auto-increment integers for:
+- Better distributed system support
+- No ID enumeration attacks
+- Easier replication across regions
+
+### 4. Timestamp Tracking
+Every table includes:
+- `created_at` - When record was created
+- `updated_at` - Last modification time
+
+### 5. Indexes
+Strategic indexes on:
+- Foreign keys
+- Frequently queried columns
+- Date fields for sorting
+- Composite indexes for common query patterns
+
+---
+
+## Scaling Considerations
+
+### Read Replicas
+- Master: Handles writes
+- Replicas: Handle read queries (feeds, profiles, search)
+
+### Sharding Strategy
+- Shard users by `user_id` hash
+- Posts sharded by `user_id` (keeps user data together)
+- Messages sharded by `conversation_id`
+
+### CDN Integration
+- Media files stored in S3/R2
+- Served via CloudFlare CDN
+- Database only stores URLs
+
+---
+
+## Security Measures
+
+1. **Password Security**: bcrypt with salt rounds ≥ 12
+2. **SQL Injection Prevention**: Parameterized queries only
+3. **Rate Limiting**: Track in Redis, block by IP/user_id
+4. **Data Encryption**: Encrypt sensitive fields at rest
+5. **Access Control**: Row-level security policies in PostgreSQL
+6. **Audit Logging**: Track all data modifications
+
+---
+
+## Migration & Backup Strategy
+
+### Daily Backups
+```bash
+pg_dump -Fc lumina_db > backup_$(date +%Y%m%d).dump
+```
+
+### Point-in-Time Recovery
+Enable WAL archiving for transaction-level recovery
+
+### Testing Environment
+Maintain staging database with anonymized production data
+
+---
+
+This database design supports:
+✅ Millions of users
+✅ Real-time interactions
+✅ Complex mood-based reactions
+✅ Efficient feed generation
+✅ Scalable messaging
+✅ Content discovery
+✅ Analytics & insights
+✅ Privacy & security

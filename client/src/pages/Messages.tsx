@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { initializeSocket, sendMessage, onMessageReceived, onMessagesLoaded, offAllEvents } from "@/lib/socket";
+import { initializeSocket, emitMessage, onMessageReceived, onMessagesLoaded, offAllEvents } from "@/lib/socket";
 
 interface Message {
   id: string;
@@ -92,7 +92,7 @@ export default function Messages() {
 
     try {
       const conversationId = [currentUser.id, selectedUserId].sort().join("_");
-      sendMessage(currentUser.id, selectedUserId, messageText);
+      emitMessage(currentUser.id, selectedUserId, messageText);
       // Add message optimistically
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -291,7 +291,7 @@ export default function Messages() {
           messages.map((msg, idx) => {
             const isConsecutive = idx > 0 && messages[idx - 1]?.senderId === msg.senderId;
             const nextIsDifferent = idx < messages.length - 1 && messages[idx + 1]?.senderId !== msg.senderId;
-            const messageTime = msg.timestamp?.toDate?.() ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now';
+            const messageTime = typeof msg.timestamp === 'string' ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : msg.timestamp?.toDate ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now';
             
             return (
               <div
@@ -321,7 +321,7 @@ export default function Messages() {
                     </div>
                     {nextIsDifferent && (
                       <p className={`text-xs ${msg.senderId === currentUser.id ? 'text-right mr-2' : 'text-left ml-2'} text-muted-foreground`}>
-                        {msg.timestamp?.toDate ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'}
+                        {typeof msg.timestamp === 'string' ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : msg.timestamp?.toDate ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'}
                       </p>
                     )}
                   </div>

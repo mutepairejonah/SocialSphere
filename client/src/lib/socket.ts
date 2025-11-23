@@ -39,7 +39,7 @@ export function disconnectSocket() {
 }
 
 // Message events
-export function sendMessage(senderId: string, recipientId: string, message: string) {
+export function emitMessage(senderId: string, recipientId: string, message: string) {
   if (!socket) return;
   const conversationId = [senderId, recipientId].sort().join("_");
   socket.emit("message:send", {
