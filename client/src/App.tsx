@@ -15,6 +15,8 @@ import EditProfile from "./pages/EditProfile";
 import Following from "./pages/Following";
 import Followers from "./pages/Followers";
 import Messages from "./pages/Messages";
+import Stories from "./pages/Stories";
+import CreateStory from "./pages/CreateStory";
 
 function App() {
   const { isAuthenticated, initializeAuth, pendingGoogleUser } = useStore();
@@ -39,6 +41,8 @@ function App() {
         <Route path="/" component={Home} />
         <Route path="/explore" component={Explore} />
         <Route path="/create" component={Create} />
+        <Route path="/stories" component={Stories} />
+        <Route path="/stories/create" component={CreateStory} />
         <Route path="/activity" component={Activity} />
         <Route path="/messages" component={Messages} />
         <Route path="/profile" component={Profile} />

@@ -3,10 +3,11 @@ import { PostCard } from "@/components/PostCard";
 import { useStore } from "@/lib/store";
 import { Heart, Send, PlusSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function Home() {
   const { posts, stories, markStoryViewed, currentUser } = useStore();
+  const [, setLocation] = useLocation();
 
   return (
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
@@ -31,15 +32,19 @@ export default function Home() {
       {/* Stories Rail */}
       <div className="pt-3 pb-2 px-4 flex gap-4 overflow-x-auto no-scrollbar border-b border-border">
         {/* My Story */}
-        <div className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer group">
+        <div 
+          className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer group"
+          onClick={() => setLocation("/stories/create")}
+          data-testid="button-create-story"
+        >
           <div className="relative w-[72px] h-[72px]">
-            <div className="w-full h-full rounded-full border-[2px] border-border overflow-hidden p-[2px]">
+            <div className="w-full h-full rounded-full border-[2px] border-border overflow-hidden p-[2px] group-hover:border-blue-500 transition-colors">
               <img 
                 src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"} 
                 className="w-full h-full object-cover rounded-full" 
               />
             </div>
-            <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center border-2 border-background text-white">
+            <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center border-2 border-background text-white group-hover:scale-110 transition-transform">
               <PlusSquare size={14} strokeWidth={3} />
             </div>
           </div>
@@ -51,16 +56,20 @@ export default function Home() {
           <div 
             key={story.id} 
             className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer group"
-            onClick={() => markStoryViewed(story.id)}
+            onClick={() => {
+              markStoryViewed(story.id);
+              setLocation("/stories");
+            }}
+            data-testid={`story-${story.id}`}
           >
             <div className={cn(
               "w-[72px] h-[72px] rounded-full p-[2px]",
               story.isViewed ? "bg-border" : "bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600"
             )}>
-              <div className="w-full h-full rounded-full border-[2px] border-background overflow-hidden bg-muted">
+              <div className="w-full h-full rounded-full border-[2px] border-background overflow-hidden bg-muted group-hover:scale-110 transition-transform">
                 <img 
                   src={story.imageUrl} 
-                  className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                  className="w-full h-full object-cover" 
                 />
               </div>
             </div>
