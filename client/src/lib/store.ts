@@ -105,13 +105,34 @@ export const useStore = create<StoreState>((set, get) => ({
               } as User,
               isAuthenticated: true
             });
-            // Load posts and users
-            await get().loadPosts();
-            await get().loadUsers();
-            await get().loadNotifications();
+            // Load posts and users with error handling
+            await Promise.all([
+              get().loadPosts().catch(err => console.warn('Posts load failed:', err)),
+              get().loadUsers().catch(err => console.warn('Users load failed:', err)),
+              get().loadNotifications().catch(err => console.warn('Notifications load failed:', err))
+            ]);
+          } else {
+            set({ currentUser: null, isAuthenticated: false });
           }
-        } catch (error) {
-          console.error('Error loading user data:', error);
+        } catch (error: any) {
+          if (error?.code === 'unavailable' || error?.message?.includes('offline')) {
+            // User is authenticated but offline, allow them to continue with local data
+            set({
+              currentUser: {
+                id: firebaseUser.uid,
+                username: firebaseUser.displayName?.split(' ')[0].toLowerCase() || 'user',
+                fullName: firebaseUser.displayName || 'User',
+                email: firebaseUser.email || '',
+                avatar: firebaseUser.photoURL || '',
+                bio: '',
+                followers: 0,
+                following: 0
+              } as User,
+              isAuthenticated: true
+            });
+          } else {
+            console.error('Error loading user data:', error);
+          }
         }
       } else {
         set({ currentUser: null, isAuthenticated: false });
@@ -342,17 +363,20 @@ export const useStore = create<StoreState>((set, get) => ({
     try {
       const postsQuery = query(collection(db, 'posts'));
       const snapshot = await getDocs(postsQuery);
-      const posts = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: new Date(doc.data().timestamp.toDate()).toLocaleString(),
-        isLiked: false,
-        isSaved: false
-      } as Post)).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      const posts = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          timestamp: data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString() : 'Just now',
+          isLiked: false,
+          isSaved: false
+        } as Post;
+      }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
       set({ posts });
     } catch (error) {
-      console.error('Error loading posts:', error);
+      console.warn('Error loading posts (using local data):', error);
     }
   },
 
@@ -371,7 +395,7 @@ export const useStore = create<StoreState>((set, get) => ({
       
       set({ allUsers: users });
     } catch (error) {
-      console.error('Error loading users:', error);
+      console.warn('Error loading users (using local data):', error);
     }
   },
 
@@ -385,17 +409,20 @@ export const useStore = create<StoreState>((set, get) => ({
         where('userId', '==', currentUser.id)
       );
       const snapshot = await getDocs(notifQuery);
-      const notifications = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: new Date(doc.data().createdAt.toDate()).toLocaleString(),
-        userAvatar: '',
-        postImage: ''
-      } as Notification));
+      const notifications = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          timestamp: data.createdAt?.toDate ? new Date(data.createdAt.toDate()).toLocaleString() : 'Recently',
+          userAvatar: '',
+          postImage: ''
+        } as Notification;
+      });
       
       set({ notifications });
     } catch (error) {
-      console.error('Error loading notifications:', error);
+      console.warn('Error loading notifications (using local data):', error);
     }
   },
 

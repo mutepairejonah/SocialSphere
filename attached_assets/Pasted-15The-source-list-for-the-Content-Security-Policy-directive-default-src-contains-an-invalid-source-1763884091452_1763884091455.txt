@@ -1,0 +1,496 @@
+15The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+15The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+15The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+SocialSphere:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+SocialSphere:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+SocialSphere:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+stallwart.build.js:1 stallwart: failed ping 1
+1a68345da7069210.js:2 [Coframe] Replit Enterprise watcher loaded
+1a68345da7069210.js:2 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+1a68345da7069210.js:2 Download the Apollo DevTools for a better development experience: https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm
+1a68345da7069210.js:2 [LaunchDarkly] LaunchDarkly client initialized
+SocialSphere:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+8Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+5Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+5Unrecognized feature: 'battery'.Understand this warning
+5Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+5Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+5Unrecognized feature: 'layout-animations'.Understand this warning
+5Unrecognized feature: 'legacy-image-formats'.Understand this warning
+5Unrecognized feature: 'navigation-override'.Understand this warning
+5Unrecognized feature: 'oversized-images'.Understand this warning
+5Unrecognized feature: 'publickey-credentials'.Understand this warning
+5Unrecognized feature: 'speaker-selection'.Understand this warning
+5Unrecognized feature: 'unoptimized-images'.Understand this warning
+5Unrecognized feature: 'unsized-media'.Understand this warning
+5Unrecognized feature: 'web-share'.Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'pointer-lock'.
+z @ ed1e693c96a75807.js:2Understand this warning
+5Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+5Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+stallwart.build.js:1 stallwart: failed ping 1
+injected.js:37 Error loading user data: FirebaseError: Failed to get document because the client is offline.
+(anonymous) @ injected.js:37Understand this error
+stallwart.build.js:1 stallwart: failed ping 1
+stallwart.build.js:1 stallwart: failed ping 2
+injected.js:37 Error loading user data: FirebaseError: Failed to get document because the client is offline.
+(anonymous) @ injected.js:37
+(anonymous) @ store.ts:53
+setTimeout
+Ou @ firebase_firestore.js?v=157e3e05:14981
+next @ firebase_firestore.js?v=157e3e05:14972
+ka @ firebase_firestore.js?v=157e3e05:13821
+va @ firebase_firestore.js?v=157e3e05:13807
+(anonymous) @ firebase_firestore.js?v=157e3e05:14378
+(anonymous) @ firebase_firestore.js?v=157e3e05:5970
+forEach @ firebase_firestore.js?v=157e3e05:4231
+forEach @ firebase_firestore.js?v=157e3e05:5969
+__PRIVATE_eventManagerOnOnlineStateChange @ firebase_firestore.js?v=157e3e05:14376
+__PRIVATE_syncEngineApplyOnlineStateChange @ firebase_firestore.js?v=157e3e05:14380
+(anonymous) @ firebase_firestore.js?v=157e3e05:14907
+ca @ firebase_firestore.js?v=157e3e05:13092
+(anonymous) @ firebase_firestore.js?v=157e3e05:13059
+(anonymous) @ firebase_firestore.js?v=157e3e05:13487
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+handleDelayElapsed @ firebase_firestore.js?v=157e3e05:13487
+(anonymous) @ firebase_firestore.js?v=157e3e05:13467
+setTimeout
+start @ firebase_firestore.js?v=157e3e05:13467
+createAndSchedule @ firebase_firestore.js?v=157e3e05:13460
+enqueueAfterDelay @ firebase_firestore.js?v=157e3e05:16017
+ua @ firebase_firestore.js?v=157e3e05:13059
+__PRIVATE_startWatchStream @ firebase_firestore.js?v=157e3e05:13207
+__PRIVATE_onWatchStreamClose @ firebase_firestore.js?v=157e3e05:13231
+close @ firebase_firestore.js?v=157e3e05:12839
+z_ @ firebase_firestore.js?v=157e3e05:12881
+(anonymous) @ firebase_firestore.js?v=157e3e05:12869
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:12869
+a_ @ firebase_firestore.js?v=157e3e05:12482
+(anonymous) @ firebase_firestore.js?v=157e3e05:12623
+(anonymous) @ firebase_firestore.js?v=157e3e05:12588
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Z2.qa @ firebase_firestore.js?v=157e3e05:2477
+Lb @ firebase_firestore.js?v=157e3e05:1387
+N2.Y @ firebase_firestore.js?v=157e3e05:1238
+N2.ba @ firebase_firestore.js?v=157e3e05:1189
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Qc @ firebase_firestore.js?v=157e3e05:1885
+h.Xa @ firebase_firestore.js?v=157e3e05:1880
+h.Ca @ firebase_firestore.js?v=157e3e05:1877
+Gc @ firebase_firestore.js?v=157e3e05:1778
+h.Ma @ firebase_firestore.js?v=157e3e05:1745
+Promise.then
+Ic @ firebase_firestore.js?v=157e3e05:1736
+h.Pa @ firebase_firestore.js?v=157e3e05:1732
+Promise.then
+h.send @ firebase_firestore.js?v=157e3e05:1712
+h.ea @ firebase_firestore.js?v=157e3e05:1853
+Eb @ firebase_firestore.js?v=157e3e05:1182
+$c @ firebase_firestore.js?v=157e3e05:2278
+h.Wa @ firebase_firestore.js?v=157e3e05:2253
+(anonymous) @ firebase_firestore.js?v=157e3e05:1032
+setTimeout
+ob @ firebase_firestore.js?v=157e3e05:1031
+h.Da @ firebase_firestore.js?v=157e3e05:2249
+sa @ firebase_firestore.js?v=157e3e05:624
+Promise.then
+u @ firebase_firestore.js?v=157e3e05:618
+ac @ firebase_firestore.js?v=157e3e05:2231
+Lb @ firebase_firestore.js?v=157e3e05:1384
+N2.Y @ firebase_firestore.js?v=157e3e05:1238
+N2.ba @ firebase_firestore.js?v=157e3e05:1189
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Qc @ firebase_firestore.js?v=157e3e05:1885
+h.Xa @ firebase_firestore.js?v=157e3e05:1880
+h.Ca @ firebase_firestore.js?v=157e3e05:1877
+Gc @ firebase_firestore.js?v=157e3e05:1778
+h.Ma @ firebase_firestore.js?v=157e3e05:1745
+Promise.then
+Ic @ firebase_firestore.js?v=157e3e05:1736
+h.Pa @ firebase_firestore.js?v=157e3e05:1732
+Promise.then
+h.send @ firebase_firestore.js?v=157e3e05:1712
+h.ea @ firebase_firestore.js?v=157e3e05:1853
+Eb @ firebase_firestore.js?v=157e3e05:1177
+Cb @ firebase_firestore.js?v=157e3e05:1152
+h.Ea @ firebase_firestore.js?v=157e3e05:2154
+sa @ firebase_firestore.js?v=157e3e05:624
+Promise.then
+u @ firebase_firestore.js?v=157e3e05:618
+bc @ firebase_firestore.js?v=157e3e05:2098
+h.connect @ firebase_firestore.js?v=157e3e05:2058
+Y2.m @ firebase_firestore.js?v=157e3e05:2425
+Yo @ firebase_firestore.js?v=157e3e05:12582
+send @ firebase_firestore.js?v=157e3e05:12473
+q_ @ firebase_firestore.js?v=157e3e05:12789
+Y_ @ firebase_firestore.js?v=157e3e05:12941
+__PRIVATE_sendWatchRequest @ firebase_firestore.js?v=157e3e05:13197
+(anonymous) @ firebase_firestore.js?v=157e3e05:13226
+__PRIVATE_onWatchStreamOpen @ firebase_firestore.js?v=157e3e05:13225
+(anonymous) @ firebase_firestore.js?v=157e3e05:12867
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:12867
+__ @ firebase_firestore.js?v=157e3e05:12479
+(anonymous) @ firebase_firestore.js?v=157e3e05:12629
+setTimeout
+T_ @ firebase_firestore.js?v=157e3e05:12628
+j_ @ firebase_firestore.js?v=157e3e05:12900
+G_ @ firebase_firestore.js?v=157e3e05:12864
+(anonymous) @ firebase_firestore.js?v=157e3e05:12854
+Promise.then
+auth @ firebase_firestore.js?v=157e3e05:12850
+start @ firebase_firestore.js?v=157e3e05:12749
+(anonymous) @ firebase_firestore.js?v=157e3e05:12876
+(anonymous) @ firebase_firestore.js?v=157e3e05:12696
+(anonymous) @ firebase_firestore.js?v=157e3e05:13487
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+handleDelayElapsed @ firebase_firestore.js?v=157e3e05:13487
+(anonymous) @ firebase_firestore.js?v=157e3e05:13467
+setTimeout
+start @ firebase_firestore.js?v=157e3e05:13467
+createAndSchedule @ firebase_firestore.js?v=157e3e05:13460
+enqueueAfterDelay @ firebase_firestore.js?v=157e3e05:16017
+p_ @ firebase_firestore.js?v=157e3e05:12696
+N_ @ firebase_firestore.js?v=157e3e05:12875
+start @ firebase_firestore.js?v=157e3e05:12749
+__PRIVATE_startWatchStream @ firebase_firestore.js?v=157e3e05:13207
+__PRIVATE_onWatchStreamClose @ firebase_firestore.js?v=157e3e05:13231
+close @ firebase_firestore.js?v=157e3e05:12839
+z_ @ firebase_firestore.js?v=157e3e05:12881
+(anonymous) @ firebase_firestore.js?v=157e3e05:12869
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:12869
+a_ @ firebase_firestore.js?v=157e3e05:12482
+(anonymous) @ firebase_firestore.js?v=157e3e05:12623
+(anonymous) @ firebase_firestore.js?v=157e3e05:12588
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Z2.qa @ firebase_firestore.js?v=157e3e05:2477
+Lb @ firebase_firestore.js?v=157e3e05:1387
+N2.Y @ firebase_firestore.js?v=157e3e05:1238
+N2.ba @ firebase_firestore.js?v=157e3e05:1189
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Qc @ firebase_firestore.js?v=157e3e05:1885
+h.Xa @ firebase_firestore.js?v=157e3e05:1880
+h.Ca @ firebase_firestore.js?v=157e3e05:1877
+Gc @ firebase_firestore.js?v=157e3e05:1778
+h.Ma @ firebase_firestore.js?v=157e3e05:1745
+Promise.then
+Ic @ firebase_firestore.js?v=157e3e05:1736
+h.Pa @ firebase_firestore.js?v=157e3e05:1732
+Promise.then
+h.send @ firebase_firestore.js?v=157e3e05:1712
+h.ea @ firebase_firestore.js?v=157e3e05:1853
+Eb @ firebase_firestore.js?v=157e3e05:1182
+$c @ firebase_firestore.js?v=157e3e05:2278
+h.Wa @ firebase_firestore.js?v=157e3e05:2253
+(anonymous) @ firebase_firestore.js?v=157e3e05:1032
+setTimeout
+ob @ firebase_firestore.js?v=157e3e05:1031
+h.Da @ firebase_firestore.js?v=157e3e05:2249
+sa @ firebase_firestore.js?v=157e3e05:624
+Promise.then
+u @ firebase_firestore.js?v=157e3e05:618
+ac @ firebase_firestore.js?v=157e3e05:2231
+Lb @ firebase_firestore.js?v=157e3e05:1384
+N2.Y @ firebase_firestore.js?v=157e3e05:1238
+N2.ba @ firebase_firestore.js?v=157e3e05:1189
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Qc @ firebase_firestore.js?v=157e3e05:1885
+h.Xa @ firebase_firestore.js?v=157e3e05:1880
+h.Ca @ firebase_firestore.js?v=157e3e05:1877
+Gc @ firebase_firestore.js?v=157e3e05:1778
+h.Ma @ firebase_firestore.js?v=157e3e05:1745
+Promise.then
+Ic @ firebase_firestore.js?v=157e3e05:1736
+h.Pa @ firebase_firestore.js?v=157e3e05:1732
+Promise.then
+h.send @ firebase_firestore.js?v=157e3e05:1712
+h.ea @ firebase_firestore.js?v=157e3e05:1853
+Eb @ firebase_firestore.js?v=157e3e05:1177
+Cb @ firebase_firestore.js?v=157e3e05:1152
+h.Ea @ firebase_firestore.js?v=157e3e05:2154
+sa @ firebase_firestore.js?v=157e3e05:624
+Promise.then
+u @ firebase_firestore.js?v=157e3e05:618
+bc @ firebase_firestore.js?v=157e3e05:2098
+h.connect @ firebase_firestore.js?v=157e3e05:2058
+Y2.m @ firebase_firestore.js?v=157e3e05:2425
+Yo @ firebase_firestore.js?v=157e3e05:12582
+send @ firebase_firestore.js?v=157e3e05:12473
+q_ @ firebase_firestore.js?v=157e3e05:12789
+Y_ @ firebase_firestore.js?v=157e3e05:12941
+__PRIVATE_sendWatchRequest @ firebase_firestore.js?v=157e3e05:13197
+(anonymous) @ firebase_firestore.js?v=157e3e05:13226
+__PRIVATE_onWatchStreamOpen @ firebase_firestore.js?v=157e3e05:13225
+(anonymous) @ firebase_firestore.js?v=157e3e05:12867
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:12867
+__ @ firebase_firestore.js?v=157e3e05:12479
+(anonymous) @ firebase_firestore.js?v=157e3e05:12629
+setTimeout
+T_ @ firebase_firestore.js?v=157e3e05:12628
+j_ @ firebase_firestore.js?v=157e3e05:12900
+G_ @ firebase_firestore.js?v=157e3e05:12864
+(anonymous) @ firebase_firestore.js?v=157e3e05:12854
+Promise.then
+auth @ firebase_firestore.js?v=157e3e05:12850
+start @ firebase_firestore.js?v=157e3e05:12749
+(anonymous) @ firebase_firestore.js?v=157e3e05:12876
+(anonymous) @ firebase_firestore.js?v=157e3e05:12696
+(anonymous) @ firebase_firestore.js?v=157e3e05:13487
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+handleDelayElapsed @ firebase_firestore.js?v=157e3e05:13487
+(anonymous) @ firebase_firestore.js?v=157e3e05:13467
+setTimeout
+start @ firebase_firestore.js?v=157e3e05:13467
+createAndSchedule @ firebase_firestore.js?v=157e3e05:13460
+enqueueAfterDelay @ firebase_firestore.js?v=157e3e05:16017
+p_ @ firebase_firestore.js?v=157e3e05:12696
+N_ @ firebase_firestore.js?v=157e3e05:12875
+start @ firebase_firestore.js?v=157e3e05:12749
+__PRIVATE_startWatchStream @ firebase_firestore.js?v=157e3e05:13207
+__PRIVATE_onWatchStreamClose @ firebase_firestore.js?v=157e3e05:13231
+close @ firebase_firestore.js?v=157e3e05:12839
+z_ @ firebase_firestore.js?v=157e3e05:12881
+(anonymous) @ firebase_firestore.js?v=157e3e05:12869
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:15977
+(anonymous) @ firebase_firestore.js?v=157e3e05:16008
+Promise.then
+cc @ firebase_firestore.js?v=157e3e05:16008
+enqueue @ firebase_firestore.js?v=157e3e05:15977
+enqueueAndForget @ firebase_firestore.js?v=157e3e05:15959
+(anonymous) @ firebase_firestore.js?v=157e3e05:12891
+(anonymous) @ firebase_firestore.js?v=157e3e05:12869
+a_ @ firebase_firestore.js?v=157e3e05:12482
+(anonymous) @ firebase_firestore.js?v=157e3e05:12623
+(anonymous) @ firebase_firestore.js?v=157e3e05:12588
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Z2.qa @ firebase_firestore.js?v=157e3e05:2477
+Lb @ firebase_firestore.js?v=157e3e05:1387
+N2.Y @ firebase_firestore.js?v=157e3e05:1238
+N2.ba @ firebase_firestore.js?v=157e3e05:1189
+Va @ firebase_firestore.js?v=157e3e05:920
+D @ firebase_firestore.js?v=157e3e05:888
+Qc @ firebase_firestore.js?v=157e3e05:1885
+h.Xa @ firebase_firestore.js?v=157e3e05:1880
+h.Ca @ firebase_firestore.js?v=157e3e05:1877
+Gc @ firebase_firestore.js?v=157e3e05:1778
+h.Ma @ firebase_firestore.js?v=157e3e05:1745
+Promise.then
+Ic @ firebase_firestore.js?v=157e3e05:1736
+h.Pa @ firebase_firestore.js?v=157e3e05:1732
+Promise.then
+h.send @ firebase_firestore.js?v=157e3e05:1712
+h.ea @ firebase_firestore.js?v=157e3e05:1853
+Eb @ firebase_firestore.js?v=157e3e05:1182
+$c @ firebase_firestore.js?v=157e3e05:2278
+h.Wa @ firebase_firestore.js?v=157e3e05:2253
+(anonymous) @ firebase_firestore.js?v=157e3e05:1032Understand this error
+stallwart.build.js:1 stallwart: failed ping 1
+stallwart.build.js:1 stallwart: failed ping 2
+stallwart.build.js:1 stallwart: failed ping 1
+injected.js:37 Firestore temporarily unavailable, app will work with cached data
+(anonymous) @ injected.js:37
+(anonymous) @ store.ts?t=1763883847156:54
+await in (anonymous)
+(anonymous) @ firebase_auth.js?v=157e3e05:2748
+Promise.then
+registerStateListener @ firebase_auth.js?v=157e3e05:2744
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:2607
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:5123
+initializeAuth @ store.ts?t=1763883847156:35
+(anonymous) @ App.tsx:21
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18567
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+commitHookEffectListMount @ react-dom_client.js?v=157e3e05:9411
+commitHookPassiveMountEffects @ react-dom_client.js?v=157e3e05:9465
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11040
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=157e3e05:11010
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11066
+flushPassiveEffects @ react-dom_client.js?v=157e3e05:13150
+flushPendingEffects @ react-dom_client.js?v=157e3e05:13088
+flushSpawnedWork @ react-dom_client.js?v=157e3e05:13062
+commitRoot @ react-dom_client.js?v=157e3e05:12804
+commitRootWhenReady @ react-dom_client.js?v=157e3e05:12016
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11950
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+flushSyncWork$1 @ react-dom_client.js?v=157e3e05:12076
+scheduleRefresh @ react-dom_client.js?v=157e3e05:372
+(anonymous) @ @react-refresh:228
+performReactRefresh @ @react-refresh:217
+(anonymous) @ @react-refresh:604Understand this warning
+injected.js:37 Firestore temporarily unavailable, app will work with cached data
+(anonymous) @ injected.js:37
+(anonymous) @ store.ts?t=1763883850708:54
+await in (anonymous)
+(anonymous) @ firebase_auth.js?v=157e3e05:2748
+Promise.then
+registerStateListener @ firebase_auth.js?v=157e3e05:2744
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:2607
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:5123
+initializeAuth @ store.ts?t=1763883850708:35
+(anonymous) @ App.tsx:21
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18567
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+commitHookEffectListMount @ react-dom_client.js?v=157e3e05:9411
+commitHookPassiveMountEffects @ react-dom_client.js?v=157e3e05:9465
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11040
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=157e3e05:11010
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11066
+flushPassiveEffects @ react-dom_client.js?v=157e3e05:13150
+flushPendingEffects @ react-dom_client.js?v=157e3e05:13088
+flushSpawnedWork @ react-dom_client.js?v=157e3e05:13062
+commitRoot @ react-dom_client.js?v=157e3e05:12804
+commitRootWhenReady @ react-dom_client.js?v=157e3e05:12016
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11950
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+flushSyncWork$1 @ react-dom_client.js?v=157e3e05:12076
+scheduleRefresh @ react-dom_client.js?v=157e3e05:372
+(anonymous) @ @react-refresh:228
+performReactRefresh @ @react-refresh:217
+(anonymous) @ @react-refresh:604Understand this warning
+injected.js:37 Firestore temporarily unavailable, app will work with cached data
+(anonymous) @ injected.js:37
+(anonymous) @ store.ts?t=1763883852336:54
+await in (anonymous)
+(anonymous) @ firebase_auth.js?v=157e3e05:2748
+Promise.then
+registerStateListener @ firebase_auth.js?v=157e3e05:2744
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:2607
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:5123
+initializeAuth @ store.ts?t=1763883852336:35
+(anonymous) @ App.tsx:21
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18567
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+commitHookEffectListMount @ react-dom_client.js?v=157e3e05:9411
+commitHookPassiveMountEffects @ react-dom_client.js?v=157e3e05:9465
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11040
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=157e3e05:11010
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11066
+flushPassiveEffects @ react-dom_client.js?v=157e3e05:13150
+flushPendingEffects @ react-dom_client.js?v=157e3e05:13088
+flushSpawnedWork @ react-dom_client.js?v=157e3e05:13062
+commitRoot @ react-dom_client.js?v=157e3e05:12804
+commitRootWhenReady @ react-dom_client.js?v=157e3e05:12016
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11950
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+flushSyncWork$1 @ react-dom_client.js?v=157e3e05:12076
+scheduleRefresh @ react-dom_client.js?v=157e3e05:372
+(anonymous) @ @react-refresh:228
+performReactRefresh @ @react-refresh:217
+(anonymous) @ @react-refresh:604Understand this warning
+injected.js:37 Firestore temporarily unavailable, app will work with cached data
+(anonymous) @ injected.js:37
+(anonymous) @ store.ts?t=1763883854458:54
+await in (anonymous)
+(anonymous) @ firebase_auth.js?v=157e3e05:2748
+Promise.then
+registerStateListener @ firebase_auth.js?v=157e3e05:2744
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:2607
+onAuthStateChanged @ firebase_auth.js?v=157e3e05:5123
+initializeAuth @ store.ts?t=1763883854458:35
+(anonymous) @ App.tsx:21
+react_stack_bottom_frame @ react-dom_client.js?v=157e3e05:18567
+runWithFiberInDEV @ react-dom_client.js?v=157e3e05:997
+commitHookEffectListMount @ react-dom_client.js?v=157e3e05:9411
+commitHookPassiveMountEffects @ react-dom_client.js?v=157e3e05:9465
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11040
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=157e3e05:11010
+commitPassiveMountOnFiber @ react-dom_client.js?v=157e3e05:11066
+flushPassiveEffects @ react-dom_client.js?v=157e3e05:13150
+flushPendingEffects @ react-dom_client.js?v=157e3e05:13088
+flushSpawnedWork @ react-dom_client.js?v=157e3e05:13062
+commitRoot @ react-dom_client.js?v=157e3e05:12804
+commitRootWhenReady @ react-dom_client.js?v=157e3e05:12016
+performWorkOnRoot @ react-dom_client.js?v=157e3e05:11950
+performSyncWorkOnRoot @ react-dom_client.js?v=157e3e05:13517
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=157e3e05:13414
+flushSyncWork$1 @ react-dom_client.js?v=157e3e05:12076
+scheduleRefresh @ react-dom_client.js?v=157e3e05:372
+(anonymous) @ @react-refresh:228
+performReactRefresh @ @react-refresh:217
+(anonymous) @ @react-refresh:604Understand this warning
+20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:815  GET https://20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/src/components/PostCard.tsx?t=1763883864328 net::ERR_ABORTED 502 (Bad Gateway)
+importUpdatedModule @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:815
+fetchUpdate @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:210
+queueUpdate @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:189
+(anonymous) @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:839
+handleMessage @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:838
+await in handleMessage
+(anonymous) @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:458
+dequeue @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:480
+(anonymous) @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:472
+enqueue @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:466
+(anonymous) @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:458
+onMessage @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:305
+(anonymous) @ 20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/@vite/client:413Understand this error
+20466466-85a7-40e9-a031-57731118ca6f-00-3dohdmcapp0gz.riker.replit.dev/__replco/static/devtools/injected.js:37 [vite] Failed to reload /src/components/PostCard.tsx. This 

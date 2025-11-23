@@ -15,11 +15,11 @@ import Following from "./pages/Following";
 import Followers from "./pages/Followers";
 
 function App() {
-  const { isAuthenticated, initializeAuth, loadPosts, loadUsers } = useStore();
+  const { isAuthenticated, initializeAuth } = useStore();
 
   useEffect(() => {
     initializeAuth();
-  }, [initializeAuth]);
+  }, []);
 
   if (!isAuthenticated) {
     return <Login />;

@@ -14,6 +14,7 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -34,11 +35,12 @@ export default function Login() {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
+    if (isSignUp && !fullName) return;
 
     setLoading(true);
     try {
       if (isSignUp) {
-        await signupWithEmail(email, password);
+        await signupWithEmail(email, password, fullName);
       } else {
         await loginWithEmail(email, password);
       }
@@ -65,6 +67,15 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleEmailAuth} className="space-y-3">
+          {isSignUp && (
+            <Input 
+              placeholder="Full Name" 
+              className="bg-muted/50" 
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          )}
           <Input 
             placeholder="Email" 
             className="bg-muted/50" 
