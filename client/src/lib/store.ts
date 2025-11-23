@@ -6,7 +6,7 @@ import {
 } from 'firebase/auth';
 import {
   collection, doc, getDoc, setDoc, query, where, getDocs, addDoc, updateDoc,
-  deleteDoc, arrayUnion, arrayRemove, Timestamp, writeBatch
+  deleteDoc, arrayUnion, arrayRemove, Timestamp, writeBatch, onSnapshot
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -335,67 +335,87 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) return;
 
     try {
+      let imageUrl = newPost.imageUrl;
+      
+      // Upload image to Firebase Storage if it's a data URL
+      if (newPost.imageUrl.startsWith('data:')) {
+        try {
+          const blob = await (await fetch(newPost.imageUrl)).blob();
+          const timestamp = Date.now();
+          const storageRef = ref(storage, `posts/${currentUser.id}/${timestamp}`);
+          await uploadBytes(storageRef, blob);
+          imageUrl = await getDownloadURL(storageRef);
+        } catch (uploadError) {
+          console.error('Image upload failed, using data URL:', uploadError);
+          // Fallback to data URL if storage fails
+        }
+      }
+
       const postRef = await addDoc(collection(db, 'posts'), {
         ...newPost,
+        imageUrl,
         timestamp: Timestamp.now(),
         likes: 0,
         comments: 0,
       });
 
-      const postData = await getDoc(postRef);
-      if (postData.exists()) {
-        set(state => ({
-          posts: [{
-            id: postData.id,
-            ...postData.data(),
-            timestamp: new Date(postData.data().timestamp.toDate()).toLocaleString(),
-            isLiked: false,
-            isSaved: false
-          } as Post, ...state.posts]
-        }));
-      }
+      console.log('Post created:', postRef.id);
     } catch (error) {
       console.error('Error adding post:', error);
+      throw error;
     }
   },
 
   loadPosts: async () => {
     try {
       const postsQuery = query(collection(db, 'posts'));
-      const snapshot = await getDocs(postsQuery);
-      const posts = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          timestamp: data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString() : 'Just now',
-          isLiked: false,
-          isSaved: false
-        } as Post;
-      }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
-      set({ posts });
+      // Real-time listener for posts
+      onSnapshot(postsQuery, (snapshot) => {
+        const posts = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            timestamp: data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString() : 'Just now',
+            isLiked: false,
+            isSaved: false
+          } as Post;
+        }).sort((a, b) => {
+          const aTime = new Date(a.timestamp).getTime();
+          const bTime = new Date(b.timestamp).getTime();
+          return isNaN(bTime) || isNaN(aTime) ? 0 : bTime - aTime;
+        });
+        
+        set({ posts });
+      }, (error) => {
+        console.warn('Posts real-time listener error:', error);
+      });
     } catch (error) {
-      console.warn('Error loading posts (using local data):', error);
+      console.warn('Error setting up posts listener:', error);
     }
   },
 
   loadUsers: async () => {
     try {
       const usersQuery = query(collection(db, 'users'));
-      const snapshot = await getDocs(usersQuery);
       const currentUserId = get().currentUser?.id;
       
-      const users = snapshot.docs
-        .filter(doc => doc.id !== currentUserId)
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as User));
-      
-      set({ allUsers: users });
+      // Real-time listener for users
+      onSnapshot(usersQuery, (snapshot) => {
+        const users = snapshot.docs
+          .filter(doc => doc.id !== currentUserId)
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as User));
+        
+        set({ allUsers: users });
+      }, (error) => {
+        console.warn('Users real-time listener error:', error);
+      });
     } catch (error) {
-      console.warn('Error loading users (using local data):', error);
+      console.warn('Error setting up users listener:', error);
     }
   },
 
@@ -408,21 +428,26 @@ export const useStore = create<StoreState>((set, get) => ({
         collection(db, 'notifications'),
         where('userId', '==', currentUser.id)
       );
-      const snapshot = await getDocs(notifQuery);
-      const notifications = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          timestamp: data.createdAt?.toDate ? new Date(data.createdAt.toDate()).toLocaleString() : 'Recently',
-          userAvatar: '',
-          postImage: ''
-        } as Notification;
-      });
       
-      set({ notifications });
+      // Real-time listener for notifications
+      onSnapshot(notifQuery, (snapshot) => {
+        const notifications = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            timestamp: data.createdAt?.toDate ? new Date(data.createdAt.toDate()).toLocaleString() : 'Recently',
+            userAvatar: '',
+            postImage: ''
+          } as Notification;
+        });
+        
+        set({ notifications });
+      }, (error) => {
+        console.warn('Notifications real-time listener error:', error);
+      });
     } catch (error) {
-      console.warn('Error loading notifications (using local data):', error);
+      console.warn('Error setting up notifications listener:', error);
     }
   },
 
