@@ -25,7 +25,7 @@ interface User {
 }
 
 export default function Messages() {
-  const { currentUser, sendMessage, getMessages, startCall } = useStore();
+  const { currentUser, sendMessage, getMessages, startCall, getFollowing } = useStore();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -33,12 +33,13 @@ export default function Messages() {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [calling, setCalling] = useState(false);
+  const [followingUsers, setFollowingUsers] = useState<User[]>([]);
 
-  // Mock following list for demo
-  const [followingUsers] = useState<User[]>([
-    { id: "user1", username: "sarah_smith", fullName: "Sarah Smith", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400" },
-    { id: "user2", username: "john_doe", fullName: "John Doe", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400" },
-  ]);
+  useEffect(() => {
+    // Load following users
+    const following = getFollowing();
+    setFollowingUsers(following as User[]);
+  }, []);
 
   useEffect(() => {
     if (selectedUserId) {
@@ -111,23 +112,33 @@ export default function Messages() {
 
         <main className="p-4">
           <h2 className="font-bold text-lg mb-4">Messages</h2>
-          <div className="space-y-3">
-            {followingUsers.map(user => (
-              <div
-                key={user.id}
-                onClick={() => setSelectedUserId(user.id)}
-                className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
-              >
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-muted border border-border">
-                  <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+          {followingUsers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground text-center">
+              <p className="font-semibold mb-2">No conversations yet</p>
+              <p className="text-sm">Follow someone to start messaging</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {followingUsers.map(user => (
+                <div
+                  key={user.id}
+                  onClick={() => setSelectedUserId(user.id)}
+                  data-testid={`conversation-${user.id}`}
+                  className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-muted border border-border">
+                    {user.avatar && (
+                      <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate">{user.username}</p>
+                    <p className="text-sm text-muted-foreground truncate">{user.fullName}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold truncate">{user.username}</p>
-                  <p className="text-sm text-muted-foreground truncate">{user.fullName}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </main>
 
         <BottomNav />
