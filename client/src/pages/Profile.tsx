@@ -7,11 +7,15 @@ import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 
 export default function Profile() {
-  const { currentUser, isAuthenticated, logout, posts } = useStore();
+  const { currentUser, isAuthenticated, logout, posts, loadPosts } = useStore();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'tagged'>('posts');
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
