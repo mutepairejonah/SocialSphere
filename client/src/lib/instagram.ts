@@ -80,10 +80,27 @@ export async function makeInstagramRequest(
 /**
  * Get user media from Instagram
  */
-export async function getUserMedia(userId: string = 'me'): Promise<any> {
+export async function getUserMedia(userId?: string): Promise<any> {
   try {
-    const response = await makeInstagramRequest(`${userId}/media`);
-    return response.data || [];
+    // Use business account ID if available, otherwise use 'me'
+    const accountId = userId || INSTAGRAM_API_CONFIG.businessAccountId || 'me';
+    console.log('Fetching media for account:', accountId);
+    const response = await makeInstagramRequest(`${accountId}?fields=id,name,media.limit(10){id,caption,media_type,media_url,thumbnail_url,timestamp}`);
+    console.log('Instagram API response:', response);
+    
+    // Handle nested response format: response.media.data
+    if (response.media && response.media.data) {
+      console.log('Extracted media.data:', response.media.data);
+      return response.media.data;
+    }
+    if (response.media) {
+      return response.media;
+    }
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    }
+    console.warn('Could not extract media from response:', response);
+    return [];
   } catch (error) {
     console.error('Error fetching user media:', error);
     return [];

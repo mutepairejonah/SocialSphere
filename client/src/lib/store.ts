@@ -438,28 +438,35 @@ export const useStore = create<StoreState>((set, get) => ({
   loadPosts: async () => {
     try {
       // Load posts from Instagram API
+      console.log('Starting loadPosts from Instagram API...');
       const instagramPosts = await getUserMedia();
+      console.log('Instagram posts received:', instagramPosts);
       
-      if (instagramPosts && instagramPosts.length > 0) {
-        const posts = instagramPosts.map((igPost: any, index: number) => ({
-          id: igPost.id || `ig_${index}`,
-          userId: get().currentUser?.id || 'instagram',
-          imageUrl: igPost.media_type === 'IMAGE' ? igPost.media_url : (igPost.thumbnail_url || 'https://via.placeholder.com/500'),
-          caption: igPost.caption || '',
-          likes: 0,
-          location: '',
-          timestamp: new Date(igPost.timestamp).toLocaleString(),
-          comments: 0,
-          isLiked: false,
-          isSaved: false
-        } as Post));
+      if (instagramPosts && Array.isArray(instagramPosts) && instagramPosts.length > 0) {
+        const posts = instagramPosts.map((igPost: any, index: number) => {
+          const timestamp = igPost.timestamp || new Date().toISOString();
+          return {
+            id: igPost.id || `ig_${index}`,
+            userId: get().currentUser?.id || 'instagram',
+            imageUrl: igPost.media_type === 'IMAGE' ? igPost.media_url : (igPost.thumbnail_url || 'https://via.placeholder.com/500?text=Instagram+Post'),
+            caption: igPost.caption || '(No caption)',
+            likes: 0,
+            location: '',
+            timestamp: new Date(timestamp).toLocaleString(),
+            comments: 0,
+            isLiked: false,
+            isSaved: false
+          } as Post;
+        });
         
+        console.log('Transformed posts:', posts);
         set({ posts });
       } else {
+        console.log('No Instagram posts found or invalid response');
         set({ posts: [] });
       }
     } catch (error) {
-      console.warn('Error loading Instagram posts:', error);
+      console.error('Error loading Instagram posts:', error);
       set({ posts: [] });
     }
   },
