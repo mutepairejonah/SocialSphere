@@ -55,7 +55,7 @@ export default function Activity() {
                     </div>
                     <Button 
                       size="sm" 
-                      className="h-8 px-5 font-semibold bg-[#0095F6] hover:bg-[#1877F2] text-white"
+                      className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleFollow(user.id);
@@ -97,7 +97,7 @@ function NotificationItem({ notification }: { notification: any }) {
       </div>
       
       {notification.type === 'follow' ? (
-         <Button size="sm" className="h-8 px-5 font-semibold bg-blue-500 hover:bg-blue-600 text-white text-xs">Follow</Button>
+         <Button size="sm" className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white text-xs">Follow</Button>
       ) : notification.type === 'message' ? (
          <div className="w-11 h-11 bg-muted rounded-lg overflow-hidden border border-border flex items-center justify-center text-foreground font-bold">
             💬

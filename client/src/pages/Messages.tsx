@@ -7,6 +7,7 @@ import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { initializeSocket, sendMessage, onMessageReceived, onMessagesLoaded, offAllEvents } from "@/lib/socket";
 
 interface Message {
   id: string;
@@ -44,13 +45,31 @@ export default function Messages() {
   }, []);
 
   useEffect(() => {
-    if (selectedUserId) {
+    if (!currentUser) return;
+    initializeSocket(currentUser.id);
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (selectedUserId && currentUser) {
       loadMessages();
-      // Refresh messages every 2 seconds for real-time feel
-      const interval = setInterval(loadMessages, 2000);
-      return () => clearInterval(interval);
+      
+      // Listen for real-time messages
+      const handleNewMessage = (message: any) => {
+        setMessages(prev => [...prev, message]);
+      };
+      
+      const handleMessagesLoaded = (loadedMessages: any[]) => {
+        setMessages(loadedMessages);
+      };
+      
+      onMessageReceived(handleNewMessage);
+      onMessagesLoaded(handleMessagesLoaded);
+      
+      return () => {
+        offAllEvents();
+      };
     }
-  }, [selectedUserId]);
+  }, [selectedUserId, currentUser]);
 
   const loadMessages = async () => {
     if (!selectedUserId) return;
@@ -65,16 +84,23 @@ export default function Messages() {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!messageInput.trim() || !selectedUserId) return;
+  const handleSendMessage = () => {
+    if (!messageInput.trim() || !selectedUserId || !currentUser) return;
 
     const messageText = messageInput.trim();
     setMessageInput("");
-    setLoading(true);
 
     try {
-      await sendMessage(selectedUserId, messageText);
-      loadMessages();
+      sendMessage(currentUser.id, selectedUserId, messageText);
+      // Add message optimistically
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        senderId: currentUser.id,
+        recipientId: selectedUserId,
+        message: messageText,
+        timestamp: new Date().toLocaleTimeString(),
+        read: false
+      }]);
       toast({
         title: "Message Sent",
         description: `Message sent to ${selectedUser?.username}`
@@ -86,8 +112,6 @@ export default function Messages() {
         title: "Error",
         description: error?.message || "Failed to send message"
       });
-    } finally {
-      setLoading(false);
     }
   };
 
