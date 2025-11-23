@@ -15,7 +15,7 @@ interface Message {
   senderId: string;
   recipientId: string;
   message: string;
-  timestamp?: { toDate: () => Date } | null;
+  timestamp?: string | { toDate: () => Date } | null;
   read: boolean;
 }
 
@@ -91,10 +91,12 @@ export default function Messages() {
     setMessageInput("");
 
     try {
+      const conversationId = [currentUser.id, selectedUserId].sort().join("_");
       sendMessage(currentUser.id, selectedUserId, messageText);
       // Add message optimistically
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
+        conversationId,
         senderId: currentUser.id,
         recipientId: selectedUserId,
         message: messageText,

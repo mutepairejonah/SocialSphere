@@ -522,7 +522,17 @@ export const useStore = create<StoreState>((set, get) => ({
 
   loadPosts: async () => {
     try {
+      const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
+      const currentUser = get().currentUser;
+      
       console.log('Loading Instagram API posts (API key owner only)...');
+      
+      // Only load posts if user is the API key owner
+      if (!currentUser || currentUser.id !== API_KEY_OWNER_ID) {
+        console.log('Post loading restricted: Only API key owner can fetch posts');
+        set({ posts: [] });
+        return;
+      }
       
       // Fetch posts from Instagram API (only API key owner's posts)
       const instagramPosts = await getUserMedia();
