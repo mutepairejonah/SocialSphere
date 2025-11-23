@@ -1,44 +1,112 @@
-import { BottomNav } from "@/components/BottomNav";
 import { PostCard } from "@/components/PostCard";
 import { useStore } from "@/lib/store";
-import { Heart, Send, PlusSquare, Menu, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings } from "lucide-react";
+import { Heart, Send, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings, PlusSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 
 export default function Home() {
   const { posts, stories, markStoryViewed, currentUser, allUsers, logout } = useStore();
-  const [, setLocation] = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [location, setLocation] = useLocation();
 
   const handleNavigation = (path: string) => {
     setLocation(path);
-    setMenuOpen(false);
   };
 
   const handleLogout = async () => {
     await logout();
-    setMenuOpen(false);
   };
 
   return (
-    <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
-        <button
-          onClick={() => setMenuOpen(true)}
-          className="hover:opacity-70 transition-opacity p-2 -ml-2"
-          data-testid="button-menu"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-        <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Authentic</h1>
+    <div className="flex min-h-screen bg-background">
+      {/* White Sidebar */}
+      <aside className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-200 flex flex-col z-40">
+        <div className="p-6 border-b border-gray-200">
+          <h1 className="font-bold text-2xl text-primary">Authentic</h1>
+        </div>
+
+        <nav className="flex-1 py-6 px-4 space-y-2">
+          <button
+            onClick={() => handleNavigation("/")}
+            className={cn(
+              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
+              location === "/" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
+            )}
+            data-testid="nav-home"
+          >
+            <HomeIcon className="w-5 h-5" />
+            <span className="font-medium">Home</span>
+          </button>
+          <button
+            onClick={() => handleNavigation("/explore")}
+            className={cn(
+              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
+              location === "/explore" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
+            )}
+            data-testid="nav-explore"
+          >
+            <Compass className="w-5 h-5" />
+            <span className="font-medium">Explore</span>
+          </button>
+          <button
+            onClick={() => handleNavigation("/create")}
+            className={cn(
+              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
+              location === "/create" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
+            )}
+            data-testid="nav-create"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="font-medium">Create</span>
+          </button>
+          <button
+            onClick={() => handleNavigation("/messages")}
+            className={cn(
+              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
+              location === "/messages" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
+            )}
+            data-testid="nav-messages"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span className="font-medium">Messages</span>
+          </button>
+          <button
+            onClick={() => handleNavigation("/profile")}
+            className={cn(
+              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
+              location === "/profile" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
+            )}
+            data-testid="nav-profile"
+          >
+            <User className="w-5 h-5" />
+            <span className="font-medium">Profile</span>
+          </button>
+        </nav>
+
+        <div className="border-t border-gray-200 p-4 space-y-2">
+          <button
+            onClick={() => handleNavigation("/profile/edit")}
+            className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            data-testid="nav-settings"
+          >
+            <Settings className="w-5 h-5" />
+            <span className="font-medium">Settings</span>
+          </button>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+            data-testid="nav-logout"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="ml-64 flex-1 flex flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
+          <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Authentic</h1>
         <div className="flex items-center gap-4">
           <Link href="/activity">
              <Heart className="w-6 h-6 cursor-pointer hover:text-secondary transition-colors" data-testid="button-notifications" />
@@ -52,10 +120,10 @@ export default function Home() {
             </div>
           </Link>
         </div>
-      </header>
+        </header>
 
-      {/* Stories Rail */}
-      <div className="pt-3 pb-2 px-4 flex gap-4 overflow-x-auto no-scrollbar border-b border-border">
+        {/* Stories Rail */}
+        <div className="pt-3 pb-2 px-4 flex gap-4 overflow-x-auto no-scrollbar border-b border-border">
         {/* My Story */}
         <div 
           className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer group"
@@ -115,101 +183,21 @@ export default function Home() {
           })}
       </div>
 
-      {/* Feed - Grid Layout (Videos Only) */}
-      <main className="min-h-[calc(100vh-150px)] p-4">
-        {posts && posts.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-             <p className="text-center">No videos available</p>
-          </div>
-        )}
-      </main>
-
-      <BottomNav />
-
-      {/* Background Overlay - Light Blur */}
-      {menuOpen && (
-        <div 
-          className="fixed inset-0 backdrop-blur-sm z-40"
-          onClick={() => setMenuOpen(false)}
-        />
-      )}
-
-      {/* Navigation Drawer */}
-      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="left" className="w-64 flex flex-col bg-background backdrop-blur-sm border-r border-border">
-          <SheetHeader className="border-b border-border pb-4">
-            <SheetTitle className="text-2xl font-bold text-primary">Authentic</SheetTitle>
-          </SheetHeader>
-
-          <nav className="flex-1 py-6 space-y-2">
-            <button
-              onClick={() => handleNavigation("/")}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
-              data-testid="nav-home"
-            >
-              <HomeIcon className="w-5 h-5" />
-              <span className="font-medium">Home</span>
-            </button>
-            <button
-              onClick={() => handleNavigation("/explore")}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
-              data-testid="nav-explore"
-            >
-              <Compass className="w-5 h-5" />
-              <span className="font-medium">Explore</span>
-            </button>
-            <button
-              onClick={() => handleNavigation("/create")}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
-              data-testid="nav-create"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="font-medium">Create</span>
-            </button>
-            <button
-              onClick={() => handleNavigation("/messages")}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
-              data-testid="nav-messages"
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span className="font-medium">Messages</span>
-            </button>
-            <button
-              onClick={() => handleNavigation("/profile")}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
-              data-testid="nav-profile"
-            >
-              <User className="w-5 h-5" />
-              <span className="font-medium">Profile</span>
-            </button>
-          </nav>
-
-          <div className="border-t border-border pt-4 space-y-2">
-            <button
-              onClick={() => handleNavigation("/profile/edit")}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
-              data-testid="nav-settings"
-            >
-              <Settings className="w-5 h-5" />
-              <span className="font-medium">Settings</span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-destructive/10 transition-colors text-destructive"
-              data-testid="nav-logout"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
-            </button>
-          </div>
-        </SheetContent>
-      </Sheet>
+        {/* Feed - Grid Layout (Videos Only) */}
+        <main className="flex-1 p-4 overflow-y-auto">
+          {posts && posts.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+               <p className="text-center">No videos available</p>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
