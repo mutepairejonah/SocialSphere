@@ -1,15 +1,28 @@
 import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
-import { Grid, Bookmark, Menu, User as UserIcon } from "lucide-react";
+import { Grid, Bookmark, Menu, User as UserIcon, Bell, Lock, HelpCircle, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Profile() {
   const { currentUser, isAuthenticated, logout, posts } = useStore();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'tagged'>('posts');
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (!isAuthenticated) {
     setLocation("/login");
@@ -18,14 +31,40 @@ export default function Profile() {
 
   if (!currentUser) return null;
 
+  const handleLogout = async () => {
+    await logout();
+    setLocation("/login");
+  };
+
   return (
     <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-[50px] flex items-center justify-between">
         <div className="flex items-center gap-1 cursor-pointer">
            <h1 className="font-bold text-xl">{currentUser.username}</h1>
         </div>
-        <div className="flex gap-5">
-           <Menu className="w-6 h-6 cursor-pointer" onClick={() => { logout(); setLocation("/login"); }} />
+        <div className="relative" ref={menuRef}>
+           <Menu className="w-6 h-6 cursor-pointer" onClick={() => setShowMenu(!showMenu)} />
+           {showMenu && (
+             <div className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-lg shadow-lg py-2 z-50">
+               <button className="w-full px-4 py-2 flex items-center gap-3 hover:bg-muted text-sm transition-colors text-foreground">
+                 <Bell className="w-4 h-4" />
+                 <span>Notifications</span>
+               </button>
+               <button className="w-full px-4 py-2 flex items-center gap-3 hover:bg-muted text-sm transition-colors text-foreground">
+                 <Lock className="w-4 h-4" />
+                 <span>Privacy & Security</span>
+               </button>
+               <button className="w-full px-4 py-2 flex items-center gap-3 hover:bg-muted text-sm transition-colors text-foreground">
+                 <HelpCircle className="w-4 h-4" />
+                 <span>Help & Support</span>
+               </button>
+               <div className="border-t border-border my-2"></div>
+               <button onClick={handleLogout} className="w-full px-4 py-2 flex items-center gap-3 hover:bg-destructive/10 text-sm transition-colors text-destructive">
+                 <LogOut className="w-4 h-4" />
+                 <span>Logout</span>
+               </button>
+             </div>
+           )}
         </div>
       </header>
 
