@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Volume2, VolumeX, MessageSquare, Share, Sparkles, Hand, HelpCircle, PartyPopper, Brain } from "lucide-react";
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Volume2, VolumeX, MessageSquare, Share } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,14 +61,6 @@ export function PostCard({ post }: PostCardProps) {
       toast.success(`Opening messages with ${post.username}`);
     }
   };
-
-  const moods = [
-    { Icon: Sparkles, label: 'Inspired', color: 'text-primary' },
-    { Icon: Hand, label: 'Grateful', color: 'text-accent' },
-    { Icon: HelpCircle, label: 'Curious', color: 'text-secondary' },
-    { Icon: PartyPopper, label: 'Excited', color: 'text-yellow-600' },
-    { Icon: Brain, label: 'Thoughtful', color: 'text-indigo-600' },
-  ];
 
   return (
     <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -190,46 +182,32 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       )}
 
-      {/* Mood Reactions */}
-      <div className="px-4 py-3 border-t border-border flex gap-1 justify-between items-center">
-        <div className="flex gap-1 flex-wrap">
-          {moods.map((mood) => (
-            <button
-              key={mood.label}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
-              title={mood.label}
-              data-testid={`mood-${mood.label.toLowerCase()}`}
-            >
-              <mood.Icon size={18} className={mood.color} />
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-1">
-          <button 
-            onClick={handleComment}
-            className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-            title="Comments"
-            data-testid="button-comment"
-          >
-            <MessageCircle size={18} />
-          </button>
-          <button 
-            onClick={handleShare}
-            className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-            title="Share"
-            data-testid="button-share"
-          >
-            <Send size={18} className="-rotate-[15deg]" />
-          </button>
-          <button 
-            onClick={() => toggleSave(post.id)}
-            className={cn("p-1.5 rounded-lg hover:bg-muted transition-colors", post.isSaved && "text-primary")}
-            title="Save"
-            data-testid="button-save"
-          >
-            <Bookmark size={18} fill={post.isSaved ? "currentColor" : "none"} />
-          </button>
-        </div>
+      {/* Actions */}
+      <div className="px-4 py-3 border-t border-border flex gap-1 justify-end items-center">
+        <button 
+          onClick={handleComment}
+          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+          title="Comments"
+          data-testid="button-comment"
+        >
+          <MessageCircle size={18} />
+        </button>
+        <button 
+          onClick={handleShare}
+          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+          title="Share"
+          data-testid="button-share"
+        >
+          <Send size={18} className="-rotate-[15deg]" />
+        </button>
+        <button 
+          onClick={() => toggleSave(post.id)}
+          className={cn("p-1.5 rounded-lg hover:bg-muted transition-colors", post.isSaved && "text-primary")}
+          title="Save"
+          data-testid="button-save"
+        >
+          <Bookmark size={18} fill={post.isSaved ? "currentColor" : "none"} />
+        </button>
       </div>
 
       {/* Likes & Caption */}
