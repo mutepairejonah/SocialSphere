@@ -37,10 +37,10 @@ export default function Profile() {
   };
 
   return (
-    <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-[50px] flex items-center justify-between">
+    <div className="pb-20 max-w-md mx-auto min-h-screen bg-gradient-to-b from-background via-background to-background/95">
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-background/98 to-background/98 backdrop-blur-xl border-b-2 border-gradient-to-r from-pink-400/30 to-yellow-400/30 px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-1 cursor-pointer">
-           <h1 className="font-bold text-xl">{currentUser.username}</h1>
+           <h1 className="font-black text-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">{currentUser.username}</h1>
         </div>
         <div className="relative" ref={menuRef}>
            <Menu className="w-6 h-6 cursor-pointer" onClick={() => setShowMenu(!showMenu)} />
@@ -72,30 +72,33 @@ export default function Profile() {
         {/* Profile Info */}
         <div className="px-4 pt-6 pb-4">
           <div className="flex items-center justify-between mb-6">
-            <div className="w-20 h-20 rounded-full p-[2px] border border-border cursor-pointer">
-              <img src={currentUser.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
+            <div className="relative w-24 h-24">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-400 to-yellow-400 blur-lg opacity-30 animate-pulse"></div>
+              <div className="relative w-full h-full rounded-full p-[3px] border-2 border-gradient-to-r from-pink-400 to-yellow-400 cursor-pointer shadow-lg overflow-hidden">
+                <img src={currentUser.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
+              </div>
             </div>
-            <div className="flex-1 flex justify-around text-center ml-4">
+            <div className="flex-1 flex justify-around text-center ml-6 gap-2">
               <div 
-                className="cursor-pointer hover:opacity-70"
+                className="cursor-pointer hover:scale-110 transition-transform bg-gradient-to-br from-blue-100/40 to-blue-50/40 dark:from-blue-900/40 dark:to-blue-800/40 rounded-2xl px-4 py-3 border border-blue-400/30 hover:border-blue-400/60"
                 onClick={() => setLocation("/followers")}
               >
-                <div className="font-bold text-lg leading-tight">{posts.length}</div>
-                <div className="text-sm text-foreground">Posts</div>
+                <div className="font-black text-xl text-blue-600 dark:text-blue-400">{posts.length}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Posts</div>
               </div>
               <div 
-                className="cursor-pointer hover:opacity-70"
+                className="cursor-pointer hover:scale-110 transition-transform bg-gradient-to-br from-pink-100/40 to-pink-50/40 dark:from-pink-900/40 dark:to-pink-800/40 rounded-2xl px-4 py-3 border border-pink-400/30 hover:border-pink-400/60"
                 onClick={() => setLocation("/followers")}
               >
-                <div className="font-bold text-lg leading-tight">{currentUser.followers}</div>
-                <div className="text-sm text-foreground">Followers</div>
+                <div className="font-black text-xl text-pink-600 dark:text-pink-400">{currentUser.followers}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Followers</div>
               </div>
               <div 
-                className="cursor-pointer hover:opacity-70"
+                className="cursor-pointer hover:scale-110 transition-transform bg-gradient-to-br from-yellow-100/40 to-orange-50/40 dark:from-yellow-900/40 dark:to-orange-800/40 rounded-2xl px-4 py-3 border border-yellow-400/30 hover:border-yellow-400/60"
                 onClick={() => setLocation("/following")}
               >
-                <div className="font-bold text-lg leading-tight">{currentUser.following}</div>
-                <div className="text-sm text-foreground">Following</div>
+                <div className="font-black text-xl text-yellow-600 dark:text-yellow-400">{currentUser.following}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Following</div>
               </div>
             </div>
           </div>
