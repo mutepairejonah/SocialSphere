@@ -1,11 +1,9 @@
 import { PostCard } from "@/components/PostCard";
 import { BottomNav } from "@/components/BottomNav";
-import { SearchModal } from "@/components/SearchModal";
 import { useStore } from "@/lib/store";
-import { Search, Heart, Send, Plus, LogOut, Settings } from "lucide-react";
+import { Heart, Send, Plus, LogOut, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 
 export default function Home() {
   const { posts, userPosts, stories, markStoryViewed, currentUser, logout, loadUserPosts } = useStore();
@@ -27,29 +25,13 @@ export default function Home() {
     return timeB - timeA;
   }) : posts;
 
-  const [showSearchModal, setShowSearchModal] = useState(false);
-
   return (
     <div className="min-h-screen bg-[#f0f2f5] pb-20">
       {/* Compact Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-2 py-1.5 flex items-center justify-between gap-2">
+        <div className="max-w-6xl mx-auto px-2 py-1.5 flex items-center justify-between">
           {/* Logo */}
           <div className="text-lg font-bold text-[#1877F2] whitespace-nowrap">Authentic</div>
-
-          {/* Search Bar - Click to open modal */}
-          <div className="flex-1 mx-2 max-w-xs">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                onClick={() => setShowSearchModal(true)}
-                className="pl-7 h-7 text-xs bg-gray-100 border-0 rounded-full focus-visible:ring-0 focus-visible:bg-gray-200 cursor-pointer"
-                readOnly
-              />
-            </div>
-          </div>
 
           {/* Right Icons */}
           <div className="flex items-center gap-1">
@@ -103,15 +85,6 @@ export default function Home() {
           </div>
         </div>
       </header>
-
-      {/* Search Modal */}
-      {showSearchModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="w-full bg-white rounded-t-2xl max-w-md mx-auto animate-in slide-in-from-bottom">
-            <SearchModal onClose={() => setShowSearchModal(false)} />
-          </div>
-        </div>
-      )}
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-3 py-3">
