@@ -81,13 +81,6 @@ export default function Profile() {
                 className="cursor-pointer hover:opacity-70 transition-opacity"
                 onClick={() => setLocation("/followers")}
               >
-                <div className="font-bold text-lg leading-tight">{posts.length}</div>
-                <div className="text-xs text-muted-foreground">Posts</div>
-              </div>
-              <div 
-                className="cursor-pointer hover:opacity-70 transition-opacity"
-                onClick={() => setLocation("/followers")}
-              >
                 <div className="font-bold text-lg leading-tight">{currentUser.followers}</div>
                 <div className="text-xs text-muted-foreground">Followers</div>
               </div>
