@@ -68,7 +68,7 @@ export default function Following() {
                     <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                   {user.isFollowing && (
-                    <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-0.5 text-white">
+                    <div className="absolute bottom-0 right-0 bg-primary rounded-full p-0.5 text-white">
                       <UserCheck className="w-3 h-3" strokeWidth={3} />
                     </div>
                   )}

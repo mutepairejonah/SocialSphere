@@ -102,22 +102,21 @@ export default function Profile() {
             <h2 className="font-bold text-sm">{currentUser.fullName}</h2>
             <p className="text-sm whitespace-pre-line leading-snug">{currentUser.bio}</p>
             {currentUser.website && (
-              <a href="#" className="text-xs text-blue-600 hover:underline">{currentUser.website}</a>
+              <a href="#" className="text-xs text-primary hover:underline">{currentUser.website}</a>
             )}
           </div>
 
           <div className="flex gap-2">
             <Button 
-              className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80" 
-              variant="secondary"
+              className="flex-1 font-semibold h-8 text-sm bg-primary text-primary-foreground hover:bg-primary/90" 
               onClick={() => setLocation("/profile/edit")}
             >
               Edit Profile
             </Button>
-            <Button className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
+            <Button className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80">
               Share Profile
             </Button>
-            <Button size="icon" className="h-8 w-8 bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
+            <Button size="icon" className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90">
                <UserIcon className="w-4 h-4" />
             </Button>
           </div>

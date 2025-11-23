@@ -56,7 +56,7 @@ export default function Followers() {
               </div>
               <Button 
                 size="sm" 
-                className="h-8 px-5 font-semibold bg-[#0095F6] hover:bg-[#1877F2] text-white"
+                className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white"
                 onClick={() => {}}
               >
                 <UserPlus className="w-4 h-4 mr-1" />

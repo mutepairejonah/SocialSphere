@@ -116,7 +116,7 @@ export default function EditProfile() {
             </div>
             <button 
               onClick={() => setShowAvatarPicker(true)}
-              className="absolute bottom-0 right-0 bg-blue-500 border-4 border-background rounded-full p-2.5 hover:bg-blue-600 transition-colors text-white shadow-lg group-hover:scale-110"
+              className="absolute bottom-0 right-0 bg-primary border-4 border-background rounded-full p-2.5 hover:bg-primary/90 transition-colors text-white shadow-lg group-hover:scale-110"
               disabled={loading}
             >
               <Camera className="w-5 h-5" strokeWidth={2} />
@@ -124,7 +124,7 @@ export default function EditProfile() {
           </div>
           <button 
             onClick={() => setShowAvatarPicker(true)}
-            className="text-blue-600 font-semibold text-sm hover:underline disabled:opacity-50"
+            className="text-primary font-semibold text-sm hover:underline disabled:opacity-50"
             disabled={loading}
           >
             Change Profile Photo
@@ -153,7 +153,7 @@ export default function EditProfile() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
                   disabled={loading}
                 >
                   <ImageIcon className="w-5 h-5" />
@@ -171,7 +171,7 @@ export default function EditProfile() {
                       onClick={() => handleAvatarSelect(avatar)}
                       disabled={loading}
                       className={`aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 disabled:opacity-50 ${
-                        formData.avatar === avatar ? "border-blue-500 scale-95" : "border-border"
+                        formData.avatar === avatar ? "border-primary scale-95" : "border-border"
                       }`}
                     >
                       <img src={avatar} alt={`Avatar ${idx}`} className="w-full h-full object-cover" />

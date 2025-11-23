@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Volume2, VolumeX, MessageSquare, Share } from "lucide-react";
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Volume2, VolumeX, MessageSquare, Share, Sparkles, Hand, HelpCircle, PartyPopper, Brain } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,11 +63,11 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   const moods = [
-    { icon: '✨', label: 'Inspired', color: 'text-primary' },
-    { icon: '🙏', label: 'Grateful', color: 'text-accent' },
-    { icon: '🤔', label: 'Curious', color: 'text-secondary' },
-    { icon: '🎉', label: 'Excited', color: 'text-yellow-500' },
-    { icon: '💭', label: 'Thoughtful', color: 'text-blue-500' },
+    { Icon: Sparkles, label: 'Inspired', color: 'text-primary' },
+    { Icon: Hand, label: 'Grateful', color: 'text-accent' },
+    { Icon: HelpCircle, label: 'Curious', color: 'text-secondary' },
+    { Icon: PartyPopper, label: 'Excited', color: 'text-yellow-600' },
+    { Icon: Brain, label: 'Thoughtful', color: 'text-indigo-600' },
   ];
 
   return (
@@ -196,11 +196,11 @@ export function PostCard({ post }: PostCardProps) {
           {moods.map((mood) => (
             <button
               key={mood.label}
-              className="px-2 py-1 rounded-lg hover:bg-muted transition-colors text-sm"
+              className="p-2 rounded-lg hover:bg-muted transition-colors"
               title={mood.label}
               data-testid={`mood-${mood.label.toLowerCase()}`}
             >
-              {mood.icon}
+              <mood.Icon size={18} className={mood.color} />
             </button>
           ))}
         </div>

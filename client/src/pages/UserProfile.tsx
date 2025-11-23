@@ -87,7 +87,7 @@ export default function UserProfile() {
               </Avatar>
               {currentFollowState && (
                 <motion.div 
-                  className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center border-4 border-background text-white"
+                  className="absolute bottom-0 right-0 bg-primary rounded-full w-6 h-6 flex items-center justify-center border-4 border-background text-white"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring" }}
@@ -119,7 +119,7 @@ export default function UserProfile() {
             <h2 className="font-bold text-sm">{user.fullName}</h2>
             <p className="text-sm whitespace-pre-line leading-snug">{user.bio}</p>
             {user.website && (
-              <a href="#" className="text-xs text-blue-600 hover:underline">{user.website}</a>
+              <a href="#" className="text-xs text-primary hover:underline">{user.website}</a>
             )}
           </div>
 
