@@ -114,17 +114,6 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Toggle Sidebar Button */}
-      {!sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="fixed left-4 top-4 z-30 p-2 hover:bg-muted rounded-lg transition-colors"
-          data-testid="button-open-sidebar"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-      )}
-
       {/* Main Content Area */}
       <div className={cn(
         "flex-1 flex flex-col transition-all duration-300",
@@ -132,7 +121,14 @@ export default function Home() {
       )}>
         {/* Header */}
         <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
-          <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Authentic</h1>
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 hover:bg-muted rounded-lg transition-colors -ml-2"
+            data-testid="button-toggle-sidebar"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <h1 className="font-bold text-2xl select-none cursor-pointer text-primary flex-1 text-center">Authentic</h1>
         <div className="flex items-center gap-4">
           <Link href="/activity">
              <Heart className="w-6 h-6 cursor-pointer hover:text-secondary transition-colors" data-testid="button-notifications" />
