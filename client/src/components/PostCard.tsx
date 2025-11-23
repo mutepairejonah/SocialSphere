@@ -1,10 +1,13 @@
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Volume2, VolumeX } from "lucide-react";
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Volume2, VolumeX, MessageSquare, Share } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Post, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
+import { useLocation } from "wouter";
+import { toast } from "sonner";
 
 interface PostCardProps {
   post: Post;
@@ -12,9 +15,12 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   const { toggleLike, toggleSave } = useStore();
+  const [, setLocation] = useLocation();
   const [isLikedAnim, setIsLikedAnim] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState("");
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
   const inFeedVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -35,6 +41,25 @@ export function PostCard({ post }: PostCardProps) {
 
   const handleToggleMute = () => {
     setIsMuted(!isMuted);
+  };
+
+  const handleComment = () => {
+    setShowComments(!showComments);
+  };
+
+  const handleSendComment = () => {
+    if (commentText.trim()) {
+      toast.success("Comment added!");
+      setCommentText("");
+    }
+  };
+
+  const handleShare = () => {
+    // Navigate to messages with this user
+    if (post.userId) {
+      setLocation(`/messages?user=${post.userId}`);
+      toast.success(`Opening messages with ${post.username}`);
+    }
   };
 
   return (
@@ -164,20 +189,20 @@ export function PostCard({ post }: PostCardProps) {
       <div className="p-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-4">
-            <button onClick={handleLike} className="transition-transform active:scale-90 focus:outline-none">
+            <button onClick={handleLike} data-testid="button-like" className="transition-transform active:scale-90 focus:outline-none">
               <Heart 
                 className={cn("w-[26px] h-[26px] transition-colors", post.isLiked ? "fill-red-500 text-red-500" : "text-foreground hover:text-muted-foreground")} 
                 strokeWidth={post.isLiked ? 0 : 2}
               />
             </button>
-            <button className="transition-transform active:scale-90 focus:outline-none">
+            <button onClick={handleComment} data-testid="button-comment" className="transition-transform active:scale-90 focus:outline-none">
               <MessageCircle className="w-[26px] h-[26px] -rotate-90 text-foreground hover:text-muted-foreground" />
             </button>
-            <button className="transition-transform active:scale-90 focus:outline-none">
+            <button onClick={handleShare} data-testid="button-share" className="transition-transform active:scale-90 focus:outline-none">
               <Send className="w-[26px] h-[26px] text-foreground hover:text-muted-foreground" />
             </button>
           </div>
-          <button onClick={() => toggleSave(post.id)} className="transition-transform active:scale-90 focus:outline-none">
+          <button onClick={() => toggleSave(post.id)} data-testid="button-save" className="transition-transform active:scale-90 focus:outline-none">
              <Bookmark 
                className={cn("w-[26px] h-[26px] transition-colors", post.isSaved ? "fill-foreground text-foreground" : "text-foreground hover:text-muted-foreground")} 
              />
@@ -192,12 +217,59 @@ export function PostCard({ post }: PostCardProps) {
             {post.caption}
           </div>
           {post.comments > 0 && (
-            <div className="text-muted-foreground text-sm cursor-pointer mt-1">
+            <button 
+              onClick={handleComment}
+              data-testid="button-view-comments"
+              className="text-muted-foreground text-sm cursor-pointer mt-1 hover:text-foreground transition-colors"
+            >
               View all {post.comments} comments
-            </div>
+            </button>
           )}
           <div className="text-[10px] text-muted-foreground uppercase tracking-wide mt-1">{post.timestamp}</div>
         </div>
+
+        {/* Comments Section */}
+        {showComments && (
+          <div className="mt-4 pt-4 border-t border-border space-y-3">
+            <div className="max-h-40 overflow-y-auto space-y-2">
+              <div className="text-sm">
+                <span className="font-semibold text-xs text-muted-foreground">2 comments</span>
+                <div className="mt-2 space-y-2">
+                  <div className="text-xs">
+                    <span className="font-semibold">user_123:</span> Amazing post! 🔥
+                  </div>
+                  <div className="text-xs">
+                    <span className="font-semibold">user_456:</span> Love this content
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2 items-center">
+              <Input
+                placeholder="Add a comment..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendComment();
+                  }
+                }}
+                className="h-8 text-sm"
+                data-testid="input-comment"
+              />
+              <Button
+                size="sm"
+                onClick={handleSendComment}
+                disabled={!commentText.trim()}
+                className="h-8"
+                data-testid="button-post-comment"
+              >
+                Post
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

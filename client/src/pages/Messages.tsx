@@ -5,7 +5,7 @@ import { ArrowLeft, Send, Phone, Video, MessageCircle, MoreVertical, Image as Im
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
