@@ -1,18 +1,24 @@
 import { create } from 'zustand';
-import { nanoid } from 'nanoid';
-import { auth } from './firebase';
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, User as FirebaseUser } from 'firebase/auth';
+import { auth, db, storage } from './firebase';
+import { 
+  signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, signOut, User as FirebaseUser, onAuthStateChanged 
+} from 'firebase/auth';
+import {
+  collection, doc, getDoc, setDoc, query, where, getDocs, addDoc, updateDoc,
+  deleteDoc, arrayUnion, arrayRemove, Timestamp, writeBatch
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-// Types
 export interface User {
   id: string;
   username: string;
   fullName: string;
+  email: string;
   avatar: string;
   bio: string;
   followers: number;
   following: number;
-  highlights?: { id: string; image: string; title: string }[];
   website?: string;
   isFollowing?: boolean;
 }
@@ -34,6 +40,7 @@ export interface Notification {
   id: string;
   type: 'like' | 'comment' | 'follow';
   userId: string;
+  fromUserId?: string;
   postId?: string;
   timestamp: string;
   read: boolean;
@@ -48,163 +55,6 @@ export interface Story {
   isViewed: boolean;
 }
 
-// Mock Data
-const MOCK_USER: User = {
-  id: 'current-user',
-  username: 'johndoe',
-  fullName: 'John Doe',
-  avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=60',
-  bio: 'Digital explorer 📸 | Coffee enthusiast ☕️ | Travels 🌍\nSan Francisco, CA',
-  followers: 1250,
-  following: 450,
-  website: 'johndoe.com',
-  highlights: [
-    { id: '1', title: 'Travels', image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&fit=crop' },
-    { id: '2', title: 'Food', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&fit=crop' },
-    { id: '3', title: 'Friends', image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&fit=crop' },
-  ]
-};
-
-const MOCK_USERS: User[] = [
-  {
-    id: 'alex_travels',
-    username: 'alex_travels',
-    fullName: 'Alex Johnson',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop',
-    bio: 'Travel photographer 🌍',
-    followers: 3421,
-    following: 234,
-    website: 'alextravel.com',
-    isFollowing: false
-  },
-  {
-    id: 'sarah.styles',
-    username: 'sarah.styles',
-    fullName: 'Sarah Chen',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&fit=crop',
-    bio: 'Fashion & lifestyle 👗\nBased in Paris',
-    followers: 8942,
-    following: 1123,
-    website: 'sarahstyles.com',
-    isFollowing: true
-  },
-  {
-    id: 'nature_lover',
-    username: 'nature_lover',
-    fullName: 'Mike Roberts',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&fit=crop',
-    bio: 'Nature & outdoor enthusiast 🏔️',
-    followers: 5623,
-    following: 456,
-    isFollowing: false
-  },
-  {
-    id: 'mike_photos',
-    username: 'mike_photos',
-    fullName: 'Michael Zhang',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop',
-    bio: 'Street photography',
-    followers: 2341,
-    following: 789,
-    isFollowing: true
-  },
-  {
-    id: 'jessica_w',
-    username: 'jessica_w',
-    fullName: 'Jessica Williams',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&fit=crop',
-    bio: 'Designer & creative 🎨',
-    followers: 4125,
-    following: 567,
-    isFollowing: false
-  }
-];
-
-const MOCK_POSTS: Post[] = [
-  {
-    id: '1',
-    userId: 'alex_travels',
-    imageUrl: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&auto=format&fit=crop&q=60',
-    caption: 'Exploring the Cinque Terre! 🇮🇹 The colors here are absolutely unreal. Can\'t wait to come back next summer. #italy #travel #summer',
-    likes: 124,
-    location: 'Cinque Terre, Italy',
-    timestamp: '2 hours ago',
-    comments: 12,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: '2',
-    userId: 'sarah.styles',
-    imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&auto=format&fit=crop&q=60',
-    caption: 'Fashion week fits 👗 What do you think of this look? #ootd #paris',
-    likes: 2431,
-    location: 'Paris, France',
-    timestamp: '5 hours ago',
-    comments: 128,
-    isLiked: false,
-    isSaved: true
-  },
-  {
-    id: '3',
-    userId: 'nature_lover',
-    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=60',
-    caption: 'Sunset vibes only 🌅 nothing beats a California sunset.',
-    likes: 856,
-    location: 'Malibu, California',
-    timestamp: '1 day ago',
-    comments: 45,
-    isLiked: true,
-    isSaved: false
-  }
-];
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { 
-    id: '1', 
-    type: 'like', 
-    userId: 'sarah.styles', 
-    userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
-    postId: '1', 
-    postImage: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=100',
-    timestamp: '2m', 
-    read: false 
-  },
-  { 
-    id: '2', 
-    type: 'follow', 
-    userId: 'mike_photos', 
-    userAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100',
-    timestamp: '2h', 
-    read: false 
-  },
-  { 
-    id: '3', 
-    type: 'comment', 
-    userId: 'alex_travels', 
-    userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
-    postId: '2', 
-    postImage: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=100',
-    timestamp: '1d', 
-    read: true 
-  },
-  { 
-    id: '4', 
-    type: 'follow', 
-    userId: 'jessica_w', 
-    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
-    timestamp: '3d', 
-    read: true 
-  }
-];
-
-const MOCK_STORIES: Story[] = [
-  { id: '1', userId: 'alex_travels', imageUrl: 'https://images.unsplash.com/photo-1526772662000-3f88f107f6b7?w=400&fit=crop', isViewed: false },
-  { id: '2', userId: 'sarah.styles', imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&fit=crop', isViewed: false },
-  { id: '3', userId: 'mike_photos', imageUrl: 'https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?w=400&fit=crop', isViewed: true },
-  { id: '4', userId: 'nature_lover', imageUrl: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&fit=crop', isViewed: false },
-];
-
 interface StoreState {
   currentUser: User | null;
   posts: Post[];
@@ -212,130 +62,424 @@ interface StoreState {
   stories: Story[];
   allUsers: User[];
   isAuthenticated: boolean;
+  isLoading: boolean;
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
-  signupWithEmail: (email: string, pass: string) => Promise<void>;
+  signupWithEmail: (email: string, pass: string, fullName: string) => Promise<void>;
   logout: () => Promise<void>;
   setUser: (user: User) => void;
-  updateProfile: (updates: Partial<User>) => void;
-  toggleFollow: (userId: string) => void;
-  getUser: (userId: string) => User | undefined;
+  updateProfile: (updates: Partial<User>) => Promise<void>;
+  toggleFollow: (userId: string) => Promise<void>;
+  getUser: (userId: string) => Promise<User | undefined>;
   getFollowing: () => User[];
-  addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'timestamp' | 'isLiked' | 'isSaved'>) => void;
-  toggleLike: (postId: string) => void;
-  toggleSave: (postId: string) => void;
+  addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'timestamp' | 'isLiked' | 'isSaved'>) => Promise<void>;
+  loadPosts: () => Promise<void>;
+  loadUsers: () => Promise<void>;
+  loadNotifications: () => Promise<void>;
+  toggleLike: (postId: string) => Promise<void>;
+  toggleSave: (postId: string) => Promise<void>;
   markStoryViewed: (storyId: string) => void;
+  initializeAuth: () => void;
 }
 
 export const useStore = create<StoreState>((set, get) => ({
   currentUser: null,
-  posts: MOCK_POSTS,
-  notifications: MOCK_NOTIFICATIONS,
-  stories: MOCK_STORIES,
-  allUsers: MOCK_USERS,
+  posts: [],
+  notifications: [],
+  stories: [],
+  allUsers: [],
   isAuthenticated: false,
-  
+  isLoading: false,
+
+  initializeAuth: () => {
+    onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            set({
+              currentUser: {
+                id: firebaseUser.uid,
+                ...userData
+              } as User,
+              isAuthenticated: true
+            });
+            // Load posts and users
+            await get().loadPosts();
+            await get().loadUsers();
+            await get().loadNotifications();
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error);
+        }
+      } else {
+        set({ currentUser: null, isAuthenticated: false });
+      }
+    });
+  },
+
   loginWithGoogle: async () => {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    set({ 
-      currentUser: {
-        ...MOCK_USER,
-        id: user.uid,
+    
+    const userRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      const newUser = {
         username: user.displayName?.split(' ')[0].toLowerCase() || 'user',
         fullName: user.displayName || 'User',
-        avatar: user.photoURL || MOCK_USER.avatar
-      }, 
-      isAuthenticated: true 
-    });
+        email: user.email,
+        avatar: user.photoURL || '',
+        bio: '',
+        followers: 0,
+        following: 0,
+        createdAt: Timestamp.now()
+      };
+      await setDoc(userRef, newUser);
+      set({
+        currentUser: {
+          id: user.uid,
+          ...newUser,
+          followers: 0,
+          following: 0
+        } as User,
+        isAuthenticated: true
+      });
+    } else {
+      const userData = userDoc.data();
+      set({
+        currentUser: {
+          id: user.uid,
+          ...userData
+        } as User,
+        isAuthenticated: true
+      });
+    }
   },
 
   loginWithEmail: async (email, pass) => {
     const result = await signInWithEmailAndPassword(auth, email, pass);
     const user = result.user;
-    set({ 
-      currentUser: {
-        ...MOCK_USER,
-        id: user.uid,
-        username: email.split('@')[0],
-        fullName: email.split('@')[0],
-      }, 
-      isAuthenticated: true 
-    });
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      set({
+        currentUser: {
+          id: user.uid,
+          ...userData
+        } as User,
+        isAuthenticated: true
+      });
+    }
   },
 
-  signupWithEmail: async (email, pass) => {
+  signupWithEmail: async (email, pass, fullName) => {
     const result = await createUserWithEmailAndPassword(auth, email, pass);
     const user = result.user;
-    set({ 
+    const newUser = {
+      username: email.split('@')[0],
+      fullName,
+      email,
+      avatar: '',
+      bio: '',
+      followers: 0,
+      following: 0,
+      createdAt: Timestamp.now()
+    };
+    await setDoc(doc(db, 'users', user.uid), newUser);
+    set({
       currentUser: {
-        ...MOCK_USER,
         id: user.uid,
-        username: email.split('@')[0],
-        fullName: email.split('@')[0],
-      }, 
-      isAuthenticated: true 
+        ...newUser,
+        followers: 0,
+        following: 0
+      } as User,
+      isAuthenticated: true
     });
   },
 
   logout: async () => {
     await signOut(auth);
-    set({ currentUser: null, isAuthenticated: false });
+    set({ currentUser: null, isAuthenticated: false, posts: [], allUsers: [] });
   },
 
   setUser: (user) => set({ currentUser: user, isAuthenticated: true }),
 
-  updateProfile: (updates) => set((state) => ({
-    currentUser: state.currentUser ? { ...state.currentUser, ...updates } : null
-  })),
+  updateProfile: async (updates) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+    
+    try {
+      const userRef = doc(db, 'users', currentUser.id);
+      const updateData: any = {};
+      
+      // Handle avatar upload if it's a data URL
+      if (updates.avatar && updates.avatar.startsWith('data:')) {
+        const blob = await (await fetch(updates.avatar)).blob();
+        const storageRef = ref(storage, `avatars/${currentUser.id}`);
+        await uploadBytes(storageRef, blob);
+        updateData.avatar = await getDownloadURL(storageRef);
+      } else if (updates.avatar) {
+        updateData.avatar = updates.avatar;
+      }
+      
+      if (updates.bio) updateData.bio = updates.bio;
+      if (updates.fullName) updateData.fullName = updates.fullName;
+      if (updates.username) updateData.username = updates.username;
+      if (updates.website) updateData.website = updates.website;
+      
+      await updateDoc(userRef, updateData);
+      set(state => ({
+        currentUser: state.currentUser ? { ...state.currentUser, ...updates } : null
+      }));
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  },
 
-  toggleFollow: (userId) => set((state) => {
-    const updatedUsers = state.allUsers.map(u => 
-      u.id === userId ? { 
-        ...u, 
-        isFollowing: !u.isFollowing,
-        followers: u.isFollowing ? u.followers - 1 : u.followers + 1
-      } : u
-    );
-    const newFollowing = updatedUsers.filter(u => u.isFollowing).length;
-    return {
-      allUsers: updatedUsers,
-      currentUser: state.currentUser ? { ...state.currentUser, following: newFollowing } : null
-    };
-  }),
+  toggleFollow: async (userId) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
 
-  getUser: (userId) => {
-    return get().allUsers.find(u => u.id === userId);
+    try {
+      const batch = writeBatch(db);
+      const currentUserRef = doc(db, 'users', currentUser.id);
+      const targetUserRef = doc(db, 'users', userId);
+      
+      const followRef = query(
+        collection(db, 'follows'),
+        where('followerId', '==', currentUser.id),
+        where('followingId', '==', userId)
+      );
+      const followDocs = await getDocs(followRef);
+      
+      if (!followDocs.empty) {
+        // Unfollow
+        followDocs.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        batch.update(currentUserRef, { following: (currentUser.following || 0) - 1 });
+      } else {
+        // Follow
+        await addDoc(collection(db, 'follows'), {
+          followerId: currentUser.id,
+          followingId: userId,
+          createdAt: Timestamp.now()
+        });
+        batch.update(currentUserRef, { following: (currentUser.following || 0) + 1 });
+      }
+      
+      await batch.commit();
+      
+      // Update allUsers
+      set(state => ({
+        allUsers: state.allUsers.map(u =>
+          u.id === userId ? { ...u, isFollowing: !u.isFollowing } : u
+        ),
+        currentUser: state.currentUser ? {
+          ...state.currentUser,
+          following: followDocs.empty ? (state.currentUser.following || 0) + 1 : (state.currentUser.following || 0) - 1
+        } : null
+      }));
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+    }
+  },
+
+  getUser: async (userId) => {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      if (userDoc.exists()) {
+        return {
+          id: userDoc.id,
+          ...userDoc.data()
+        } as User;
+      }
+    } catch (error) {
+      console.error('Error getting user:', error);
+    }
+    return undefined;
   },
 
   getFollowing: () => {
     return get().allUsers.filter(u => u.isFollowing);
   },
 
-  addPost: (newPost) => set((state) => ({
-    posts: [{
-      ...newPost,
-      id: nanoid(),
-      likes: 0,
-      comments: 0,
-      timestamp: 'Just now',
-      isLiked: false,
-      isSaved: false
-    }, ...state.posts]
-  })),
-  toggleLike: (postId) => set((state) => ({
-    posts: state.posts.map(p => 
-      p.id === postId ? { ...p, likes: p.isLiked ? p.likes - 1 : p.likes + 1, isLiked: !p.isLiked } : p
-    )
-  })),
-  toggleSave: (postId) => set((state) => ({
-    posts: state.posts.map(p => 
-      p.id === postId ? { ...p, isSaved: !p.isSaved } : p
-    )
-  })),
+  addPost: async (newPost) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+
+    try {
+      const postRef = await addDoc(collection(db, 'posts'), {
+        ...newPost,
+        timestamp: Timestamp.now(),
+        likes: 0,
+        comments: 0,
+      });
+
+      const postData = await getDoc(postRef);
+      if (postData.exists()) {
+        set(state => ({
+          posts: [{
+            id: postData.id,
+            ...postData.data(),
+            timestamp: new Date(postData.data().timestamp.toDate()).toLocaleString(),
+            isLiked: false,
+            isSaved: false
+          } as Post, ...state.posts]
+        }));
+      }
+    } catch (error) {
+      console.error('Error adding post:', error);
+    }
+  },
+
+  loadPosts: async () => {
+    try {
+      const postsQuery = query(collection(db, 'posts'));
+      const snapshot = await getDocs(postsQuery);
+      const posts = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: new Date(doc.data().timestamp.toDate()).toLocaleString(),
+        isLiked: false,
+        isSaved: false
+      } as Post)).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      
+      set({ posts });
+    } catch (error) {
+      console.error('Error loading posts:', error);
+    }
+  },
+
+  loadUsers: async () => {
+    try {
+      const usersQuery = query(collection(db, 'users'));
+      const snapshot = await getDocs(usersQuery);
+      const currentUserId = get().currentUser?.id;
+      
+      const users = snapshot.docs
+        .filter(doc => doc.id !== currentUserId)
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        } as User));
+      
+      set({ allUsers: users });
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  },
+
+  loadNotifications: async () => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+    
+    try {
+      const notifQuery = query(
+        collection(db, 'notifications'),
+        where('userId', '==', currentUser.id)
+      );
+      const snapshot = await getDocs(notifQuery);
+      const notifications = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: new Date(doc.data().createdAt.toDate()).toLocaleString(),
+        userAvatar: '',
+        postImage: ''
+      } as Notification));
+      
+      set({ notifications });
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+  },
+
+  toggleLike: async (postId) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+
+    try {
+      const likeRef = query(
+        collection(db, 'likes'),
+        where('userId', '==', currentUser.id),
+        where('postId', '==', postId)
+      );
+      const likeDocs = await getDocs(likeRef);
+      const postRef = doc(db, 'posts', postId);
+      const postDoc = await getDoc(postRef);
+
+      if (!likeDocs.empty) {
+        // Unlike
+        likeDocs.forEach(doc => {
+          deleteDoc(doc.ref);
+        });
+        await updateDoc(postRef, { likes: Math.max(0, (postDoc.data()?.likes || 0) - 1) });
+      } else {
+        // Like
+        await addDoc(collection(db, 'likes'), {
+          userId: currentUser.id,
+          postId,
+          createdAt: Timestamp.now()
+        });
+        await updateDoc(postRef, { likes: (postDoc.data()?.likes || 0) + 1 });
+      }
+
+      // Update local state
+      set(state => ({
+        posts: state.posts.map(p =>
+          p.id === postId ? {
+            ...p,
+            likes: likeDocs.empty ? p.likes + 1 : Math.max(0, p.likes - 1),
+            isLiked: !p.isLiked
+          } : p
+        )
+      }));
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  },
+
+  toggleSave: async (postId) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+
+    try {
+      const saveRef = query(
+        collection(db, 'saves'),
+        where('userId', '==', currentUser.id),
+        where('postId', '==', postId)
+      );
+      const saveDocs = await getDocs(saveRef);
+
+      if (!saveDocs.empty) {
+        saveDocs.forEach(doc => {
+          deleteDoc(doc.ref);
+        });
+      } else {
+        await addDoc(collection(db, 'saves'), {
+          userId: currentUser.id,
+          postId,
+          createdAt: Timestamp.now()
+        });
+      }
+
+      set(state => ({
+        posts: state.posts.map(p =>
+          p.id === postId ? { ...p, isSaved: !p.isSaved } : p
+        )
+      }));
+    } catch (error) {
+      console.error('Error toggling save:', error);
+    }
+  },
+
   markStoryViewed: (storyId) => set((state) => ({
-    stories: state.stories.map(s => 
+    stories: state.stories.map(s =>
       s.id === storyId ? { ...s, isViewed: true } : s
     )
   }))
