@@ -628,13 +628,17 @@ export const useStore = create<StoreState>((set, get) => ({
         where('userId', '==', currentUser.id)
       );
       const snapshot = await getDocs(notifQuery);
+      const allUsers = get().allUsers;
+      
       const notifications = snapshot.docs.map(doc => {
         const data = doc.data();
+        const fromUser = allUsers.find(u => u.id === data.fromUserId);
+        
         return {
           id: doc.id,
           ...data,
           timestamp: data.createdAt?.toDate ? new Date(data.createdAt.toDate()).toLocaleString() : 'Recently',
-          userAvatar: '',
+          userAvatar: fromUser?.avatar || '',
           postImage: ''
         } as Notification;
       });

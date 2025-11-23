@@ -76,15 +76,18 @@ export default function Activity() {
 }
 
 function NotificationItem({ notification }: { notification: any }) {
+  const { allUsers } = useStore();
+  const fromUser = allUsers.find(u => u.id === notification.fromUserId);
+  
   return (
     <div className="flex items-center justify-between py-3 px-4 hover:bg-muted/40 transition-colors cursor-pointer">
       <div className="flex items-center gap-3 flex-1">
         <Avatar className="h-11 w-11 border-2 border-border">
-          <AvatarImage src={notification.userAvatar} />
+          <AvatarImage src={fromUser?.avatar || notification.userAvatar} />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
         <div className="text-sm leading-snug pr-2 flex-1">
-          <span className="font-semibold mr-1">{notification.fromUserId}</span>
+          <span className="font-semibold mr-1">{fromUser?.username || notification.fromUserId || 'User'}</span>
           {notification.type === 'like' && <span className="text-foreground">liked your photo.</span>}
           {notification.type === 'comment' && <span className="text-foreground">commented: "Great shot! 🔥"</span>}
           {notification.type === 'follow' && <span className="text-foreground">started following you.</span>}
