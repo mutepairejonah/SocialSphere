@@ -61,25 +61,30 @@ export default function Activity() {
 
 function NotificationItem({ notification }: { notification: any }) {
   return (
-    <div className="flex items-center justify-between py-3 px-4 hover:bg-muted/30 transition-colors cursor-pointer">
+    <div className="flex items-center justify-between py-3 px-4 hover:bg-muted/40 transition-colors cursor-pointer">
       <div className="flex items-center gap-3 flex-1">
-        <Avatar className="h-11 w-11 border border-border">
+        <Avatar className="h-11 w-11 border-2 border-border">
           <AvatarImage src={notification.userAvatar} />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
-        <div className="text-sm leading-snug pr-2">
-          <span className="font-semibold mr-1">{notification.userId}</span>
+        <div className="text-sm leading-snug pr-2 flex-1">
+          <span className="font-semibold mr-1">{notification.fromUserId}</span>
           {notification.type === 'like' && <span className="text-foreground">liked your photo.</span>}
           {notification.type === 'comment' && <span className="text-foreground">commented: "Great shot! 🔥"</span>}
           {notification.type === 'follow' && <span className="text-foreground">started following you.</span>}
+          {notification.type === 'message' && <span className="text-foreground">sent you a message: <span className="italic">"{notification.messageText}"</span></span>}
           <span className="text-muted-foreground ml-1 text-xs">{notification.timestamp}</span>
         </div>
       </div>
       
       {notification.type === 'follow' ? (
          <Button size="sm" className="h-8 px-5 font-semibold bg-[#0095F6] hover:bg-[#1877F2] text-white">Follow</Button>
+      ) : notification.type === 'message' ? (
+         <div className="w-11 h-11 bg-blue-100 rounded-[4px] overflow-hidden border border-border flex items-center justify-center text-blue-500 font-bold">
+            💬
+         </div>
       ) : (
-         <div className="w-11 h-11 bg-muted rounded-[4px] overflow-hidden border border-border">
+         notification.postImage && <div className="w-11 h-11 bg-muted rounded-[4px] overflow-hidden border border-border">
             <img src={notification.postImage} className="w-full h-full object-cover" />
          </div>
       )}

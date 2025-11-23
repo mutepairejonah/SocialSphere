@@ -1,7 +1,8 @@
 import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Send, Phone, Video } from "lucide-react";
+import { ArrowLeft, Send, Phone, Video, MessageCircle } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -116,35 +117,44 @@ export default function Messages() {
   if (!selectedUserId) {
     return (
       <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
-        <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-14 flex items-center">
-          <h1 className="font-bold text-xl">{currentUser.username}</h1>
+        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-16 flex items-center justify-between">
+          <h1 className="font-bold text-2xl">Messages</h1>
+          <Button size="icon" variant="ghost" className="h-10 w-10">
+            <Phone className="w-5 h-5" />
+          </Button>
         </header>
 
         <main className="p-4">
-          <h2 className="font-bold text-lg mb-4">Messages</h2>
           {followingUsers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground text-center">
-              <p className="font-semibold mb-2">No conversations yet</p>
+            <div className="flex flex-col items-center justify-center py-32 text-muted-foreground text-center">
+              <MessageCircle className="w-16 h-16 mb-4 opacity-30" />
+              <p className="font-semibold text-lg mb-2">No conversations yet</p>
               <p className="text-sm">Follow someone to start messaging</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-1">
               {followingUsers.map(user => (
                 <div
                   key={user.id}
                   onClick={() => setSelectedUserId(user.id)}
                   data-testid={`conversation-${user.id}`}
-                  className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
+                  className="flex items-center gap-3 p-3 hover:bg-muted/60 rounded-xl cursor-pointer transition-colors group"
                 >
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-muted border border-border">
-                    {user.avatar && (
-                      <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
-                    )}
+                  <div className="relative">
+                    <Avatar className="h-14 w-14 border-2 border-border">
+                      <AvatarImage src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt={user.username} />
+                      <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate">{user.username}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-sm">{user.username}</p>
+                      <p className="text-xs text-muted-foreground">now</p>
+                    </div>
                     <p className="text-sm text-muted-foreground truncate">{user.fullName}</p>
                   </div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
               ))}
             </div>
@@ -160,21 +170,29 @@ export default function Messages() {
 
   return (
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setSelectedUserId(null)}>
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setSelectedUserId(null)} className="h-10 w-10">
             <ArrowLeft className="w-6 h-6" />
           </Button>
-          <div>
-            <p className="font-bold text-sm">{selectedUser?.username}</p>
+          <div className="flex items-center gap-2">
+            <Avatar className="h-10 w-10 border border-border">
+              <AvatarImage src={selectedUser?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedUserId}`} alt={selectedUser?.username} />
+              <AvatarFallback>{selectedUser?.username.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-bold text-sm">{selectedUser?.username}</p>
+              <p className="text-xs text-green-500 font-medium">Active now</p>
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <Button
             size="icon"
             variant="ghost"
             onClick={() => handleCall('audio')}
             disabled={calling}
+            className="h-10 w-10 hover:bg-muted rounded-full"
           >
             <Phone className="w-5 h-5" />
           </Button>
@@ -183,46 +201,60 @@ export default function Messages() {
             variant="ghost"
             onClick={() => handleCall('video')}
             disabled={calling}
+            className="h-10 w-10 hover:bg-muted rounded-full"
           >
             <Video className="w-5 h-5" />
           </Button>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4 space-y-3 flex flex-col-reverse">
+      <main className="flex-1 overflow-y-auto px-4 py-4 space-y-2 flex flex-col-reverse">
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-            No messages yet. Start a conversation!
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-center py-20">
+            <Avatar className="h-20 w-20 mb-4 opacity-20">
+              <AvatarImage src={selectedUser?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedUserId}`} />
+              <AvatarFallback>{selectedUser?.username.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <p className="font-bold text-sm">No messages yet</p>
+            <p className="text-xs">Start a conversation with {selectedUser?.username}</p>
           </div>
         ) : (
-          messages.map(msg => (
+          messages.map((msg, idx) => (
             <div
               key={msg.id}
-              className={`flex ${msg.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${msg.senderId === currentUser.id ? 'justify-end' : 'justify-start'} ${idx > 0 && messages[idx - 1]?.senderId === msg.senderId ? 'mt-0' : 'mt-2'}`}
             >
-              <div
-                className={`max-w-xs px-4 py-2 rounded-2xl ${
-                  msg.senderId === currentUser.id
-                    ? 'bg-blue-500 text-white rounded-br-none'
-                    : 'bg-muted rounded-bl-none'
-                }`}
-              >
-                <p className="text-sm">{msg.message}</p>
-                <p className={`text-xs mt-1 ${msg.senderId === currentUser.id ? 'text-blue-100' : 'text-muted-foreground'}`}>
-                  {msg.timestamp?.toDate ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'}
-                </p>
+              <div className={`flex gap-2 max-w-xs ${msg.senderId === currentUser.id ? 'flex-row-reverse' : 'flex-row'}`}>
+                {msg.senderId !== currentUser.id && (
+                  <Avatar className="h-8 w-8 flex-shrink-0">
+                    <AvatarImage src={selectedUser?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedUserId}`} />
+                    <AvatarFallback>{selectedUser?.username.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                )}
+                <div
+                  className={`px-4 py-2.5 rounded-2xl break-words ${
+                    msg.senderId === currentUser.id
+                      ? 'bg-blue-500 text-white rounded-br-none shadow-sm'
+                      : 'bg-muted rounded-bl-none text-foreground'
+                  }`}
+                >
+                  <p className="text-sm leading-relaxed">{msg.message}</p>
+                  <p className={`text-xs mt-1 ${msg.senderId === currentUser.id ? 'text-blue-100' : 'text-muted-foreground'}`}>
+                    {msg.timestamp?.toDate ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'}
+                  </p>
+                </div>
               </div>
             </div>
           ))
         )}
       </main>
 
-      <div className="border-t border-border p-4 bg-background">
-        <div className="flex gap-2">
+      <div className="border-t border-border p-3 bg-background/95 backdrop-blur-sm">
+        <div className="flex gap-2 items-end">
           <Input
             id="message-input"
             name="message"
-            placeholder="Message..."
+            placeholder="Aa"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyPress={(e) => {
@@ -231,7 +263,7 @@ export default function Messages() {
                 handleSendMessage();
               }
             }}
-            className="bg-muted/50 border-0 focus-visible:ring-0 h-10"
+            className="bg-muted/60 border-0 focus-visible:ring-0 h-10 rounded-full px-4"
             data-testid="input-message"
             disabled={loading}
             autoComplete="off"
@@ -242,6 +274,7 @@ export default function Messages() {
             disabled={!messageInput.trim() || loading}
             data-testid="button-send"
             aria-label="Send message"
+            className="h-10 w-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white"
           >
             <Send className="w-4 h-4" />
           </Button>

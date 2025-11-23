@@ -73,6 +73,7 @@ export function PostCard({ post }: PostCardProps) {
               muted
               playsInline
               className="w-full h-full object-cover bg-black"
+              style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' }}
             />
             {/* Video overlay hint */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
@@ -121,6 +122,7 @@ export function PostCard({ post }: PostCardProps) {
               muted={isMuted}
               playsInline
               className="w-full h-full object-contain bg-black"
+              style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden', maxHeight: '100vh' }}
             />
             
             {/* Fullscreen Controls */}
