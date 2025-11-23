@@ -16,7 +16,7 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600 h-[60px] pb-safe z-50 shadow-2xl">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background/95 backdrop-blur-sm h-[50px] pb-safe z-50">
       <div className="flex justify-around items-center h-full px-2 max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = location === item.path;
@@ -24,17 +24,15 @@ export function BottomNav() {
           
           return (
             <Link key={item.path} href={item.path}>
-              <div className={cn(
-                "p-2 cursor-pointer transition-all active:scale-90 flex items-center justify-center w-10 h-10 rounded-lg",
-                isActive ? "bg-white/20 backdrop-blur-sm" : ""
-              )}>
+              <div className="p-2 cursor-pointer transition-transform active:scale-90 flex items-center justify-center w-10 h-10">
                 <Icon 
                   size={26} 
                   className={cn(
                     "transition-all duration-200",
-                    isActive ? "text-white stroke-[3px]" : "text-white/60 stroke-[2px]"
+                    isActive ? "text-foreground stroke-[3px] fill-foreground" : "text-foreground stroke-[2px]"
                   )}
-                  fill={isActive ? "currentColor" : "none"} 
+                  // Lucide icons don't always fill nicely with just 'fill-foreground', handling visually via props/classes
+                  fill={isActive && item.label !== 'Search' && item.label !== 'Create' ? "currentColor" : "none"} 
                 />
               </div>
             </Link>
