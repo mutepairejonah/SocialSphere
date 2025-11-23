@@ -15,6 +15,9 @@ export default function UserProfile() {
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
+  // API key owner's user ID
+  const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
+
   useEffect(() => {
     const loadUser = async () => {
       if (params?.id && allUsers.length > 0) {
@@ -27,6 +30,21 @@ export default function UserProfile() {
     };
     loadUser();
   }, [params?.id, allUsers, loadFollowStatus]);
+
+  // Block access to API key owner's profile
+  if (params?.id === API_KEY_OWNER_ID) {
+    return (
+      <div className="max-w-md mx-auto min-h-screen bg-background flex flex-col items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <h2 className="text-xl font-bold">Profile Restricted</h2>
+          <p className="text-muted-foreground">This profile is not available for viewing.</p>
+          <Button onClick={() => setLocation("/")} className="mt-4">
+            Go Back Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

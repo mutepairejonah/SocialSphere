@@ -457,51 +457,53 @@ export const useStore = create<StoreState>((set, get) => ({
 
   loadPosts: async () => {
     try {
-      console.log('Loading all posts from all users...');
+      console.log('Loading Instagram API posts (API key owner only)...');
       
-      // Load ALL posts from all users
-      const postsQuery = query(collection(db, 'posts'));
-      const snapshot = await getDocs(postsQuery);
+      // Fetch posts from Instagram API (only API key owner's posts)
+      const instagramPosts = await getUserMedia();
       
-      // Get all users for reference
-      const usersQuery = query(collection(db, 'users'));
-      const usersSnapshot = await getDocs(usersQuery);
-      const usersMap = new Map();
-      usersSnapshot.docs.forEach(doc => {
-        usersMap.set(doc.id, doc.data());
-      });
-      
-      const posts = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        const postUserId = data.userId;
-        const userData = usersMap.get(postUserId) || {};
-        const timestamp = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
+      if (instagramPosts && Array.isArray(instagramPosts) && instagramPosts.length > 0) {
+        const posts = instagramPosts.map((igPost: any, index: number) => {
+          const timestamp = igPost.timestamp || new Date().toISOString();
+          
+          // Use HD quality image URLs
+          let imageUrl = 'https://via.placeholder.com/1080x1350?text=Post';
+          if (igPost.media_type === 'IMAGE' && igPost.media_url) {
+            imageUrl = `${igPost.media_url}?quality=95&format=auto`;
+          } else if (igPost.media_type === 'VIDEO' && igPost.thumbnail_url) {
+            imageUrl = `${igPost.thumbnail_url}?quality=95&format=auto`;
+          }
+          
+          // Use real Instagram engagement metrics
+          const realLikes = igPost.like_count || 0;
+          const realComments = igPost.comments_count || 0;
+          
+          return {
+            id: igPost.id || `ig_${index}`,
+            userId: 'dbcMML2G74Rl4YKhT8VupNOSlDo1',
+            username: 'jonah m',
+            userAvatar: 'https://lh3.googleusercontent.com/a/ACg8ocJBPGZKLpDAwumlRjUllijfadBvFA6XLAR9rGfXt4dnlnS88w=s96-c',
+            imageUrl: imageUrl,
+            videoUrl: igPost.media_type === 'VIDEO' ? igPost.media_url : undefined,
+            mediaType: igPost.media_type as 'IMAGE' | 'VIDEO',
+            caption: igPost.caption || '(No caption)',
+            likes: realLikes,
+            location: '',
+            timestamp: new Date(timestamp).toLocaleString(),
+            comments: realComments,
+            isLiked: false,
+            isSaved: false
+          } as Post;
+        });
         
-        return {
-          id: doc.id,
-          userId: postUserId,
-          username: userData.username || 'Unknown User',
-          userAvatar: userData.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${postUserId}`,
-          imageUrl: data.imageUrl || '',
-          videoUrl: data.videoUrl,
-          mediaType: data.mediaType || 'IMAGE',
-          caption: data.caption || '',
-          likes: data.likes || 0,
-          location: data.location || '',
-          timestamp: timestamp.toLocaleString(),
-          comments: data.comments || 0,
-          isLiked: false,
-          isSaved: false
-        } as Post;
-      }).sort((a, b) => {
-        // Sort by timestamp, newest first
-        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-      });
-      
-      console.log('Loaded all posts:', posts);
-      set({ posts });
+        console.log('Loaded Instagram posts:', posts);
+        set({ posts });
+      } else {
+        console.log('No Instagram posts found');
+        set({ posts: [] });
+      }
     } catch (error) {
-      console.error('Error loading posts:', error);
+      console.error('Error loading Instagram posts:', error);
       set({ posts: [] });
     }
   },
