@@ -368,44 +368,22 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) return;
 
     try {
-      const batch = writeBatch(db);
-      const currentUserRef = doc(db, 'users', currentUser.id);
-      const targetUserRef = doc(db, 'users', userId);
-      
-      const followRef = query(
-        collection(db, 'follows'),
-        where('followerId', '==', currentUser.id),
-        where('followingId', '==', userId)
-      );
-      const followDocs = await getDocs(followRef);
-      
-      if (!followDocs.empty) {
-        // Unfollow
-        followDocs.forEach(doc => {
-          batch.delete(doc.ref);
-        });
-        batch.update(currentUserRef, { following: (currentUser.following || 0) - 1 });
-      } else {
-        // Follow
-        await addDoc(collection(db, 'follows'), {
-          followerId: currentUser.id,
-          followingId: userId,
-          createdAt: Timestamp.now()
-        });
-        batch.update(currentUserRef, { following: (currentUser.following || 0) + 1 });
+      const response = await fetch(`/api/follow/${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followerId: currentUser.id })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to toggle follow');
       }
-      
-      await batch.commit();
-      
-      // Update allUsers
+
+      const data = await response.json();
+
       set(state => ({
         allUsers: state.allUsers.map(u =>
-          u.id === userId ? { ...u, isFollowing: !u.isFollowing } : u
-        ),
-        currentUser: state.currentUser ? {
-          ...state.currentUser,
-          following: followDocs.empty ? (state.currentUser.following || 0) + 1 : (state.currentUser.following || 0) - 1
-        } : null
+          u.id === userId ? { ...u, isFollowing: data.isFollowing } : u
+        )
       }));
     } catch (error) {
       console.error('Error toggling follow:', error);
@@ -826,29 +804,25 @@ export const useStore = create<StoreState>((set, get) => ({
   })),
 
   searchUsers: async (searchTerm: string) => {
-    if (!searchTerm || searchTerm.trim().length === 0) {
+    const currentUser = get().currentUser;
+    if (!currentUser || !searchTerm || searchTerm.trim().length === 0) {
       return [];
     }
 
     try {
-      const searchLower = searchTerm.toLowerCase();
-      const allUsers = get().allUsers;
+      const response = await fetch(`/api/search/users?q=${encodeURIComponent(searchTerm)}`);
+      const data = await response.json();
       
-      const users = allUsers
-        .filter(user => 
-          (user.username && user.username.toLowerCase().includes(searchLower)) || 
-          (user.fullName && user.fullName.toLowerCase().includes(searchLower))
-        );
+      // Get following list to determine follow status
+      const followingRes = await fetch(`/api/following/${currentUser.id}`);
+      const followingList = await followingRes.json();
+      const followingIds = new Set(followingList.map((u: any) => u.id));
 
-      // Load follow status for each user
-      const usersWithFollowStatus = await Promise.all(
-        users.map(async (user) => {
-          const isFollowing = await get().loadFollowStatus(user.id);
-          return { ...user, isFollowing };
-        })
-      );
-
-      return usersWithFollowStatus;
+      // Map follow status
+      return data.map((user: any) => ({
+        ...user,
+        isFollowing: followingIds.has(user.id)
+      }));
     } catch (error) {
       console.error('Error searching users:', error);
       return [];
