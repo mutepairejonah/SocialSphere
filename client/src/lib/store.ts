@@ -27,6 +27,8 @@ export interface User {
 export interface Post {
   id: string;
   userId: string;
+  username?: string;
+  userAvatar?: string;
   imageUrl: string;
   caption: string;
   likes: number;
@@ -35,6 +37,8 @@ export interface Post {
   comments: number;
   isLiked: boolean;
   isSaved: boolean;
+  mediaType?: 'IMAGE' | 'VIDEO' | 'CAROUSEL';
+  videoUrl?: string;
 }
 
 export interface Notification {
@@ -443,12 +447,19 @@ export const useStore = create<StoreState>((set, get) => ({
       console.log('Instagram posts received:', instagramPosts);
       
       if (instagramPosts && Array.isArray(instagramPosts) && instagramPosts.length > 0) {
+        const currentUser = get().currentUser;
         const posts = instagramPosts.map((igPost: any, index: number) => {
           const timestamp = igPost.timestamp || new Date().toISOString();
+          const mediaUrl = igPost.media_type === 'IMAGE' ? igPost.media_url : (igPost.thumbnail_url || 'https://via.placeholder.com/500?text=Instagram+Post');
+          
           return {
             id: igPost.id || `ig_${index}`,
-            userId: get().currentUser?.id || 'instagram',
-            imageUrl: igPost.media_type === 'IMAGE' ? igPost.media_url : (igPost.thumbnail_url || 'https://via.placeholder.com/500?text=Instagram+Post'),
+            userId: currentUser?.id || 'instagram',
+            username: currentUser?.username || 'Instagram',
+            userAvatar: currentUser?.avatar,
+            imageUrl: mediaUrl,
+            videoUrl: igPost.media_type === 'VIDEO' ? igPost.media_url : undefined,
+            mediaType: igPost.media_type as 'IMAGE' | 'VIDEO',
             caption: igPost.caption || '(No caption)',
             likes: 0,
             location: '',
@@ -530,6 +541,23 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) return;
 
     try {
+      // For Instagram posts (start with 'ig_' or long numeric IDs), just toggle local state
+      const post = get().posts.find(p => p.id === postId);
+      if (post?.id.toString().length > 20 || post?.userId.startsWith('ig_')) {
+        // Instagram post - toggle locally
+        set(state => ({
+          posts: state.posts.map(p =>
+            p.id === postId ? {
+              ...p,
+              likes: p.isLiked ? Math.max(0, p.likes - 1) : p.likes + 1,
+              isLiked: !p.isLiked
+            } : p
+          )
+        }));
+        return;
+      }
+
+      // Firebase posts
       const likeRef = query(
         collection(db, 'likes'),
         where('userId', '==', currentUser.id),

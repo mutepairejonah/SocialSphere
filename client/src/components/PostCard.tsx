@@ -30,12 +30,12 @@ export function PostCard({ post }: PostCardProps) {
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full opacity-0 hover:opacity-100 transition-opacity" />
             <Avatar className="h-8 w-8 border border-border relative z-10">
-              <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`} />
-              <AvatarFallback>U</AvatarFallback>
+              <AvatarImage src={post.userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`} />
+              <AvatarFallback>{post.username?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold leading-none cursor-pointer hover:underline">{post.userId}</span>
+            <span className="text-sm font-semibold leading-none cursor-pointer hover:underline">{post.username || post.userId}</span>
             {post.location && (
               <span className="text-xs text-muted-foreground cursor-pointer">{post.location}</span>
             )}
@@ -46,14 +46,29 @@ export function PostCard({ post }: PostCardProps) {
         </Button>
       </div>
 
-      {/* Image */}
-      <div className="relative aspect-[4/5] bg-muted overflow-hidden" onDoubleClick={handleLike}>
-        <img 
-          src={post.imageUrl} 
-          alt="Post" 
-          className="object-cover w-full h-full"
-          loading="lazy"
-        />
+      {/* Media - Image or Video */}
+      <div className="relative aspect-[4/5] bg-muted overflow-hidden group" onDoubleClick={handleLike}>
+        {post.mediaType === 'VIDEO' && post.videoUrl ? (
+          <>
+            <video 
+              src={post.videoUrl}
+              controls
+              className="object-cover w-full h-full"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <div className="bg-white/20 rounded-full p-4">
+                <svg className="w-8 h-8 text-white fill-white" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </div>
+            </div>
+          </>
+        ) : (
+          <img 
+            src={post.imageUrl} 
+            alt="Post" 
+            className="object-cover w-full h-full"
+            loading="lazy"
+          />
+        )}
         {isLikedAnim && (
           <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
              <motion.div
@@ -94,9 +109,9 @@ export function PostCard({ post }: PostCardProps) {
 
         {/* Likes & Caption */}
         <div className="space-y-1.5">
-          <div className="text-sm font-semibold">{post.likes.toLocaleString()} likes</div>
+          <div className="text-sm font-semibold">{post.likes.toLocaleString()} {post.likes === 1 ? 'like' : 'likes'}</div>
           <div className="text-sm leading-snug">
-            <span className="font-semibold mr-2">{post.userId}</span>
+            <span className="font-semibold mr-2">{post.username || post.userId}</span>
             {post.caption}
           </div>
           {post.comments > 0 && (
