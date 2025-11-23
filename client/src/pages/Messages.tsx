@@ -5,7 +5,7 @@ import { ArrowLeft, Send, Phone, Video, MessageCircle, MoreVertical, Image as Im
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -175,11 +175,6 @@ export default function Messages() {
   }
 
   const selectedUser = followingUsers.find(u => u.id === selectedUserId);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   return (
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background flex flex-col">
@@ -281,7 +276,6 @@ export default function Messages() {
             );
           })
         )}
-        <div className="h-4"></div>
       </main>
 
       <div className="border-t border-border p-3 bg-background/95 backdrop-blur-sm">

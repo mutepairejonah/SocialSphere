@@ -155,19 +155,17 @@ export default function Profile() {
                 <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover" />
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <div className="text-white font-semibold">{post.likes} likes</div>
+                <div className="text-white font-semibold text-sm">{post.likes} likes</div>
               </div>
             </div>
           ))}
-          {activeTab === 'posts' && posts.length === 0 && [...Array(12)].map((_, i) => (
-            <div key={i} className="aspect-square bg-muted relative group cursor-pointer">
-              <img 
-                src={`https://images.unsplash.com/photo-${1500000000000 + i}?w=300&auto=format&fit=crop&q=60`} 
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+          {activeTab === 'posts' && posts.length === 0 && (
+            <div className="col-span-3 py-20 flex flex-col items-center text-muted-foreground">
+              <Grid className="w-16 h-16 stroke-1 mb-4" />
+              <h3 className="text-xl font-bold text-foreground">No Posts Yet</h3>
+              <p className="text-sm">Your Instagram posts will appear here</p>
             </div>
-          ))}
+          )}
           {activeTab === 'saved' && (
              <div className="col-span-3 py-20 flex flex-col items-center text-muted-foreground">
                 <Bookmark className="w-16 h-16 stroke-1 mb-4" />
