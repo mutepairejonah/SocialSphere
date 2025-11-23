@@ -132,9 +132,17 @@ export default function Home() {
 
       <BottomNav />
 
+      {/* Background Overlay */}
+      {menuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
       {/* Navigation Drawer */}
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="left" className="w-64 flex flex-col">
+        <SheetContent side="left" className="w-64 flex flex-col bg-background/95 backdrop-blur-md">
           <SheetHeader className="border-b border-border pb-4">
             <SheetTitle className="text-2xl font-bold text-primary">Authentic</SheetTitle>
           </SheetHeader>
