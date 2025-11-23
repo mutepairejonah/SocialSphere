@@ -29,7 +29,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#f0f2f5] pb-20">
       {/* Compact Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-2 py-1.5 flex items-center justify-between">
+        <div className="w-full px-2 sm:px-4 py-1.5 flex items-center justify-between">
           {/* Logo */}
           <div className="text-lg font-bold text-[#1877F2] whitespace-nowrap">Authentic</div>
 
@@ -87,9 +87,9 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-3 py-3">
+      <div className="w-full px-2 sm:px-4 py-3 flex flex-col items-center">
         {/* Stories Section - Facebook Style */}
-        <div className="mb-4 bg-white rounded-lg shadow-sm p-2 overflow-x-auto">
+        <div className="mb-4 bg-white rounded-lg shadow-sm p-2 overflow-x-auto w-full max-w-2xl">
           <div className="flex gap-2 no-scrollbar pb-1">
             {/* Create Story Card */}
             <div
@@ -157,9 +157,9 @@ export default function Home() {
         </div>
 
         {/* Feed */}
-        <div className="max-w-md mx-auto">
+        <div className="w-full max-w-2xl">
           {allPosts && allPosts.length > 0 ? (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-max">
               {allPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}

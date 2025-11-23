@@ -63,23 +63,23 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border-2 border-primary/20">
+      <div className="flex items-center justify-between p-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar className="h-8 w-8 border-2 border-primary/20 flex-shrink-0">
             <AvatarImage src={post.userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`} />
             <AvatarFallback>{post.username?.charAt(0) || 'U'}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold leading-none cursor-pointer hover:text-primary transition-colors">{post.username || post.userId}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs sm:text-sm font-semibold leading-none cursor-pointer hover:text-primary transition-colors truncate">{post.username || post.userId}</span>
             {post.location && (
-              <span className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors">{post.location}</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors truncate">{post.location}</span>
             )}
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-          <MoreHorizontal className="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground hover:text-foreground flex-shrink-0">
+          <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
       </div>
 
