@@ -4,13 +4,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
-import { useState } from "react";
-import { Menu, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings, X } from "lucide-react";
 
 export default function Activity() {
-  const { notifications, allUsers, toggleFollow, logout } = useStore();
-  const [location, setLocation] = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { notifications, allUsers, toggleFollow } = useStore();
+  const [, setLocation] = useLocation();
 
   // Group by timeframe (mock logic)
   const newNotifs = notifications.filter(n => !n.read);
@@ -19,121 +16,13 @@ export default function Activity() {
   // Get suggested users (not yet followed)
   const suggestedUsers = allUsers.filter(u => !u.isFollowing).slice(0, 3);
 
-  const handleNavigation = (path: string) => {
-    setLocation(path);
-  };
-
-  const handleLogout = async () => {
-    await logout();
-  };
-
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* White Sidebar */}
-      <aside className={cn(
-        "fixed left-0 top-0 h-screen bg-white border-r border-gray-200 flex flex-col z-40 transition-all duration-300 overflow-hidden",
-        sidebarOpen ? "w-64" : "w-0"
-      )}>
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h1 className="font-bold text-2xl text-primary">Authentic</h1>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-700" />
-          </button>
-        </div>
+    <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center">
+        <h1 className="font-bold text-xl">Activity</h1>
+      </header>
 
-        <nav className="flex-1 py-6 px-4 space-y-2">
-          <button
-            onClick={() => handleNavigation("/")}
-            className={cn(
-              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
-              location === "/" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
-            )}
-          >
-            <HomeIcon className="w-5 h-5" />
-            <span className="font-medium">Home</span>
-          </button>
-          <button
-            onClick={() => handleNavigation("/explore")}
-            className={cn(
-              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
-              location === "/explore" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
-            )}
-          >
-            <Compass className="w-5 h-5" />
-            <span className="font-medium">Explore</span>
-          </button>
-          <button
-            onClick={() => handleNavigation("/create")}
-            className={cn(
-              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
-              location === "/create" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
-            )}
-          >
-            <Plus className="w-5 h-5" />
-            <span className="font-medium">Create</span>
-          </button>
-          <button
-            onClick={() => handleNavigation("/messages")}
-            className={cn(
-              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
-              location === "/messages" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
-            )}
-          >
-            <MessageCircle className="w-5 h-5" />
-            <span className="font-medium">Messages</span>
-          </button>
-          <button
-            onClick={() => handleNavigation("/profile")}
-            className={cn(
-              "w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors",
-              location === "/profile" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100"
-            )}
-          >
-            <User className="w-5 h-5" />
-            <span className="font-medium">Profile</span>
-          </button>
-        </nav>
-
-        <div className="border-t border-gray-200 p-4 space-y-2">
-          <button
-            onClick={() => handleNavigation("/profile/edit")}
-            className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-          >
-            <Settings className="w-5 h-5" />
-            <span className="font-medium">Settings</span>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <div className={cn(
-        "flex-1 flex flex-col transition-all duration-300",
-        sidebarOpen ? "ml-64" : "ml-0"
-      )}>
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 hover:bg-muted rounded-lg transition-colors -ml-2"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Activity</h1>
-          <div className="w-6"></div>
-        </header>
-
-        {/* Main Content */}
-        <main className="pb-20 flex-1 overflow-y-auto divide-y divide-border/0">
+      <main className="divide-y divide-border/0">
         {newNotifs.length > 0 && (
           <div className="pt-4 pb-2">
             <h2 className="font-bold px-4 mb-3 text-base">New</h2>
@@ -179,11 +68,9 @@ export default function Activity() {
              </div>
            )}
         </div>
-        </main>
-      </div>
+      </main>
 
-      {/* Bottom Navigation */}
-      <BottomNav onMenuClick={() => setSidebarOpen(true)} />
+      <BottomNav />
     </div>
   );
 }
@@ -216,10 +103,10 @@ function NotificationItem({ notification }: { notification: any }) {
             💬
          </div>
       ) : (
-         notification.postImage && <div className="w-11 h-11 bg-muted rounded-[4px] overflow-hidden border border-border">
-            <img src={notification.postImage} className="w-full h-full object-cover" />
+         <div className="w-11 h-11 bg-muted rounded-lg overflow-hidden border border-border flex items-center justify-center text-foreground font-bold">
+            ❤️
          </div>
       )}
     </div>
-  )
+  );
 }
