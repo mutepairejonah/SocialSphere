@@ -63,13 +63,13 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   return (
-    <div className="pb-2 border-b border-border last:border-0">
+    <div className="rounded-2xl overflow-hidden bg-card border border-border/50 shadow-xl hover:shadow-2xl transition-shadow">
       {/* Header */}
-      <div className="flex items-center justify-between p-3">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-card/50 to-card/20">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full opacity-0 hover:opacity-100 transition-opacity" />
-            <Avatar className="h-8 w-8 border border-border relative z-10">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
+            <Avatar className="h-10 w-10 border-2 border-purple-500/30 relative z-10">
               <AvatarImage src={post.userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`} />
               <AvatarFallback>{post.username?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
@@ -87,7 +87,7 @@ export function PostCard({ post }: PostCardProps) {
       </div>
 
       {/* Media - Image or Video */}
-      <div className="relative aspect-square bg-muted overflow-hidden group cursor-pointer" onDoubleClick={handleLike} onClick={handleVideoClick}>
+      <div className="relative aspect-square bg-gradient-to-br from-purple-900 to-black overflow-hidden group cursor-pointer" onDoubleClick={handleLike} onClick={handleVideoClick}>
         {post.mediaType === 'VIDEO' && post.videoUrl ? (
           <>
             <video 
