@@ -33,7 +33,7 @@ export default function Messages() {
   const [messageInput, setMessageInput] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [calling, setCalling] = useState(false);
+  const [calling, setCalling] = useState<{ active: boolean; type?: 'audio' | 'video' }>({ active: false });
   const [followingUsers, setFollowingUsers] = useState<User[]>([]);
 
   useEffect(() => {
@@ -45,6 +45,9 @@ export default function Messages() {
   useEffect(() => {
     if (selectedUserId) {
       loadMessages();
+      // Refresh messages every 2 seconds for real-time feel
+      const interval = setInterval(loadMessages, 2000);
+      return () => clearInterval(interval);
     }
   }, [selectedUserId]);
 
@@ -90,22 +93,22 @@ export default function Messages() {
   const handleCall = async (callType: 'audio' | 'video') => {
     if (!selectedUserId) return;
     
-    setCalling(true);
+    setCalling({ active: true, type: callType });
     try {
       const callId = await startCall(selectedUserId, callType);
       toast({
         title: "Call Started",
-        description: `${callType === 'video' ? 'Video' : 'Audio'} call initiated`
+        description: `${callType === 'video' ? 'Video' : 'Audio'} call initiated with ${selectedUser?.username}`
       });
-      // In a real app, this would open a call interface
-      setTimeout(() => setCalling(false), 3000);
+      // Simulate call UI (in production, integrate WebRTC)
+      setTimeout(() => setCalling({ active: false }), 5000);
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message
       });
-      setCalling(false);
+      setCalling({ active: false });
     }
   };
 
@@ -114,16 +117,41 @@ export default function Messages() {
     return null;
   }
 
+  const selectedUser = followingUsers.find(u => u.id === selectedUserId);
+
+  // Call screen
+  if (calling.active) {
+    return (
+      <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center fixed inset-0 z-50">
+        <div className="text-center space-y-6">
+          <div className="w-24 h-24 rounded-full overflow-hidden mx-auto border-4 border-blue-500 animate-pulse">
+            <img src={selectedUser?.avatar} alt={selectedUser?.username} className="w-full h-full object-cover" />
+          </div>
+          <div className="text-white">
+            <h2 className="text-2xl font-bold">{selectedUser?.username}</h2>
+            <p className="text-gray-300 text-sm mt-2">{calling.type === 'video' ? '📹 Video Call' : '☎️ Audio Call'}</p>
+            <p className="text-gray-400 text-xs mt-4 animate-pulse">Calling...</p>
+          </div>
+        </div>
+        <div className="absolute bottom-8 flex gap-4">
+          <button onClick={() => setCalling({ active: false })} className="bg-red-500 hover:bg-red-600 text-white rounded-full p-4 transition-colors" data-testid="button-end-call">
+            <Phone className="w-6 h-6 rotate-[135deg]" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!selectedUserId) {
     return (
       <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
         <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-16 flex items-center justify-between">
           <div>
             <h1 className="font-bold text-2xl">Messages</h1>
-            <p className="text-xs text-muted-foreground">Connected to your Instagram</p>
+            <p className="text-xs text-muted-foreground">Real-time chat & video calls</p>
           </div>
           <div className="flex gap-2">
-            <Button size="icon" variant="ghost" className="h-10 w-10 hover:bg-muted rounded-full">
+            <Button size="icon" variant="ghost" className="h-10 w-10 hover:bg-muted rounded-full" data-testid="button-audio-calls">
               <Phone className="w-5 h-5" />
             </Button>
             <Button size="icon" variant="ghost" className="h-10 w-10 hover:bg-muted rounded-full">

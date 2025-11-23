@@ -47,13 +47,22 @@ export default function Stories() {
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-      {/* Story Image */}
+      {/* Story Media */}
       <div className="relative w-full h-full flex items-center justify-center">
-        <img 
-          src={story.imageUrl} 
-          alt="Story" 
-          className="w-full h-full object-contain"
-        />
+        {story.imageUrl?.includes('.mp4') || story.imageUrl?.startsWith('data:video') ? (
+          <video 
+            src={story.imageUrl} 
+            autoPlay
+            controls
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <img 
+            src={story.imageUrl} 
+            alt="Story" 
+            className="w-full h-full object-contain"
+          />
+        )}
 
         {/* Progress Bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800">
