@@ -3,16 +3,28 @@ import { BottomNav } from "@/components/BottomNav";
 import { useStore } from "@/lib/store";
 import { Search, Heart, Send, Plus, LogOut, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 
 export default function Home() {
-  const { posts, stories, markStoryViewed, currentUser, logout } = useStore();
+  const { posts, userPosts, stories, markStoryViewed, currentUser, logout, loadUserPosts } = useStore();
   const [, setLocation] = useLocation();
+  const [allPostsLoaded, setAllPostsLoaded] = useState(false);
+
+  useEffect(() => {
+    loadUserPosts().then(() => setAllPostsLoaded(true));
+  }, [loadUserPosts]);
 
   const handleLogout = async () => {
     await logout();
   };
+
+  // Combine Instagram videos and user posts
+  const allPosts = allPostsLoaded ? [...posts, ...userPosts].sort((a, b) => {
+    const timeA = new Date(a.timestamp).getTime();
+    const timeB = new Date(b.timestamp).getTime();
+    return timeB - timeA;
+  }) : posts;
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] pb-20">
@@ -161,15 +173,15 @@ export default function Home() {
 
         {/* Feed */}
         <div className="max-w-md mx-auto">
-          {posts && posts.length > 0 ? (
+          {allPosts && allPosts.length > 0 ? (
             <div className="space-y-4">
-              {posts.map((post) => (
+              {allPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg shadow-sm">
-              <p className="text-center text-gray-500">No videos available</p>
+              <p className="text-center text-gray-500">No posts available</p>
             </div>
           )}
         </div>

@@ -12,11 +12,13 @@ import { useToast } from "@/hooks/use-toast";
 export default function Create() {
   const [, setLocation] = useLocation();
   const addPost = useStore((state) => state.addPost);
+  const addStory = useStore((state) => state.addStory);
   const currentUser = useStore((state) => state.currentUser);
   const { toast } = useToast();
   const [caption, setCaption] = useState("");
   const [locationTag, setLocationTag] = useState("");
-  const [step, setStep] = useState<'picker' | 'details'>('picker');
+  const [step, setStep] = useState<'picker' | 'details' | 'type'>('type');
+  const [creationType, setCreationType] = useState<'post' | 'story' | null>(null);
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
   const [uploading, setUploading] = useState(false);
@@ -64,44 +66,86 @@ export default function Create() {
 
     setUploading(true);
     try {
-      await addPost({
-        userId: currentUser.id,
-        imageUrl: selectedMedia,
-        caption,
-        location: locationTag || undefined,
-      });
-      
-      toast({
-        title: "Success",
-        description: "Post uploaded successfully"
-      });
+      if (creationType === 'story') {
+        await addStory(selectedMedia);
+        toast({
+          title: "Success",
+          description: "Story created successfully"
+        });
+      } else {
+        await addPost({
+          userId: currentUser.id,
+          imageUrl: selectedMedia,
+          caption,
+          location: locationTag || undefined,
+        });
+        toast({
+          title: "Success",
+          description: "Post uploaded successfully"
+        });
+      }
       
       setLocation("/");
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error?.message || "Failed to upload post"
+        description: error?.message || "Failed to upload"
       });
     } finally {
       setUploading(false);
     }
   };
 
+  // Type selection flow
+  if (step === 'type') {
+    return (
+      <div className="max-w-md mx-auto min-h-screen bg-background flex flex-col pb-20">
+        <header className="h-12 flex items-center justify-between px-4 border-b border-border">
+          <X className="w-7 h-7 cursor-pointer hover:opacity-70" onClick={() => setLocation("/")} />
+          <h1 className="font-bold text-lg">Create</h1>
+          <div className="w-7"></div>
+        </header>
+
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
+          <Button
+            className="w-full h-20 text-lg font-bold bg-primary hover:bg-primary/90 text-white"
+            onClick={() => {
+              setCreationType('story');
+              setStep('picker');
+            }}
+          >
+            📸 Create Story
+          </Button>
+          <Button
+            className="w-full h-20 text-lg font-bold bg-primary hover:bg-primary/90 text-white"
+            onClick={() => {
+              setCreationType('post');
+              setStep('picker');
+            }}
+          >
+            📝 Create Post
+          </Button>
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
+
   // Media picker flow
   if (step === 'picker') {
     return (
       <div className="max-w-md mx-auto min-h-screen bg-background flex flex-col pb-20">
         <header className="h-12 flex items-center justify-between px-4 border-b border-border">
-          <X className="w-7 h-7 cursor-pointer hover:opacity-70" onClick={() => setLocation("/")} />
-          <h1 className="font-bold text-lg">New Post</h1>
+          <button onClick={() => setStep('type')} className="text-primary font-bold hover:opacity-70">← Back</button>
+          <h1 className="font-bold text-lg">New {creationType === 'story' ? 'Story' : 'Post'}</h1>
           <Button 
             className="text-primary font-bold hover:text-primary/80" 
             variant="ghost"
             disabled={!selectedMedia}
-            onClick={() => setStep('details')}
+            onClick={() => creationType === 'story' ? handlePost() : setStep('details')}
           >
-            Next
+            {creationType === 'story' ? 'Share' : 'Next'}
           </Button>
         </header>
         
