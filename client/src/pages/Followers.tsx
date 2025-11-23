@@ -4,17 +4,43 @@ import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BottomNav } from "@/components/BottomNav";
 
+interface FollowerUser {
+  id: string;
+  username: string;
+  fullName?: string;
+  avatar?: string;
+  isFollowing?: boolean;
+}
+
 export default function Followers() {
-  const { allUsers } = useStore();
+  const { currentUser, toggleFollow } = useStore();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [followers, setFollowers] = useState<FollowerUser[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFollowers = async () => {
+      if (!currentUser) return;
+      try {
+        const res = await fetch(`/api/followers/${currentUser.id}`);
+        const data = await res.json();
+        setFollowers(data);
+      } catch (error) {
+        console.error("Error fetching followers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFollowers();
+  }, [currentUser]);
   
-  const filtered = allUsers.filter(user => 
+  const filtered = followers.filter(user => 
     user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+    user.fullName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -57,7 +83,7 @@ export default function Followers() {
               <Button 
                 size="sm" 
                 className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white"
-                onClick={() => {}}
+                onClick={() => currentUser && toggleFollow(user.id)}
               >
                 <UserPlus className="w-4 h-4 mr-1" />
                 Follow

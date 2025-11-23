@@ -31,6 +31,8 @@ export interface IStorage {
   // Follows
   toggleFollow(followerId: string, followingId: string): Promise<boolean>;
   isFollowing(followerId: string, followingId: string): Promise<boolean>;
+  getFollowers(userId: string): Promise<User[]>;
+  getFollowing(userId: string): Promise<User[]>;
   
   // Messages
   getMessages(senderId: string, recipientId: string): Promise<any[]>;
@@ -158,6 +160,26 @@ export class PostgresStorage implements IStorage {
         sql`${stories.createdAt} > ${oneDay}`
       ))
       .orderBy(desc(stories.createdAt));
+  }
+
+  async getFollowers(userId: string): Promise<User[]> {
+    const followerIds = await db.select({ followerId: follows.followerId }).from(follows)
+      .where(eq(follows.followingId, userId));
+    
+    if (followerIds.length === 0) return [];
+    
+    return db.select().from(users)
+      .where(sql`${users.id} IN (${sql.raw(followerIds.map(f => `'${f.followerId}'`).join(','))})`);
+  }
+
+  async getFollowing(userId: string): Promise<User[]> {
+    const followingIds = await db.select({ followingId: follows.followingId }).from(follows)
+      .where(eq(follows.followerId, userId));
+    
+    if (followingIds.length === 0) return [];
+    
+    return db.select().from(users)
+      .where(sql`${users.id} IN (${sql.raw(followingIds.map(f => `'${f.followingId}'`).join(','))})`);
   }
 
   async getMessages(senderId: string, recipientId: string): Promise<any[]> {
