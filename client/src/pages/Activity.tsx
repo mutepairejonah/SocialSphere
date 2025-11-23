@@ -3,13 +3,18 @@ import { useStore } from "@/lib/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
 
 export default function Activity() {
-  const notifications = useStore((state) => state.notifications);
+  const { notifications, allUsers, toggleFollow } = useStore();
+  const [, setLocation] = useLocation();
 
   // Group by timeframe (mock logic)
   const newNotifs = notifications.filter(n => !n.read);
   const oldNotifs = notifications.filter(n => n.read);
+  
+  // Get suggested users (not yet followed)
+  const suggestedUsers = allUsers.filter(u => !u.isFollowing).slice(0, 3);
 
   return (
     <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
@@ -32,25 +37,36 @@ export default function Activity() {
            {oldNotifs.map((notif) => (
               <NotificationItem key={notif.id} notification={notif} />
             ))}
-           {/* Mock suggestions */}
-           <div className="mt-6">
-             <h2 className="font-bold px-4 mb-3 text-base">Suggested for you</h2>
-             {[1,2,3].map((i) => (
-                <div key={i} className="flex items-center justify-between py-3 px-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                   <div className="flex items-center gap-3">
-                    <Avatar className="h-11 w-11 border border-border">
-                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=sug${i}`} />
-                      <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
-                    <div className="text-sm flex flex-col">
-                      <span className="font-semibold">suggested_user_{i}</span>
-                      <span className="text-xs text-muted-foreground">Followed by alex_travels + 2 more</span>
+           {/* Suggestions from real users */}
+           {suggestedUsers.length > 0 && (
+             <div className="mt-6">
+               <h2 className="font-bold px-4 mb-3 text-base">Suggested for you</h2>
+               {suggestedUsers.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between py-3 px-4 hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => setLocation(`/user/${user.id}`)}>
+                     <div className="flex items-center gap-3 flex-1">
+                      <Avatar className="h-11 w-11 border border-border">
+                        <AvatarImage src={user.avatar} />
+                        <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="text-sm flex flex-col">
+                        <span className="font-semibold">{user.username}</span>
+                        <span className="text-xs text-muted-foreground">{user.followers} followers</span>
+                      </div>
                     </div>
+                    <Button 
+                      size="sm" 
+                      className="h-8 px-5 font-semibold bg-[#0095F6] hover:bg-[#1877F2] text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFollow(user.id);
+                      }}
+                    >
+                      Follow
+                    </Button>
                   </div>
-                  <Button size="sm" className="h-8 px-5 font-semibold bg-[#0095F6] hover:bg-[#1877F2] text-white">Follow</Button>
-                </div>
-             ))}
-           </div>
+               ))}
+             </div>
+           )}
         </div>
       </main>
 
