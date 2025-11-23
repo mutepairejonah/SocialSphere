@@ -120,6 +120,25 @@ export const useStore = create<StoreState>((set, get) => ({
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
+            
+            // Sync to PostgreSQL database
+            try {
+              await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  id: firebaseUser.uid,
+                  username: userData.username || firebaseUser.displayName?.split(' ')[0].toLowerCase() || 'user',
+                  email: firebaseUser.email || userData.email,
+                  fullName: userData.fullName || firebaseUser.displayName,
+                  avatar: userData.avatar || firebaseUser.photoURL || '',
+                  bio: userData.bio || ''
+                })
+              });
+            } catch (err) {
+              console.warn('Database sync failed:', err);
+            }
+            
             set({
               currentUser: {
                 id: firebaseUser.uid,
@@ -231,6 +250,25 @@ export const useStore = create<StoreState>((set, get) => ({
     };
 
     await setDoc(doc(db, 'users', pending.uid), newUser);
+    
+    // Sync to PostgreSQL database
+    try {
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: pending.uid,
+          username: username.toLowerCase(),
+          email: pending.email,
+          fullName: pending.displayName,
+          avatar: pending.photoURL,
+          bio: ''
+        })
+      });
+    } catch (err) {
+      console.warn('Database sync failed:', err);
+    }
+    
     set({
       currentUser: {
         id: pending.uid,
@@ -285,6 +323,25 @@ export const useStore = create<StoreState>((set, get) => ({
       createdAt: Timestamp.now()
     };
     await setDoc(doc(db, 'users', user.uid), newUser);
+    
+    // Sync to PostgreSQL database
+    try {
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: user.uid,
+          username,
+          email,
+          fullName,
+          avatar: '',
+          bio: ''
+        })
+      });
+    } catch (err) {
+      console.warn('Database sync failed:', err);
+    }
+    
     set({
       currentUser: {
         id: user.uid,

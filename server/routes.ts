@@ -144,6 +144,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/users", async (req, res) => {
+    try {
+      const { id, username, email, fullName, avatar, bio } = req.body;
+      if (!id || !username || !email) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const existingUser = await storage.getUser(id);
+      let user;
+      
+      if (existingUser) {
+        user = await storage.updateUser(id, {
+          username: username.toLowerCase(),
+          email,
+          fullName: fullName || existingUser.fullName,
+          avatar: avatar || existingUser.avatar,
+          bio: bio || existingUser.bio
+        });
+      } else {
+        user = await storage.createUser({
+          id,
+          username: username.toLowerCase(),
+          email,
+          fullName: fullName || "",
+          avatar: avatar || "",
+          bio: bio || ""
+        });
+      }
+      
+      res.json(user);
+    } catch (error) {
+      console.error("Error syncing user:", error);
+      res.status(500).json({ error: "Failed to sync user" });
+    }
+  });
+
   app.post("/api/follow/:userId", async (req, res) => {
     try {
       const { followerId } = req.body;
