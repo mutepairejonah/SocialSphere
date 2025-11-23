@@ -9,7 +9,6 @@ import {
   deleteDoc, arrayUnion, arrayRemove, Timestamp, writeBatch
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ref as dbRef, push, set, get as getDbValue, onValue, off } from 'firebase/database';
 
 export interface User {
   id: string;
@@ -294,11 +293,10 @@ export const useStore = create<StoreState>((set, get) => ({
       if (updates.website) updateData.website = updates.website;
       
       // Handle avatar upload separately (non-blocking)
-      if (updates.avatar && updates.avatar.startsWith('data:')) {
+      if (updates.avatar && typeof updates.avatar === 'string' && updates.avatar.startsWith('data:')) {
         (async () => {
           try {
-            const avatarUrl = updates.avatar;
-            const response = await fetch(avatarUrl);
+            const response = await fetch(updates.avatar);
             const blob = await response.blob();
             const storageRef = ref(storage, `avatars/${currentUser.id}`);
             await uploadBytes(storageRef, blob);
@@ -638,20 +636,21 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   },
 
-  // Messaging functions - Using Firebase Realtime Database
+  // Messaging functions - Using Firestore
   sendMessage: async (recipientId: string, message: string) => {
     const currentUser = get().currentUser;
     if (!currentUser) throw new Error('Not authenticated');
 
     try {
       const conversationId = [currentUser.id, recipientId].sort().join('_');
-      const messagesRef = dbRef(rtdb, `messages/${conversationId}`);
+      const messagesRef = collection(db, 'messages');
       
-      await push(messagesRef, {
+      await addDoc(messagesRef, {
+        conversationId,
         senderId: currentUser.id,
         recipientId,
         message,
-        timestamp: Date.now(),
+        timestamp: Timestamp.now(),
         read: false
       });
     } catch (error) {
@@ -666,20 +665,16 @@ export const useStore = create<StoreState>((set, get) => ({
 
     try {
       const conversationId = [currentUser.id, recipientId].sort().join('_');
-      const messagesRef = dbRef(rtdb, `messages/${conversationId}`);
+      const messagesRef = query(
+        collection(db, 'messages'),
+        where('conversationId', '==', conversationId)
+      );
       
-      const snapshot = await getDbValue(messagesRef);
-      if (!snapshot.exists()) return [];
-      
-      const messages: any[] = [];
-      snapshot.forEach(childSnapshot => {
-        messages.push({
-          id: childSnapshot.key,
-          ...childSnapshot.val()
-        });
-      });
-      
-      return messages.sort((a, b) => a.timestamp - b.timestamp);
+      const snapshot = await getDocs(messagesRef);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).sort((a: any, b: any) => a.timestamp?.toDate?.() - b.timestamp?.toDate?.());
     } catch (error) {
       console.error('Error fetching messages:', error);
       return [];
@@ -691,17 +686,15 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) throw new Error('Not authenticated');
 
     try {
-      const callsRef = dbRef(rtdb, 'calls');
-      const callData = {
+      const callRef = await addDoc(collection(db, 'calls'), {
         callerId: currentUser.id,
         recipientId,
         callType,
         status: 'ringing',
-        createdAt: Date.now()
-      };
-      
-      const newCallRef = await push(callsRef, callData);
-      return newCallRef.key || '';
+        createdAt: Timestamp.now()
+      });
+
+      return callRef.id;
     } catch (error) {
       console.error('Error starting call:', error);
       throw error;
@@ -710,11 +703,10 @@ export const useStore = create<StoreState>((set, get) => ({
 
   endCall: async (callId: string) => {
     try {
-      const callRef = dbRef(rtdb, `calls/${callId}`);
-      await set(callRef, {
+      await updateDoc(doc(db, 'calls', callId), {
         status: 'ended',
-        endedAt: Date.now()
-      }, { merge: true });
+        endedAt: Timestamp.now()
+      });
     } catch (error) {
       console.error('Error ending call:', error);
     }
