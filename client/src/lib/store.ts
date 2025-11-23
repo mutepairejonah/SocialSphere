@@ -674,29 +674,37 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) return;
     
     try {
-      const notifQuery = query(
-        collection(db, 'notifications'),
-        where('userId', '==', currentUser.id)
-      );
-      const snapshot = await getDocs(notifQuery);
-      const allUsers = get().allUsers;
+      const response = await fetch(`/api/notifications/${currentUser.id}`);
+      const data = await response.json();
       
-      const notifications = snapshot.docs.map(doc => {
-        const data = doc.data();
-        const fromUser = allUsers.find(u => u.id === data.fromUserId);
-        
-        return {
-          id: doc.id,
-          ...data,
-          timestamp: data.createdAt?.toDate ? new Date(data.createdAt.toDate()).toLocaleString() : 'Recently',
-          userAvatar: fromUser?.avatar || '',
-          postImage: ''
-        } as Notification;
-      });
+      const notifications = data.map((n: any) => ({
+        id: n.id,
+        type: n.type,
+        userId: n.userId,
+        fromUserId: n.fromUserId,
+        fromUserUsername: n.fromUserUsername,
+        userAvatar: n.fromUserAvatar,
+        timestamp: new Date(n.createdAt).toLocaleString(),
+        read: n.read,
+        postId: n.postId,
+        postImage: ''
+      })) as Notification[];
       
       set({ notifications });
     } catch (error) {
-      console.warn('Error loading notifications (using local data):', error);
+      console.warn('Error loading notifications:', error);
+    }
+  },
+
+  createFollowNotification: async (userId: string, fromUserId: string) => {
+    try {
+      await fetch(`/api/follow/${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followerId: fromUserId })
+      });
+    } catch (error) {
+      console.error('Error creating notification:', error);
     }
   },
 
