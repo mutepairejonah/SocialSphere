@@ -83,6 +83,7 @@ interface StoreState {
   addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'timestamp' | 'isLiked' | 'isSaved'>) => Promise<void>;
   loadPosts: () => Promise<void>;
   loadUserPosts: () => Promise<void>;
+  loadStories: () => Promise<void>;
   loadUsers: () => Promise<void>;
   loadNotifications: () => Promise<void>;
   toggleLike: (postId: string) => Promise<void>;
@@ -756,6 +757,27 @@ export const useStore = create<StoreState>((set, get) => ({
       }));
     } catch (error) {
       console.error('Error toggling save:', error);
+    }
+  },
+
+  loadStories: async () => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+
+    try {
+      const response = await fetch(`/api/stories/following/${currentUser.id}`);
+      const dbStories = await response.json();
+      
+      const storyList = dbStories.map((story: any) => ({
+        id: story.id,
+        userId: story.userId,
+        imageUrl: story.imageUrl,
+        isViewed: story.isViewed || false
+      }));
+
+      set({ stories: storyList });
+    } catch (error) {
+      console.error('Error loading stories:', error);
     }
   },
 
