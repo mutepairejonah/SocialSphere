@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Following from "./pages/Following";
 import Followers from "./pages/Followers";
+import Messages from "./pages/Messages";
 
 function App() {
   const { isAuthenticated, initializeAuth, pendingGoogleUser } = useStore();
@@ -39,6 +40,7 @@ function App() {
         <Route path="/explore" component={Explore} />
         <Route path="/create" component={Create} />
         <Route path="/activity" component={Activity} />
+        <Route path="/messages" component={Messages} />
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={EditProfile} />
         <Route path="/following" component={Following} />

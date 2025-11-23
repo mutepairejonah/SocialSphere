@@ -282,24 +282,36 @@ export const useStore = create<StoreState>((set, get) => ({
       const userRef = doc(db, 'users', currentUser.id);
       const updateData: any = {};
       
-      // Handle avatar upload if it's a data URL
-      if (updates.avatar && updates.avatar.startsWith('data:')) {
-        const blob = await (await fetch(updates.avatar)).blob();
-        const storageRef = ref(storage, `avatars/${currentUser.id}`);
-        await uploadBytes(storageRef, blob);
-        updateData.avatar = await getDownloadURL(storageRef);
-      } else if (updates.avatar) {
-        updateData.avatar = updates.avatar;
-      }
-      
+      // Update local state immediately for text fields
       if (updates.bio) updateData.bio = updates.bio;
       if (updates.fullName) updateData.fullName = updates.fullName;
       if (updates.username) updateData.username = updates.username;
       if (updates.website) updateData.website = updates.website;
       
+      // Handle avatar upload separately (non-blocking)
+      if (updates.avatar && updates.avatar.startsWith('data:')) {
+        (async () => {
+          try {
+            const blob = await (await fetch(updates.avatar)).blob();
+            const storageRef = ref(storage, `avatars/${currentUser.id}`);
+            await uploadBytes(storageRef, blob);
+            const downloadURL = await getDownloadURL(storageRef);
+            await updateDoc(userRef, { avatar: downloadURL });
+            set(state => ({
+              currentUser: state.currentUser ? { ...state.currentUser, avatar: downloadURL } : null
+            }));
+          } catch (error) {
+            console.error('Error uploading avatar:', error);
+          }
+        })();
+        updateData.avatar = updates.avatar;
+      } else if (updates.avatar) {
+        updateData.avatar = updates.avatar;
+      }
+      
       await updateDoc(userRef, updateData);
       set(state => ({
-        currentUser: state.currentUser ? { ...state.currentUser, ...updates } : null
+        currentUser: state.currentUser ? { ...state.currentUser, ...updateData } : null
       }));
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -616,6 +628,82 @@ export const useStore = create<StoreState>((set, get) => ({
     } catch (error) {
       console.error('Error loading follow status:', error);
       return false;
+    }
+  },
+
+  // Messaging functions
+  sendMessage: async (recipientId: string, message: string) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) throw new Error('Not authenticated');
+
+    try {
+      const conversationId = [currentUser.id, recipientId].sort().join('_');
+      const messagesRef = collection(db, 'messages');
+      
+      await addDoc(messagesRef, {
+        conversationId,
+        senderId: currentUser.id,
+        recipientId,
+        message,
+        timestamp: Timestamp.now(),
+        read: false
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      throw error;
+    }
+  },
+
+  getMessages: async (recipientId: string) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return [];
+
+    try {
+      const conversationId = [currentUser.id, recipientId].sort().join('_');
+      const messagesRef = query(
+        collection(db, 'messages'),
+        where('conversationId', '==', conversationId)
+      );
+      
+      const snapshot = await getDocs(messagesRef);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).sort((a: any, b: any) => a.timestamp?.toDate?.() - b.timestamp?.toDate?.());
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      return [];
+    }
+  },
+
+  startCall: async (recipientId: string, callType: 'audio' | 'video') => {
+    const currentUser = get().currentUser;
+    if (!currentUser) throw new Error('Not authenticated');
+
+    try {
+      const callRef = await addDoc(collection(db, 'calls'), {
+        callerId: currentUser.id,
+        recipientId,
+        callType,
+        status: 'ringing',
+        createdAt: Timestamp.now()
+      });
+
+      return callRef.id;
+    } catch (error) {
+      console.error('Error starting call:', error);
+      throw error;
+    }
+  },
+
+  endCall: async (callId: string) => {
+    try {
+      await updateDoc(doc(db, 'calls', callId), {
+        status: 'ended',
+        endedAt: Timestamp.now()
+      });
+    } catch (error) {
+      console.error('Error ending call:', error);
     }
   }
 }));

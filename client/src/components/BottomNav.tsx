@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { House, Search, PlusSquare, Heart, User } from "lucide-react";
+import { House, Search, PlusSquare, Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 
@@ -12,6 +12,7 @@ export function BottomNav() {
     { icon: Search, label: "Explore", path: "/explore" },
     { icon: PlusSquare, label: "Create", path: "/create" },
     { icon: Heart, label: "Activity", path: "/activity" },
+    { icon: MessageCircle, label: "Messages", path: "/messages" },
   ];
 
   return (
