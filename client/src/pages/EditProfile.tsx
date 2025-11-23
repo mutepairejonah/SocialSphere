@@ -1,10 +1,11 @@
-import { ArrowLeft, Camera, X, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Camera, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { useState, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const AVATAR_OPTIONS = [
   "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&fit=crop",
@@ -20,7 +21,9 @@ const AVATAR_OPTIONS = [
 export default function EditProfile() {
   const { currentUser, updateProfile } = useStore();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     fullName: currentUser?.fullName || "",
@@ -45,6 +48,14 @@ export default function EditProfile() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please select an image file"
+        });
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event) => {
         const imageData = event.target?.result as string;
@@ -55,13 +66,28 @@ export default function EditProfile() {
     }
   };
 
-  const handleSave = () => {
-    updateProfile(formData);
-    setLocation("/profile");
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await updateProfile(formData);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully"
+      });
+      setLocation("/profile");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error?.message || "Failed to update profile"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-background">
+    <div className="max-w-md mx-auto min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => setLocation("/profile")}>
@@ -69,8 +95,13 @@ export default function EditProfile() {
           </Button>
           <h1 className="font-bold text-lg">Edit Profile</h1>
         </div>
-        <Button variant="ghost" className="text-blue-500 font-bold hover:text-blue-600" onClick={handleSave}>
-          Done
+        <Button 
+          variant="ghost" 
+          className="text-blue-500 font-bold hover:text-blue-600 disabled:opacity-50" 
+          onClick={handleSave}
+          disabled={loading}
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Done"}
         </Button>
       </header>
 
@@ -78,19 +109,23 @@ export default function EditProfile() {
         {/* Profile Picture */}
         <div className="flex flex-col items-center gap-4">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-full border-4 border-border overflow-hidden shadow-md">
-              <img src={formData.avatar} alt="Profile" className="w-full h-full object-cover" />
+            <div className="w-24 h-24 rounded-full border-4 border-border overflow-hidden shadow-md bg-muted">
+              {formData.avatar && (
+                <img src={formData.avatar} alt="Profile" className="w-full h-full object-cover" />
+              )}
             </div>
             <button 
               onClick={() => setShowAvatarPicker(true)}
               className="absolute bottom-0 right-0 bg-blue-500 border-4 border-background rounded-full p-2.5 hover:bg-blue-600 transition-colors text-white shadow-lg group-hover:scale-110"
+              disabled={loading}
             >
               <Camera className="w-5 h-5" strokeWidth={2} />
             </button>
           </div>
           <button 
             onClick={() => setShowAvatarPicker(true)}
-            className="text-blue-600 font-semibold text-sm hover:underline"
+            className="text-blue-600 font-semibold text-sm hover:underline disabled:opacity-50"
+            disabled={loading}
           >
             Change Profile Photo
           </button>
@@ -118,7 +153,8 @@ export default function EditProfile() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+                  disabled={loading}
                 >
                   <ImageIcon className="w-5 h-5" />
                   Upload from Device
@@ -133,7 +169,8 @@ export default function EditProfile() {
                     <button
                       key={idx}
                       onClick={() => handleAvatarSelect(avatar)}
-                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                      disabled={loading}
+                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 disabled:opacity-50 ${
                         formData.avatar === avatar ? "border-blue-500 scale-95" : "border-border"
                       }`}
                     >
@@ -156,6 +193,7 @@ export default function EditProfile() {
               onChange={handleChange}
               className="bg-muted/50 border-0 focus-visible:ring-0 h-10 px-3"
               placeholder="Full Name"
+              disabled={loading}
             />
           </div>
 
@@ -167,6 +205,7 @@ export default function EditProfile() {
               onChange={handleChange}
               className="bg-muted/50 border-0 focus-visible:ring-0 h-10 px-3"
               placeholder="username"
+              disabled={loading}
             />
           </div>
 
@@ -179,6 +218,7 @@ export default function EditProfile() {
               className="bg-muted/50 border-0 focus-visible:ring-0 p-3 resize-none"
               placeholder="Bio"
               rows={3}
+              disabled={loading}
             />
           </div>
 
@@ -190,6 +230,7 @@ export default function EditProfile() {
               onChange={handleChange}
               className="bg-muted/50 border-0 focus-visible:ring-0 h-10 px-3"
               placeholder="Website"
+              disabled={loading}
             />
           </div>
         </div>
@@ -197,10 +238,10 @@ export default function EditProfile() {
         {/* Account Section */}
         <div className="border-t border-border pt-4 space-y-3">
           <h3 className="font-bold">Account</h3>
-          <button className="w-full text-left py-2 text-blue-600 font-semibold text-sm hover:underline">
+          <button className="w-full text-left py-2 text-blue-600 font-semibold text-sm hover:underline disabled:opacity-50" disabled={loading}>
             Change Password
           </button>
-          <button className="w-full text-left py-2 text-destructive font-semibold text-sm hover:underline">
+          <button className="w-full text-left py-2 text-destructive font-semibold text-sm hover:underline disabled:opacity-50" disabled={loading}>
             Deactivate Account
           </button>
         </div>
