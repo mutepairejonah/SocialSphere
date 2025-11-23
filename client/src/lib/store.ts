@@ -85,6 +85,7 @@ interface StoreState {
   loadNotifications: () => Promise<void>;
   toggleLike: (postId: string) => Promise<void>;
   toggleSave: (postId: string) => Promise<void>;
+  addStory: (imageUrl: string) => Promise<void>;
   markStoryViewed: (storyId: string) => void;
   initializeAuth: () => void;
   checkUsernameAvailable: (username: string) => Promise<boolean>;
@@ -685,6 +686,34 @@ export const useStore = create<StoreState>((set, get) => ({
       }));
     } catch (error) {
       console.error('Error toggling save:', error);
+    }
+  },
+
+  addStory: async (imageUrl) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+
+    const newStory = {
+      id: `story_${Date.now()}`,
+      userId: currentUser.username || currentUser.id,
+      imageUrl,
+      isViewed: false
+    };
+
+    // Add to state immediately for instant appearance
+    set(state => ({
+      stories: [newStory, ...state.stories]
+    }));
+
+    // Save to Firebase asynchronously
+    try {
+      await addDoc(collection(db, 'stories'), {
+        ...newStory,
+        createdAt: Timestamp.now(),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      });
+    } catch (error) {
+      console.error('Error saving story:', error);
     }
   },
 
