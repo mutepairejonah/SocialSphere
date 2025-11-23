@@ -435,64 +435,48 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) return;
 
     try {
-      // Handle video uploads to Firebase Storage
-      let videoUrl = null;
-      if (newPost.videoUrl && newPost.videoUrl.startsWith('data:')) {
-        try {
-          const response = await fetch(newPost.videoUrl);
-          const blob = await response.blob();
-          const videoRef = ref(storage, `videos/${currentUser.id}/${Date.now()}`);
-          await uploadBytes(videoRef, blob);
-          videoUrl = await getDownloadURL(videoRef);
-        } catch (uploadError) {
-          console.error('Video upload error:', uploadError);
-        }
-      }
-
       const postData = {
         userId: currentUser.id,
-        username: currentUser.username || '',
-        userAvatar: currentUser.avatar || '',
-        imageUrl: newPost.imageUrl || null,
         caption: (newPost.caption || '').trim(),
-        location: (newPost.location || '').trim(),
+        imageUrl: newPost.imageUrl || null,
+        videoUrl: newPost.videoUrl || null,
         mediaType: newPost.mediaType || 'IMAGE',
-        createdAt: Timestamp.now(),
-        likes: 0,
-        commentCount: 0,
-      } as any;
+        location: (newPost.location || '').trim(),
+      };
 
-      // Only add videoUrl if it exists
-      if (videoUrl) {
-        postData.videoUrl = videoUrl;
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create post');
       }
 
-      const postRef = await addDoc(collection(db, 'posts'), postData);
-
-      const postSnapshot = await getDoc(postRef);
-      if (postSnapshot.exists()) {
-        const data = postSnapshot.data();
-        set(state => ({
-          posts: [{
-            id: postSnapshot.id,
-            userId: data.userId,
-            username: data.username,
-            userAvatar: data.userAvatar,
-            imageUrl: data.imageUrl,
-            videoUrl: data.videoUrl,
-            caption: data.caption,
-            location: data.location,
-            mediaType: data.mediaType,
-            timestamp: new Date(data.createdAt.toDate()).toLocaleString(),
-            likes: data.likes || 0,
-            comments: data.commentCount || 0,
-            isLiked: false,
-            isSaved: false
-          } as Post, ...state.posts]
-        }));
-      }
+      const post = await response.json();
+      
+      set(state => ({
+        posts: [{
+          id: post.id,
+          userId: post.userId,
+          username: currentUser.username,
+          userAvatar: currentUser.avatar,
+          imageUrl: post.imageUrl,
+          videoUrl: post.videoUrl,
+          caption: post.caption,
+          location: post.location,
+          mediaType: post.mediaType,
+          timestamp: new Date(post.createdAt).toLocaleString(),
+          likes: post.likes || 0,
+          comments: post.commentCount || 0,
+          isLiked: false,
+          isSaved: false
+        } as Post, ...state.posts]
+      }));
     } catch (error) {
       console.error('Error adding post:', error);
+      throw error;
     }
   },
 
@@ -779,27 +763,37 @@ export const useStore = create<StoreState>((set, get) => ({
     const currentUser = get().currentUser;
     if (!currentUser) return;
 
-    const newStory = {
-      id: `story_${Date.now()}`,
-      userId: currentUser.username || currentUser.id,
-      imageUrl,
-      isViewed: false
-    };
-
-    // Add to state immediately for instant appearance
-    set(state => ({
-      stories: [newStory, ...state.stories]
-    }));
-
-    // Save to Firebase asynchronously
     try {
-      await addDoc(collection(db, 'stories'), {
-        ...newStory,
-        createdAt: Timestamp.now(),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      const storyData = {
+        userId: currentUser.id,
+        imageUrl,
+      };
+
+      const response = await fetch('/api/stories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(storyData)
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to create story');
+      }
+
+      const story = await response.json();
+
+      const newStory = {
+        id: story.id,
+        userId: currentUser.id,
+        imageUrl: story.imageUrl,
+        isViewed: false
+      };
+
+      set(state => ({
+        stories: [newStory, ...state.stories]
+      }));
     } catch (error) {
       console.error('Error saving story:', error);
+      throw error;
     }
   },
 
