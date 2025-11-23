@@ -1,5 +1,5 @@
 import { db } from "../shared/db";
-import { users, posts, stories, follows, messages, comments } from "../shared/schema";
+import { users, posts, stories, follows, messages, comments, notifications } from "../shared/schema";
 import { eq, like, and, desc, sql, inArray } from "drizzle-orm";
 import type { InsertUser, InsertPost, InsertStory, User, Post, Story } from "../shared/schema";
 
@@ -37,6 +37,10 @@ export interface IStorage {
   // Messages
   getMessages(senderId: string, recipientId: string): Promise<any[]>;
   createMessage(senderId: string, recipientId: string, content: string): Promise<any>;
+
+  // Notifications
+  getNotifications(userId: string): Promise<any[]>;
+  createNotification(userId: string, fromUserId: string, type: string, postId?: string): Promise<void>;
 }
 
 export class PostgresStorage implements IStorage {

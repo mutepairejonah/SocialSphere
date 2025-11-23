@@ -71,6 +71,17 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// ========== NOTIFICATIONS TABLE ==========
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  fromUserId: varchar("from_user_id").notNull().references(() => users.id),
+  type: varchar("type", { length: 20 }).notNull(), // like, comment, follow, message
+  postId: varchar("post_id").references(() => posts.id),
+  read: boolean("read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
