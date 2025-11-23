@@ -10,6 +10,11 @@ export async function fetchUserPosts(userId: string) {
   return res.json();
 }
 
+export async function fetchFollowingPosts(userId: string) {
+  const res = await fetch(`/api/posts/following/${userId}`);
+  return res.json();
+}
+
 export async function createPost(post: any) {
   const res = await fetch("/api/posts", {
     method: "POST",
@@ -21,6 +26,11 @@ export async function createPost(post: any) {
 
 export async function fetchStories() {
   const res = await fetch("/api/stories");
+  return res.json();
+}
+
+export async function fetchFollowingStories(userId: string) {
+  const res = await fetch(`/api/stories/following/${userId}`);
   return res.json();
 }
 

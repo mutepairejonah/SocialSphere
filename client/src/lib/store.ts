@@ -575,32 +575,30 @@ export const useStore = create<StoreState>((set, get) => ({
     }
 
     try {
-      const postsQuery = query(collection(db, 'posts'), where('userId', '==', currentUser.id));
-      const snapshot = await getDocs(postsQuery);
+      // Fetch posts from users that current user follows
+      const res = await fetch(`/api/posts/following/${currentUser.id}`);
+      const userPostsData = await res.json();
       
-      const userPostsData = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          userId: data.userId,
-          username: data.username || currentUser.username,
-          userAvatar: data.userAvatar || currentUser.avatar,
-          imageUrl: data.imageUrl,
-          videoUrl: data.videoUrl,
-          caption: data.caption,
-          location: data.location,
-          mediaType: data.mediaType,
-          timestamp: new Date(data.createdAt.toDate()).toLocaleString(),
-          likes: data.likes || 0,
-          comments: data.commentCount || 0,
-          isLiked: false,
-          isSaved: false
-        } as Post;
-      });
+      const formattedPosts = userPostsData.map((data: any) => ({
+        id: data.id,
+        userId: data.userId,
+        username: data.username,
+        userAvatar: data.userAvatar,
+        imageUrl: data.imageUrl,
+        videoUrl: data.videoUrl,
+        caption: data.caption,
+        location: data.location,
+        mediaType: data.mediaType,
+        timestamp: new Date(data.createdAt).toLocaleString(),
+        likes: data.likes || 0,
+        comments: data.commentCount || 0,
+        isLiked: false,
+        isSaved: false
+      }));
 
-      set({ userPosts: userPostsData });
+      set({ userPosts: formattedPosts });
     } catch (error) {
-      console.error('Error loading user posts:', error);
+      console.error('Error loading following posts:', error);
       set({ userPosts: [] });
     }
   },

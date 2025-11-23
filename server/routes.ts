@@ -47,6 +47,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/posts/following/:userId", async (req, res) => {
+    try {
+      const posts = await storage.getPostsFromFollowing(req.params.userId);
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching following posts:", error);
+      res.json([]);
+    }
+  });
+
   app.post("/api/posts", async (req, res) => {
     try {
       const { userId, caption, imageUrl, videoUrl, mediaType, location } = req.body;
@@ -72,6 +82,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stories);
     } catch (error) {
       console.error("Error fetching stories:", error);
+      res.json([]);
+    }
+  });
+
+  app.get("/api/stories/following/:userId", async (req, res) => {
+    try {
+      const stories = await storage.getStoriesFromFollowing(req.params.userId);
+      res.json(stories);
+    } catch (error) {
+      console.error("Error fetching following stories:", error);
       res.json([]);
     }
   });

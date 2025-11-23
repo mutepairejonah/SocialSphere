@@ -9,16 +9,19 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User>;
+  getFollowingIds(userId: string): Promise<string[]>;
   
   // Posts
   getPosts(): Promise<Post[]>;
   getPostsByUser(userId: string): Promise<Post[]>;
+  getPostsFromFollowing(userId: string): Promise<Post[]>;
   createPost(post: InsertPost): Promise<Post>;
   updatePost(id: string, updates: Partial<Post>): Promise<Post>;
   
   // Stories
   getStories(): Promise<Story[]>;
   getStoriesByUser(userId: string): Promise<Story[]>;
+  getStoriesFromFollowing(userId: string): Promise<Story[]>;
   createStory(story: InsertStory): Promise<Story>;
   
   // Search
@@ -127,6 +130,34 @@ export class PostgresStorage implements IStorage {
     const result = await db.select().from(follows)
       .where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
     return result.length > 0;
+  }
+
+  async getFollowingIds(userId: string): Promise<string[]> {
+    const result = await db.select({ followingId: follows.followingId }).from(follows)
+      .where(eq(follows.followerId, userId));
+    return result.map(r => r.followingId);
+  }
+
+  async getPostsFromFollowing(userId: string): Promise<Post[]> {
+    const followingIds = await this.getFollowingIds(userId);
+    if (followingIds.length === 0) return [];
+    
+    return db.select().from(posts)
+      .where(sql`${posts.userId} IN (${sql.raw(followingIds.map(id => `'${id}'`).join(','))})`)
+      .orderBy(desc(posts.createdAt));
+  }
+
+  async getStoriesFromFollowing(userId: string): Promise<Story[]> {
+    const followingIds = await this.getFollowingIds(userId);
+    if (followingIds.length === 0) return [];
+    
+    const oneDay = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    return db.select().from(stories)
+      .where(and(
+        sql`${stories.userId} IN (${sql.raw(followingIds.map(id => `'${id}'`).join(','))})`,
+        sql`${stories.createdAt} > ${oneDay}`
+      ))
+      .orderBy(desc(stories.createdAt));
   }
 
   async getMessages(senderId: string, recipientId: string): Promise<any[]> {
