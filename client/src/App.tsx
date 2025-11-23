@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 
 // Pages
 import Login from "./pages/Login";
+import SetupProfile from "./pages/SetupProfile";
 import Home from "./pages/Home";
 import Explore from "./pages/Explore";
 import Create from "./pages/Create";
@@ -15,11 +16,15 @@ import Following from "./pages/Following";
 import Followers from "./pages/Followers";
 
 function App() {
-  const { isAuthenticated, initializeAuth } = useStore();
+  const { isAuthenticated, initializeAuth, pendingGoogleUser } = useStore();
 
   useEffect(() => {
     initializeAuth();
   }, []);
+
+  if (pendingGoogleUser) {
+    return <SetupProfile />;
+  }
 
   if (!isAuthenticated) {
     return <Login />;
@@ -28,6 +33,8 @@ function App() {
   return (
     <>
       <Router base="/">
+        <Route path="/login" component={Login} />
+        <Route path="/setup" component={SetupProfile} />
         <Route path="/" component={Home} />
         <Route path="/explore" component={Explore} />
         <Route path="/create" component={Create} />

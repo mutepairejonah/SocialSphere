@@ -57,6 +57,7 @@ export interface Story {
 
 interface StoreState {
   currentUser: User | null;
+  pendingGoogleUser: {uid: string, displayName: string, email: string, photoURL: string} | null;
   posts: Post[];
   notifications: Notification[];
   stories: Story[];
@@ -80,10 +81,13 @@ interface StoreState {
   toggleSave: (postId: string) => Promise<void>;
   markStoryViewed: (storyId: string) => void;
   initializeAuth: () => void;
+  checkUsernameAvailable: (username: string) => Promise<boolean>;
+  completeGoogleSignup: (username: string) => Promise<void>;
 }
 
 export const useStore = create<StoreState>((set, get) => ({
   currentUser: null,
+  pendingGoogleUser: null,
   posts: [],
   notifications: [],
   stories: [],
@@ -149,26 +153,16 @@ export const useStore = create<StoreState>((set, get) => ({
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-      const newUser = {
-        username: user.displayName?.split(' ')[0].toLowerCase() || 'user',
-        fullName: user.displayName || 'User',
-        email: user.email,
-        avatar: user.photoURL || '',
-        bio: '',
-        followers: 0,
-        following: 0,
-        createdAt: Timestamp.now()
-      };
-      await setDoc(userRef, newUser);
+      // New user - store pending and wait for username selection
       set({
-        currentUser: {
-          id: user.uid,
-          ...newUser,
-          followers: 0,
-          following: 0
-        } as User,
-        isAuthenticated: true
+        pendingGoogleUser: {
+          uid: user.uid,
+          displayName: user.displayName || 'User',
+          email: user.email || '',
+          photoURL: user.photoURL || ''
+        }
       });
+      throw new Error('USERNAME_SETUP_REQUIRED');
     } else {
       const userData = userDoc.data();
       set({
@@ -176,9 +170,58 @@ export const useStore = create<StoreState>((set, get) => ({
           id: user.uid,
           ...userData
         } as User,
-        isAuthenticated: true
+        isAuthenticated: true,
+        pendingGoogleUser: null
       });
     }
+  },
+
+  checkUsernameAvailable: async (username: string) => {
+    try {
+      const usersQuery = query(
+        collection(db, 'users'),
+        where('username', '==', username.toLowerCase())
+      );
+      const snapshot = await getDocs(usersQuery);
+      return snapshot.empty;
+    } catch (error) {
+      console.error('Error checking username:', error);
+      return false;
+    }
+  },
+
+  completeGoogleSignup: async (username: string) => {
+    const pending = get().pendingGoogleUser;
+    if (!pending) throw new Error('No pending user');
+
+    // Check username availability
+    const available = await get().checkUsernameAvailable(username);
+    if (!available) {
+      throw new Error('Username already taken');
+    }
+
+    const newUser = {
+      username: username.toLowerCase(),
+      fullName: pending.displayName,
+      email: pending.email,
+      avatar: pending.photoURL,
+      bio: '',
+      followers: 0,
+      following: 0,
+      createdAt: Timestamp.now()
+    };
+
+    await setDoc(doc(db, 'users', pending.uid), newUser);
+    set({
+      currentUser: {
+        id: pending.uid,
+        ...newUser,
+        followers: 0,
+        following: 0
+      } as User,
+      isAuthenticated: true,
+      pendingGoogleUser: null
+    });
   },
 
   loginWithEmail: async (email, pass) => {

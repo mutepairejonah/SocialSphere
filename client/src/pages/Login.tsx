@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
-  const { loginWithGoogle, loginWithEmail, signupWithEmail } = useStore();
+  const { loginWithGoogle, loginWithEmail, signupWithEmail, pendingGoogleUser } = useStore();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -22,11 +22,16 @@ export default function Login() {
       await loginWithGoogle();
       setLocation("/");
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message
-      });
+      if (error.message === 'USERNAME_SETUP_REQUIRED') {
+        // Redirect to setup page for new users
+        setLocation("/setup");
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message || "Login failed"
+        });
+      }
     } finally {
       setLoading(false);
     }
