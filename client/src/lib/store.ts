@@ -456,28 +456,32 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   loadPosts: async () => {
-    const currentUser = get().currentUser;
-    if (!currentUser) return;
-
     try {
-      console.log('Loading posts for current user:', currentUser.username);
+      console.log('Loading all posts from all users...');
       
-      // Load only posts from the current logged-in user
-      const postsQuery = query(
-        collection(db, 'posts'),
-        where('userId', '==', currentUser.id)
-      );
+      // Load ALL posts from all users
+      const postsQuery = query(collection(db, 'posts'));
       const snapshot = await getDocs(postsQuery);
+      
+      // Get all users for reference
+      const usersQuery = query(collection(db, 'users'));
+      const usersSnapshot = await getDocs(usersQuery);
+      const usersMap = new Map();
+      usersSnapshot.docs.forEach(doc => {
+        usersMap.set(doc.id, doc.data());
+      });
       
       const posts = snapshot.docs.map((doc) => {
         const data = doc.data();
+        const postUserId = data.userId;
+        const userData = usersMap.get(postUserId) || {};
         const timestamp = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
         
         return {
           id: doc.id,
-          userId: currentUser.id,
-          username: currentUser.username,
-          userAvatar: currentUser.avatar,
+          userId: postUserId,
+          username: userData.username || 'Unknown User',
+          userAvatar: userData.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${postUserId}`,
           imageUrl: data.imageUrl || '',
           videoUrl: data.videoUrl,
           mediaType: data.mediaType || 'IMAGE',
@@ -489,9 +493,12 @@ export const useStore = create<StoreState>((set, get) => ({
           isLiked: false,
           isSaved: false
         } as Post;
+      }).sort((a, b) => {
+        // Sort by timestamp, newest first
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
       });
       
-      console.log('Loaded posts for', currentUser.username, ':', posts);
+      console.log('Loaded all posts:', posts);
       set({ posts });
     } catch (error) {
       console.error('Error loading posts:', error);
