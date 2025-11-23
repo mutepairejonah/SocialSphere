@@ -5,15 +5,38 @@ import { useLocation, useRoute } from "wouter";
 import { BottomNav } from "@/components/BottomNav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { User } from "@/lib/store";
 
 export default function UserProfile() {
   const [, params] = useRoute("/user/:id");
-  const { getUser, toggleFollow } = useStore();
+  const { allUsers, toggleFollow, loadFollowStatus } = useStore();
   const [, setLocation] = useLocation();
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const user = getUser(params?.id || "");
+  useEffect(() => {
+    const loadUser = async () => {
+      if (params?.id) {
+        const foundUser = allUsers.find(u => u.id === params.id);
+        if (foundUser) {
+          const followStatus = await loadFollowStatus(foundUser.id);
+          setUser({ ...foundUser, isFollowing: followStatus });
+        }
+      }
+      setLoading(false);
+    };
+    loadUser();
+  }, [params?.id, allUsers]);
+
+  if (loading) {
+    return (
+      <div className="max-w-md mx-auto min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

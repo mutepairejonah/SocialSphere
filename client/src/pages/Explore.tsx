@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Search as SearchIcon, Loader2, UserPlus, UserCheck } from "lucide-react";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
+import { useLocation } from "wouter";
 
 export default function Explore() {
   const { searchUsers, toggleFollow } = useStore();
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
@@ -85,7 +87,10 @@ export default function Explore() {
                     <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div 
+                  className="flex-1 min-w-0 cursor-pointer"
+                  onClick={() => setLocation(`/user/${user.id}`)}
+                >
                   <p className="font-semibold truncate">{user.username}</p>
                   <p className="text-sm text-muted-foreground truncate">{user.fullName}</p>
                   {user.bio && (

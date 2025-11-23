@@ -58,8 +58,9 @@ export default function Following() {
               transition={{ duration: 0.3 }}
             >
               <div 
-                className="flex items-center gap-3 flex-1 cursor-pointer"
+                className="flex items-center gap-3 flex-1 cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => setLocation(`/user/${user.id}`)}
+                data-testid={`user-card-${user.id}`}
               >
                 <div className="relative">
                   <Avatar className="h-12 w-12 border-2 border-border">
