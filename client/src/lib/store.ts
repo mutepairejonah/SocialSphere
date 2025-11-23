@@ -456,56 +456,45 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   loadPosts: async () => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+
     try {
-      // Load posts from Instagram API with real engagement data
-      console.log('Starting loadPosts from Instagram API with real metrics...');
-      const instagramPosts = await getUserMedia();
-      console.log('Instagram posts received:', instagramPosts);
+      console.log('Loading posts for current user:', currentUser.username);
       
-      if (instagramPosts && Array.isArray(instagramPosts) && instagramPosts.length > 0) {
-        const currentUser = get().currentUser;
-        const posts = instagramPosts.map((igPost: any, index: number) => {
-          const timestamp = igPost.timestamp || new Date().toISOString();
-          
-          // Use HD quality image URLs with proper sizing
-          let imageUrl = 'https://via.placeholder.com/1080x1350?text=Post';
-          if (igPost.media_type === 'IMAGE' && igPost.media_url) {
-            // Add quality parameters for HD display
-            imageUrl = `${igPost.media_url}?quality=95&format=auto`;
-          } else if (igPost.media_type === 'VIDEO' && igPost.thumbnail_url) {
-            imageUrl = `${igPost.thumbnail_url}?quality=95&format=auto`;
-          }
-          
-          // Use real Instagram engagement metrics
-          const realLikes = igPost.like_count || 0;
-          const realComments = igPost.comments_count || 0;
-          
-          return {
-            id: igPost.id || `ig_${index}`,
-            userId: currentUser?.id || 'instagram',
-            username: currentUser?.username || 'Instagram',
-            userAvatar: currentUser?.avatar,
-            imageUrl: imageUrl,
-            videoUrl: igPost.media_type === 'VIDEO' ? igPost.media_url : undefined,
-            mediaType: igPost.media_type as 'IMAGE' | 'VIDEO',
-            caption: igPost.caption || '(No caption)',
-            likes: realLikes,
-            location: '',
-            timestamp: new Date(timestamp).toLocaleString(),
-            comments: realComments,
-            isLiked: false,
-            isSaved: false
-          } as Post;
-        });
+      // Load only posts from the current logged-in user
+      const postsQuery = query(
+        collection(db, 'posts'),
+        where('userId', '==', currentUser.id)
+      );
+      const snapshot = await getDocs(postsQuery);
+      
+      const posts = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const timestamp = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
         
-        console.log('Transformed posts with real Instagram metrics:', posts);
-        set({ posts });
-      } else {
-        console.log('No Instagram posts found or invalid response');
-        set({ posts: [] });
-      }
+        return {
+          id: doc.id,
+          userId: currentUser.id,
+          username: currentUser.username,
+          userAvatar: currentUser.avatar,
+          imageUrl: data.imageUrl || '',
+          videoUrl: data.videoUrl,
+          mediaType: data.mediaType || 'IMAGE',
+          caption: data.caption || '',
+          likes: data.likes || 0,
+          location: data.location || '',
+          timestamp: timestamp.toLocaleString(),
+          comments: data.comments || 0,
+          isLiked: false,
+          isSaved: false
+        } as Post;
+      });
+      
+      console.log('Loaded posts for', currentUser.username, ':', posts);
+      set({ posts });
     } catch (error) {
-      console.error('Error loading Instagram posts:', error);
+      console.error('Error loading posts:', error);
       set({ posts: [] });
     }
   },
