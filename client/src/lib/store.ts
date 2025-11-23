@@ -532,7 +532,7 @@ export const useStore = create<StoreState>((set, get) => ({
           const timestamp = igPost.timestamp || new Date().toISOString();
           
           // Use HD quality image URLs
-          let imageUrl = 'https://via.placeholder.com/1080x1350?text=Post';
+          let imageUrl = igPost.media_url || '';
           if (igPost.media_type === 'IMAGE' && igPost.media_url) {
             imageUrl = `${igPost.media_url}?quality=95&format=auto`;
           } else if (igPost.media_type === 'VIDEO' && igPost.thumbnail_url) {
@@ -579,36 +579,9 @@ export const useStore = create<StoreState>((set, get) => ({
       const snapshot = await getDocs(usersQuery);
       const currentUserId = get().currentUser?.id;
       
-      // Create demo users if database is empty
-      if (snapshot.empty && currentUserId) {
-        const demoUsers = [
-          { username: 'alex_photo', fullName: 'Alex Johnson', bio: 'Travel photographer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alex123' },
-          { username: 'sophia_art', fullName: 'Sophia Martinez', bio: 'Digital artist & designer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sophia456' },
-          { username: 'mike_tech', fullName: 'Mike Chen', bio: 'Tech enthusiast & coder', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=mike789' },
-          { username: 'emma_fitness', fullName: 'Emma Wilson', bio: 'Fitness coach & wellness', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma101' },
-          { username: 'ryan_music', fullName: 'Ryan Blake', bio: 'Musician & producer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ryan202' },
-        ];
-
-        const users: User[] = [];
-        for (const demo of demoUsers) {
-          const demoId = `demo_${demo.username}`;
-          await setDoc(doc(db, 'users', demoId), {
-            ...demo,
-            email: `${demo.username}@demo.com`,
-            followers: Math.floor(Math.random() * 5000) + 100,
-            following: Math.floor(Math.random() * 500) + 50,
-            createdAt: Timestamp.now()
-          });
-          users.push({
-            id: demoId,
-            ...demo,
-            email: `${demo.username}@demo.com`,
-            followers: Math.floor(Math.random() * 5000) + 100,
-            following: Math.floor(Math.random() * 500) + 50,
-            isFollowing: false
-          } as User);
-        }
-        set({ allUsers: users });
+      // Return empty list if no users exist
+      if (snapshot.empty) {
+        set({ allUsers: [] });
         return;
       }
 
@@ -640,7 +613,8 @@ export const useStore = create<StoreState>((set, get) => ({
       
       set({ allUsers: usersWithFollowStatus });
     } catch (error) {
-      console.warn('Error loading users (using local data):', error);
+      console.warn('Error loading users:', error);
+      set({ allUsers: [] });
     }
   },
 
