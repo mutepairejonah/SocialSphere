@@ -3,16 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
-import { ArrowLeft, MapPin, Image as ImageIcon, X, ChevronRight, Film, Loader2 } from "lucide-react";
+import { Menu, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings, X, MapPin, Image as ImageIcon, ChevronRight, Film, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function Create() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const addPost = useStore((state) => state.addPost);
   const currentUser = useStore((state) => state.currentUser);
+  const { logout } = useStore();
   const { toast } = useToast();
   const [caption, setCaption] = useState("");
   const [locationTag, setLocationTag] = useState("");
@@ -20,8 +22,17 @@ export default function Create() {
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
   const [uploading, setUploading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recentMedia, setRecentMedia] = useState<{url: string, type: 'image' | 'video'}[]>([]);
+
+  const handleNavigation = (path: string) => {
+    setLocation(path);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   const handleMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -91,19 +102,44 @@ export default function Create() {
   // Media picker flow
   if (step === 'picker') {
     return (
-      <div className="max-w-md mx-auto min-h-screen bg-background flex flex-col">
-        <header className="h-12 flex items-center justify-between px-4 border-b border-border">
-          <X className="w-7 h-7 cursor-pointer hover:opacity-70" onClick={() => setLocation("/")} />
-          <h1 className="font-bold text-lg">New Post</h1>
-          <Button 
-            className="text-primary font-bold hover:text-primary/80" 
-            variant="ghost"
-            disabled={!selectedMedia}
-            onClick={() => setStep('details')}
-          >
-            Next
-          </Button>
-        </header>
+      <div className="flex min-h-screen bg-background">
+        {/* White Sidebar */}
+        <aside className={cn(
+          "fixed left-0 top-0 h-screen bg-white border-r border-gray-200 flex flex-col z-40 transition-all duration-300 overflow-hidden",
+          sidebarOpen ? "w-64" : "w-0"
+        )}>
+          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+            <h1 className="font-bold text-2xl text-primary">Authentic</h1>
+            <button onClick={() => setSidebarOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+              <X className="w-5 h-5 text-gray-700" />
+            </button>
+          </div>
+          <nav className="flex-1 py-6 px-4 space-y-2">
+            <button onClick={() => handleNavigation("/")} className={cn("w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors", location === "/" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100")}><HomeIcon className="w-5 h-5" /><span className="font-medium">Home</span></button>
+            <button onClick={() => handleNavigation("/explore")} className={cn("w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors", location === "/explore" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100")}><Compass className="w-5 h-5" /><span className="font-medium">Explore</span></button>
+            <button onClick={() => handleNavigation("/create")} className={cn("w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors", location === "/create" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100")}><Plus className="w-5 h-5" /><span className="font-medium">Create</span></button>
+            <button onClick={() => handleNavigation("/messages")} className={cn("w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors", location === "/messages" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100")}><MessageCircle className="w-5 h-5" /><span className="font-medium">Messages</span></button>
+            <button onClick={() => handleNavigation("/profile")} className={cn("w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors", location === "/profile" ? "bg-primary/10 text-foreground" : "text-gray-700 hover:bg-gray-100")}><User className="w-5 h-5" /><span className="font-medium">Profile</span></button>
+          </nav>
+          <div className="border-t border-gray-200 p-4 space-y-2">
+            <button onClick={() => handleNavigation("/profile/edit")} className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"><Settings className="w-5 h-5" /><span className="font-medium">Settings</span></button>
+            <button onClick={handleLogout} className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"><LogOut className="w-5 h-5" /><span className="font-medium">Logout</span></button>
+          </div>
+        </aside>
+        <div className={cn("flex-1 flex flex-col transition-all duration-300", sidebarOpen ? "ml-64" : "ml-0")}>
+          <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-muted rounded-lg transition-colors -ml-2"><Menu className="w-6 h-6" /></button>
+            <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">New Post</h1>
+            <Button 
+              className="text-primary font-bold hover:text-primary/80" 
+              variant="ghost"
+              disabled={!selectedMedia}
+              onClick={() => setStep('details')}
+            >
+              Next
+            </Button>
+          </header>
+          <div className="pb-20 flex-1 overflow-y-auto">
         
         {/* Preview Area */}
         <motion.div 
@@ -200,6 +236,9 @@ export default function Create() {
             </div>
           </div>
         </div>
+          </div>
+        </div>
+        <BottomNav onMenuClick={() => setSidebarOpen(true)} />
       </div>
     );
   }
