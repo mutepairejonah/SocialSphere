@@ -128,20 +128,20 @@ export default function Home() {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <h1 className="font-bold text-2xl select-none cursor-pointer text-primary flex-1 text-center">Authentic</h1>
-        <div className="flex items-center gap-4">
-          <Link href="/activity">
-             <Heart className="w-6 h-6 cursor-pointer hover:text-secondary transition-colors" data-testid="button-notifications" />
-          </Link>
-          <Link href="/messages">
-            <div className="relative cursor-pointer" data-testid="button-messages">
-              <Send className="w-6 h-6 -rotate-[15deg]" />
-              <span className="absolute -top-2 -right-2 bg-secondary text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border border-background">
-                2
-              </span>
-            </div>
-          </Link>
-        </div>
+          <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Authentic</h1>
+          <div className="flex items-center gap-4">
+            <Link href="/activity">
+               <Heart className="w-6 h-6 cursor-pointer hover:text-secondary transition-colors" data-testid="button-notifications" />
+            </Link>
+            <Link href="/messages">
+              <div className="relative cursor-pointer" data-testid="button-messages">
+                <Send className="w-6 h-6 -rotate-[15deg]" />
+                <span className="absolute -top-2 -right-2 bg-secondary text-white text-[10px] font-bold px-1.5 h-4 flex items-center justify-center rounded-full border border-background">
+                  2
+                </span>
+              </div>
+            </Link>
+          </div>
         </header>
 
         {/* Stories Rail */}
