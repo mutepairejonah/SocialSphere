@@ -22,7 +22,7 @@ export default function Home() {
     <div className="flex min-h-screen bg-background">
       {/* White Sidebar */}
       <aside className={cn(
-        "fixed left-0 top-0 h-screen bg-white border-r border-gray-200 flex flex-col z-40 transition-all duration-300",
+        "fixed left-0 top-0 h-screen bg-white border-r border-gray-200 flex flex-col z-40 transition-all duration-300 overflow-hidden",
         sidebarOpen ? "w-64" : "w-0"
       )}>
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
