@@ -4,20 +4,26 @@ import { useStore } from "@/lib/store";
 import { X, ChevronRight, ChevronLeft } from "lucide-react";
 
 export default function Stories() {
-  const { stories, currentUser } = useStore();
+  const { stories, currentUser, allUsers } = useStore();
   const [, setLocation] = useLocation();
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
 
+  // Filter stories to only show from followed users
+  const followedStories = stories.filter(story => {
+    const storyUser = allUsers.find(u => u.username === story.userId);
+    return storyUser && storyUser.isFollowing;
+  });
+
   useEffect(() => {
-    if (stories.length === 0) {
+    if (followedStories.length === 0) {
       setLocation("/");
     }
-  }, [stories.length]);
+  }, [followedStories.length]);
 
-  if (stories.length === 0) return null;
+  if (followedStories.length === 0) return null;
 
-  const story = stories[currentStoryIndex];
-  const hasNext = currentStoryIndex < stories.length - 1;
+  const story = followedStories[currentStoryIndex];
+  const hasNext = currentStoryIndex < followedStories.length - 1;
   const hasPrev = currentStoryIndex > 0;
 
   const handleNext = () => {
@@ -48,7 +54,7 @@ export default function Stories() {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800">
           <div 
             className="h-full bg-white transition-all duration-5000"
-            style={{ width: `${((currentStoryIndex + 1) / stories.length) * 100}%` }}
+            style={{ width: `${((currentStoryIndex + 1) / followedStories.length) * 100}%` }}
           />
         </div>
 

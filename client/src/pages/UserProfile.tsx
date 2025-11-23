@@ -1,4 +1,4 @@
-import { ArrowLeft, MoreHorizontal, MessageCircle } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, MessageCircle, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { useLocation, useRoute } from "wouter";
@@ -151,22 +151,14 @@ export default function UserProfile() {
           </div>
         </div>
 
-        {/* Photos Grid */}
+        {/* Posts Grid */}
         <div className="border-t border-border mt-2" />
         <div className="grid grid-cols-3 gap-0.5 pb-4">
-          {[...Array(9)].map((_, i) => (
-            <motion.div 
-              key={i}
-              className="aspect-square bg-muted relative group cursor-pointer overflow-hidden"
-              whileHover={{ scale: 1.02 }}
-            >
-              <img 
-                src={`https://images.unsplash.com/photo-${1500000000000 + (i * 5)}?w=300&auto=format&fit=crop&q=60`} 
-                className="w-full h-full object-cover group-hover:brightness-75 transition-all"
-                loading="lazy"
-              />
-            </motion.div>
-          ))}
+          <div className="col-span-3 py-20 flex flex-col items-center text-muted-foreground">
+            <Grid className="w-16 h-16 stroke-1 mb-4" />
+            <h3 className="text-xl font-bold text-foreground">No Posts</h3>
+            <p className="text-sm">This user hasn't posted yet</p>
+          </div>
         </div>
       </main>
 
