@@ -65,31 +65,37 @@ export default function Followers() {
 
         {/* Followers List */}
         <div className="divide-y divide-border">
-          {filtered.map((user) => (
-            <div key={user.id} className="flex items-center justify-between py-3 px-4 hover:bg-muted/30 transition-colors">
-              <div 
-                className="flex items-center gap-3 flex-1 cursor-pointer"
-                onClick={() => setLocation(`/user/${user.id}`)}
-              >
-                <Avatar className="h-12 w-12 border border-border">
-                  <AvatarImage src={user.avatar} />
-                  <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="text-sm">
-                  <div className="font-semibold">{user.username}</div>
-                  <div className="text-muted-foreground">{user.fullName}</div>
-                </div>
-              </div>
-              <Button 
-                size="sm" 
-                className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white"
-                onClick={() => currentUser && toggleFollow(user.id)}
-              >
-                <UserPlus className="w-4 h-4 mr-1" />
-                Follow
-              </Button>
+          {!loading && filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+              <p>No followers yet</p>
             </div>
-          ))}
+          ) : (
+            filtered.map((user) => (
+              <div key={user.id} className="flex items-center justify-between py-3 px-4 hover:bg-muted/30 transition-colors">
+                <div 
+                  className="flex items-center gap-3 flex-1 cursor-pointer"
+                  onClick={() => setLocation(`/user/${user.id}`)}
+                >
+                  <Avatar className="h-12 w-12 border border-border">
+                    <AvatarImage src={user.avatar} />
+                    <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="text-sm">
+                    <div className="font-semibold">{user.username}</div>
+                    <div className="text-muted-foreground">{user.fullName}</div>
+                  </div>
+                </div>
+                <Button 
+                  size="sm" 
+                  className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white"
+                  onClick={() => currentUser && toggleFollow(user.id)}
+                >
+                  <UserPlus className="w-4 h-4 mr-1" />
+                  Follow
+                </Button>
+              </div>
+            ))
+          )}
         </div>
       </main>
 
