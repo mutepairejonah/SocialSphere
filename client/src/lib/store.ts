@@ -83,6 +83,8 @@ interface StoreState {
   initializeAuth: () => void;
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   completeGoogleSignup: (username: string) => Promise<void>;
+  searchUsers: (searchTerm: string) => Promise<User[]>;
+  loadFollowStatus: (userId: string) => Promise<boolean>;
 }
 
 export const useStore = create<StoreState>((set, get) => ({
@@ -435,8 +437,16 @@ export const useStore = create<StoreState>((set, get) => ({
           id: doc.id,
           ...doc.data()
         } as User));
+
+      // Load follow status for each user
+      const usersWithFollowStatus = await Promise.all(
+        users.map(async (user) => {
+          const isFollowing = await get().loadFollowStatus(user.id);
+          return { ...user, isFollowing };
+        })
+      );
       
-      set({ allUsers: users });
+      set({ allUsers: usersWithFollowStatus });
     } catch (error) {
       console.warn('Error loading users (using local data):', error);
     }
@@ -552,5 +562,60 @@ export const useStore = create<StoreState>((set, get) => ({
     stories: state.stories.map(s =>
       s.id === storyId ? { ...s, isViewed: true } : s
     )
-  }))
+  })),
+
+  searchUsers: async (searchTerm: string) => {
+    if (!searchTerm || searchTerm.trim().length === 0) {
+      return [];
+    }
+
+    try {
+      const searchLower = searchTerm.toLowerCase();
+      const usersQuery = query(collection(db, 'users'));
+      const snapshot = await getDocs(usersQuery);
+      const currentUserId = get().currentUser?.id;
+      
+      const users = snapshot.docs
+        .filter(doc => doc.id !== currentUserId)
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        } as User))
+        .filter(user => 
+          user.username.toLowerCase().includes(searchLower) || 
+          user.fullName.toLowerCase().includes(searchLower)
+        );
+
+      // Load follow status for each user
+      const usersWithFollowStatus = await Promise.all(
+        users.map(async (user) => {
+          const isFollowing = await get().loadFollowStatus(user.id);
+          return { ...user, isFollowing };
+        })
+      );
+
+      return usersWithFollowStatus;
+    } catch (error) {
+      console.error('Error searching users:', error);
+      return [];
+    }
+  },
+
+  loadFollowStatus: async (userId: string) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return false;
+
+    try {
+      const followRef = query(
+        collection(db, 'follows'),
+        where('followerId', '==', currentUser.id),
+        where('followingId', '==', userId)
+      );
+      const followDocs = await getDocs(followRef);
+      return !followDocs.empty;
+    } catch (error) {
+      console.error('Error loading follow status:', error);
+      return false;
+    }
+  }
 }));

@@ -73,7 +73,7 @@ export default function Profile() {
             <Button 
               className="flex-1 font-semibold h-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/80" 
               variant="secondary"
-              onClick={() => setLocation("/edit-profile")}
+              onClick={() => setLocation("/profile/edit")}
             >
               Edit Profile
             </Button>
@@ -86,27 +86,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Highlights */}
-        {currentUser.highlights && (
-           <div className="flex gap-4 px-4 pb-4 overflow-x-auto no-scrollbar">
-              {currentUser.highlights.map(highlight => (
-                 <div key={highlight.id} className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer">
-                    <div className="w-16 h-16 rounded-full border border-border p-[2px]">
-                       <div className="w-full h-full rounded-full bg-muted overflow-hidden">
-                          <img src={highlight.image} className="w-full h-full object-cover" />
-                       </div>
-                    </div>
-                    <span className="text-xs truncate max-w-[64px]">{highlight.title}</span>
-                 </div>
-              ))}
-              <div className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer">
-                 <div className="w-16 h-16 rounded-full border border-border flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                 </div>
-                 <span className="text-xs">New</span>
-              </div>
-           </div>
-        )}
+        {/* Highlights - Coming soon */}
 
         {/* Tabs */}
         <div className="flex border-t border-border mt-2">
