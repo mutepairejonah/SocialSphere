@@ -698,43 +698,49 @@ export const useStore = create<StoreState>((set, get) => ({
   sendMessage: async (recipientId: string, message: string) => {
     const currentUser = get().currentUser;
     if (!currentUser) throw new Error('Not authenticated');
+    if (!message || message.trim().length === 0) throw new Error('Message cannot be empty');
+    if (!recipientId) throw new Error('Invalid recipient');
 
     try {
       const conversationId = [currentUser.id, recipientId].sort().join('_');
       const messagesRef = collection(db, 'messages');
+      
+      // Verify recipient exists
+      const recipientDoc = await getDoc(doc(db, 'users', recipientId));
+      if (!recipientDoc.exists()) {
+        throw new Error('Recipient user not found');
+      }
       
       // Send the message
       await addDoc(messagesRef, {
         conversationId,
         senderId: currentUser.id,
         recipientId,
-        message,
+        message: message.trim(),
         timestamp: Timestamp.now(),
         read: false
       });
 
       // Create a notification for the recipient
-      const recipientDoc = await getDoc(doc(db, 'users', recipientId));
-      const recipientData = recipientDoc.data();
-      
       await addDoc(collection(db, 'notifications'), {
         type: 'message',
         userId: recipientId,
         fromUserId: currentUser.id,
-        messageText: message.substring(0, 100),
+        messageText: message.trim().substring(0, 100),
         timestamp: Timestamp.now(),
         read: false,
         userAvatar: currentUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.id}`
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
-      throw error;
+      throw new Error(error?.message || 'Failed to send message');
     }
   },
 
   getMessages: async (recipientId: string) => {
     const currentUser = get().currentUser;
     if (!currentUser) return [];
+    if (!recipientId) return [];
 
     try {
       const conversationId = [currentUser.id, recipientId].sort().join('_');
@@ -744,10 +750,17 @@ export const useStore = create<StoreState>((set, get) => ({
       );
       
       const snapshot = await getDocs(messagesRef);
-      return snapshot.docs.map(doc => ({
+      const messages = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      })).sort((a: any, b: any) => a.timestamp?.toDate?.() - b.timestamp?.toDate?.());
+      }));
+      
+      // Sort by timestamp, handle both Timestamp objects and Date objects
+      return messages.sort((a: any, b: any) => {
+        const timeA = a.timestamp?.toDate?.() || a.timestamp || 0;
+        const timeB = b.timestamp?.toDate?.() || b.timestamp || 0;
+        return new Date(timeA).getTime() - new Date(timeB).getTime();
+      });
     } catch (error) {
       console.error('Error fetching messages:', error);
       return [];

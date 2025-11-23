@@ -16,6 +16,7 @@ export function PostCard({ post }: PostCardProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
+  const inFeedVideoRef = useRef<HTMLVideoElement>(null);
 
   const handleLike = () => {
     toggleLike(post.id);
@@ -65,6 +66,7 @@ export function PostCard({ post }: PostCardProps) {
         {post.mediaType === 'VIDEO' && post.videoUrl ? (
           <>
             <video 
+              ref={inFeedVideoRef}
               src={post.videoUrl}
               autoPlay
               loop

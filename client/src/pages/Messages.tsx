@@ -63,20 +63,26 @@ export default function Messages() {
   const handleSendMessage = async () => {
     if (!messageInput.trim() || !selectedUserId) return;
 
+    const messageText = messageInput.trim();
+    setMessageInput("");
+    setLoading(true);
+
     try {
-      await sendMessage(selectedUserId, messageInput);
-      setMessageInput("");
+      await sendMessage(selectedUserId, messageText);
       loadMessages();
       toast({
         title: "Message Sent",
         description: `Message sent to ${selectedUser?.username}`
       });
     } catch (error: any) {
+      setMessageInput(messageText);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message
+        description: error?.message || "Failed to send message"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -214,6 +220,8 @@ export default function Messages() {
       <div className="border-t border-border p-4 bg-background">
         <div className="flex gap-2">
           <Input
+            id="message-input"
+            name="message"
             placeholder="Message..."
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
@@ -225,12 +233,15 @@ export default function Messages() {
             }}
             className="bg-muted/50 border-0 focus-visible:ring-0 h-10"
             data-testid="input-message"
+            disabled={loading}
+            autoComplete="off"
           />
           <Button
             size="icon"
             onClick={handleSendMessage}
-            disabled={!messageInput.trim()}
+            disabled={!messageInput.trim() || loading}
             data-testid="button-send"
+            aria-label="Send message"
           >
             <Send className="w-4 h-4" />
           </Button>
