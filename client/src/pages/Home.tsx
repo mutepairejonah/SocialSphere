@@ -18,26 +18,26 @@ export default function Home() {
     <div className="min-h-screen bg-[#f0f2f5] pb-20">
       {/* Facebook-style Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-3 py-2 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="text-2xl font-bold text-[#1877F2]">Authentic</div>
+            <div className="text-xl font-bold text-[#1877F2]">Authentic</div>
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 mx-4 max-w-sm">
+          <div className="flex-1 mx-3 max-w-xs">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
               <Input
                 type="text"
-                placeholder="Search Authentic..."
-                className="pl-9 h-9 bg-gray-100 border-0 rounded-full focus-visible:ring-0 focus-visible:bg-gray-200"
+                placeholder="Search..."
+                className="pl-8 h-8 text-sm bg-gray-100 border-0 rounded-full focus-visible:ring-0 focus-visible:bg-gray-200"
               />
             </div>
           </div>
 
           {/* Right Icons */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             {/* Logout Button */}
             <button
               onClick={handleLogout}
@@ -90,26 +90,26 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="max-w-4xl mx-auto px-3 py-3">
         {/* Stories Section - Facebook Style */}
-        <div className="mb-6 bg-white rounded-lg shadow-sm p-4 overflow-x-auto">
-          <div className="flex gap-4 no-scrollbar pb-2">
+        <div className="mb-4 bg-white rounded-lg shadow-sm p-2 overflow-x-auto">
+          <div className="flex gap-2 no-scrollbar pb-1">
             {/* Create Story Card */}
             <div
               onClick={() => setLocation("/create")}
-              className="flex-shrink-0 w-32 h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-all group relative"
+              className="flex-shrink-0 w-24 h-36 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-all group relative"
               data-testid="button-create-story"
             >
               <img
                 src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200"}
-                className="w-full h-24 object-cover"
+                className="w-full h-16 object-cover"
                 alt="Your Story"
               />
-              <div className="p-3 h-24 flex flex-col items-center justify-center">
-                <div className="w-10 h-10 bg-[#1877F2] rounded-full flex items-center justify-center text-white mb-2 group-hover:scale-110 transition-transform">
-                  <Plus className="w-5 h-5" />
+              <div className="p-2 h-20 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 bg-[#1877F2] rounded-full flex items-center justify-center text-white mb-1 group-hover:scale-110 transition-transform">
+                  <Plus className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-semibold text-center text-gray-800">Create Story</span>
+                <span className="text-[10px] font-semibold text-center text-gray-800">Story</span>
               </div>
             </div>
 
@@ -121,7 +121,7 @@ export default function Home() {
                   markStoryViewed(story.id);
                   setLocation("/stories");
                 }}
-                className={`flex-shrink-0 w-32 h-48 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-all relative group ${
+                className={`flex-shrink-0 w-24 h-36 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-all relative group ${
                   story.isViewed ? "opacity-60" : ""
                 }`}
                 data-testid={`story-${story.id}`}
@@ -134,13 +134,13 @@ export default function Home() {
                 
                 {/* Blue border for unviewed stories */}
                 {!story.isViewed && (
-                  <div className="absolute inset-0 border-4 border-[#1877F2] rounded-lg pointer-events-none" />
+                  <div className="absolute inset-0 border-3 border-[#1877F2] rounded-lg pointer-events-none" />
                 )}
 
                 {/* Story User Info - Overlay at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full flex-shrink-0 border-2 ${
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1.5">
+                  <div className="flex items-center gap-1">
+                    <div className={`w-5 h-5 rounded-full flex-shrink-0 border-2 ${
                       story.isViewed ? "border-gray-400" : "border-[#1877F2]"
                     } overflow-hidden`}>
                       <img
@@ -149,7 +149,7 @@ export default function Home() {
                         alt="Story avatar"
                       />
                     </div>
-                    <span className="text-xs text-white font-semibold truncate line-clamp-1">
+                    <span className="text-[10px] text-white font-semibold truncate line-clamp-1">
                       {story.userId}
                     </span>
                   </div>
