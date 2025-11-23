@@ -160,23 +160,11 @@ export default function Profile() {
 
         {/* Content Grid */}
         <div className="grid grid-cols-3 gap-0.5 pb-4">
-          {activeTab === 'posts' && currentUser?.id === API_KEY_OWNER_ID && posts.length > 0 && posts.map((post) => (
-            <div key={post.id} className="aspect-square bg-muted relative group cursor-pointer overflow-hidden">
-              {post.mediaType === 'VIDEO' ? (
-                <video src={post.videoUrl} className="w-full h-full object-cover" />
-              ) : (
-                <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover" />
-              )}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <div className="text-white font-semibold text-sm">{post.likes} likes</div>
-              </div>
-            </div>
-          ))}
-          {activeTab === 'posts' && (currentUser?.id !== API_KEY_OWNER_ID || posts.length === 0) && (
+          {activeTab === 'posts' && (
             <div className="col-span-3 py-20 flex flex-col items-center text-muted-foreground">
               <Grid className="w-16 h-16 stroke-1 mb-4" />
               <h3 className="text-xl font-bold text-foreground">No Posts Yet</h3>
-              <p className="text-sm">{currentUser?.id === API_KEY_OWNER_ID ? 'Your posts will appear here' : 'Only the app owner can see posts'}</p>
+              <p className="text-sm">Your posts will appear here</p>
             </div>
           )}
           {activeTab === 'saved' && (

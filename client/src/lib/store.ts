@@ -521,66 +521,9 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   loadPosts: async () => {
-    try {
-      const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
-      const currentUser = get().currentUser;
-      
-      console.log('Loading Instagram API posts (API key owner only)...');
-      
-      // Only load posts if user is the API key owner
-      if (!currentUser || currentUser.id !== API_KEY_OWNER_ID) {
-        console.log('Post loading restricted: Only API key owner can fetch posts');
-        set({ posts: [] });
-        return;
-      }
-      
-      // Fetch posts from Instagram API (only API key owner's posts)
-      const instagramPosts = await getUserMedia();
-      
-      if (instagramPosts && Array.isArray(instagramPosts) && instagramPosts.length > 0) {
-        const posts = instagramPosts.map((igPost: any, index: number) => {
-          const timestamp = igPost.timestamp || new Date().toISOString();
-          
-          // Use HD quality image URLs
-          let imageUrl = igPost.media_url || '';
-          if (igPost.media_type === 'IMAGE' && igPost.media_url) {
-            imageUrl = `${igPost.media_url}?quality=95&format=auto`;
-          } else if (igPost.media_type === 'VIDEO' && igPost.thumbnail_url) {
-            imageUrl = `${igPost.thumbnail_url}?quality=95&format=auto`;
-          }
-          
-          // Use real Instagram engagement metrics
-          const realLikes = igPost.like_count || 0;
-          const realComments = igPost.comments_count || 0;
-          
-          return {
-            id: igPost.id || `ig_${index}`,
-            userId: 'dbcMML2G74Rl4YKhT8VupNOSlDo1',
-            username: 'jonah m',
-            userAvatar: 'https://lh3.googleusercontent.com/a/ACg8ocJBPGZKLpDAwumlRjUllijfadBvFA6XLAR9rGfXt4dnlnS88w=s96-c',
-            imageUrl: imageUrl,
-            videoUrl: igPost.media_type === 'VIDEO' ? igPost.media_url : undefined,
-            mediaType: igPost.media_type as 'IMAGE' | 'VIDEO',
-            caption: igPost.caption || '(No caption)',
-            likes: realLikes,
-            location: '',
-            timestamp: new Date(timestamp).toLocaleString(),
-            comments: realComments,
-            isLiked: false,
-            isSaved: false
-          } as Post;
-        });
-        
-        console.log('Loaded Instagram posts:', posts);
-        set({ posts });
-      } else {
-        console.log('No Instagram posts found');
-        set({ posts: [] });
-      }
-    } catch (error) {
-      console.error('Error loading Instagram posts:', error);
-      set({ posts: [] });
-    }
+    // Instagram API posts are disabled - no posts will be displayed
+    console.log('Instagram API posts disabled - showing zero posts');
+    set({ posts: [] });
   },
 
   loadUsers: async () => {
