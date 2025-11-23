@@ -1,0 +1,72 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index-dev.ts
+
+3:59:09 PM [express] serving on port 5000
+[replit-cartographer] Error processing /home/runner/workspace/client/src/pages/Messages.tsx: SyntaxError: Identifier 'selectedUser' has already been declared. (205:8)
+    at toParseError (/home/runner/workspace/node_modules/@babel/parser/src/parse-error.ts:95:45)
+    at raise (/home/runner/workspace/node_modules/@babel/parser/src/tokenizer/index.ts:1503:19)
+    at checkRedeclarationInScope (/home/runner/workspace/node_modules/@babel/parser/src/util/scope.ts:164:19)
+    at declareName (/home/runner/workspace/node_modules/@babel/parser/src/util/scope.ts:118:12)
+    at declareName (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/scope.ts:89:11)
+    at declareNameFromIdentifier (/home/runner/workspace/node_modules/@babel/parser/src/parser/lval.ts:818:16)
+    at checkIdentifier (/home/runner/workspace/node_modules/@babel/parser/src/parser/lval.ts:813:12)
+    at checkLVal (/home/runner/workspace/node_modules/@babel/parser/src/parser/lval.ts:713:12)
+    at parseVarId (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1628:10)
+    at parseVarId (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3663:13)
+    at parseVar (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1577:12)
+    at parseVarStatement (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1246:10)
+    at parseVarStatement (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3126:33)
+    at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:607:21)
+    at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3185:20)
+    at parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:477:17)
+    at parseStatementListItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:426:17)
+    at parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1439:16)
+    at parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1412:10)
+    at parseBlock (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1380:10)
+    at parseFunctionBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2616:24)
+    at parseFunctionBodyAndFinish (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2585:10)
+    at parseFunctionBodyAndFinish (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:2646:20)
+    at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1690:12)
+    at withSmartMixTopicForbiddingContext (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3166:14)
+    at parseFunction (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1688:10)
+    at parseExportDefaultExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:2565:19)
+    at parseExportDefaultExpression (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3117:20)
+    at parseExport (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:2447:25)
+    at parseExport (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3087:22)
+    at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:644:25)
+    at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3185:20)
+    at parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:477:17)
+    at parseModuleItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:414:17)
+    at parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1438:16)
+    at parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1412:10)
+    at parseProgram (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:229:10)
+    at parseTopLevel (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:203:25)
+    at parse (/home/runner/workspace/node_modules/@babel/parser/src/parser/index.ts:93:10)
+    at parse (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:4309:20)
+    at parse (/home/runner/workspace/node_modules/@babel/parser/src/index.ts:92:38)
+    at TransformPluginContext.handler (/home/runner/workspace/node_modules/@replit/vite-plugin-cartographer/dist/index.mjs:74:23)
+    at EnvironmentPluginContainer.transform (/home/runner/workspace/node_modules/vite/dist/node/chunks/config.js:30905:51)
+    at loadAndTransform (/home/runner/workspace/node_modules/vite/dist/node/chunks/config.js:26043:48) {
+  code: 'BABEL_PARSER_SYNTAX_ERROR',
+  reasonCode: 'VarRedeclaration',
+  loc: Position { line: 205, column: 8, index: 7842 },
+  pos: 7842,
+  syntaxPlugin: undefined
+}
+3:59:11 PM [vite] (client) Pre-transform error: /home/runner/workspace/client/src/pages/Messages.tsx: Identifier 'selectedUser' has already been declared. (205:8)
+
+  203 |   }
+  204 |
+> 205 |   const selectedUser = followingUsers.find(u => u.id === selectedUserId);
+      |         ^
+  206 |
+  207 |   return (
+  208 |     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background flex flex-col">
+  Plugin: vite:react-babel
+  File: /home/runner/workspace/client/src/pages/Messages.tsx:205:8
+  203 |    }
+  204 |  
+  205 |    const selectedUser = followingUsers.find(u => u.id === selectedUserId);
+      |          ^
+  206 |  

@@ -35,6 +35,7 @@ export default function Messages() {
   const [loading, setLoading] = useState(false);
   const [calling, setCalling] = useState<{ active: boolean; type?: 'audio' | 'video' }>({ active: false });
   const [followingUsers, setFollowingUsers] = useState<User[]>([]);
+  const selectedUser = followingUsers.find(u => u.id === selectedUserId);
 
   useEffect(() => {
     // Load following users
@@ -116,8 +117,6 @@ export default function Messages() {
     setLocation("/login");
     return null;
   }
-
-  const selectedUser = followingUsers.find(u => u.id === selectedUserId);
 
   // Call screen
   if (calling.active) {
@@ -202,13 +201,11 @@ export default function Messages() {
     );
   }
 
-  const selectedUser = followingUsers.find(u => u.id === selectedUserId);
-
   return (
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background flex flex-col">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setSelectedUserId(null)} className="h-10 w-10 hover:bg-muted">
+          <Button variant="ghost" size="icon" onClick={() => setSelectedUserId(null)} className="h-10 w-10 hover:bg-muted" data-testid="button-back-messages">
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="flex items-center gap-2">
@@ -230,9 +227,10 @@ export default function Messages() {
             size="icon"
             variant="ghost"
             onClick={() => handleCall('audio')}
-            disabled={calling}
+            disabled={calling.active}
             className="h-10 w-10 hover:bg-muted rounded-full"
             title="Audio call"
+            data-testid="button-voice-call"
           >
             <Phone className="w-5 h-5" />
           </Button>
@@ -240,9 +238,10 @@ export default function Messages() {
             size="icon"
             variant="ghost"
             onClick={() => handleCall('video')}
-            disabled={calling}
+            disabled={calling.active}
             className="h-10 w-10 hover:bg-muted rounded-full"
             title="Video call"
+            data-testid="button-video-call"
           >
             <Video className="w-5 h-5" />
           </Button>
@@ -266,6 +265,7 @@ export default function Messages() {
           messages.map((msg, idx) => {
             const isConsecutive = idx > 0 && messages[idx - 1]?.senderId === msg.senderId;
             const nextIsDifferent = idx < messages.length - 1 && messages[idx + 1]?.senderId !== msg.senderId;
+            const messageTime = msg.timestamp?.toDate?.() ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now';
             
             return (
               <div
