@@ -507,6 +507,38 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   },
 
+  loadUserPosts: async () => {
+    const currentUser = get().currentUser;
+    if (!currentUser) return;
+
+    try {
+      // Fetch user posts from database
+      const response = await fetch(`/api/posts/following/${currentUser.id}`);
+      const dbPosts = await response.json();
+      
+      const userPosts = dbPosts.map((post: any) => ({
+        id: post.id,
+        userId: post.userId,
+        username: post.username || currentUser.username,
+        userAvatar: post.userAvatar || currentUser.avatar,
+        imageUrl: post.imageUrl,
+        videoUrl: post.videoUrl,
+        caption: post.caption || '',
+        location: post.location || '',
+        mediaType: post.mediaType || 'IMAGE',
+        timestamp: new Date(post.createdAt).toLocaleString(),
+        likes: post.likes || 0,
+        comments: post.commentCount || 0,
+        isLiked: false,
+        isSaved: false
+      }));
+
+      set({ userPosts });
+    } catch (error) {
+      console.error('Error loading user posts:', error);
+    }
+  },
+
   loadPosts: async () => {
     try {
       console.log('Loading Instagram API videos (Home page only)...');
