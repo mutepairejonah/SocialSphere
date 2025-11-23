@@ -27,7 +27,7 @@ interface User {
 }
 
 export default function Messages() {
-  const { currentUser, sendMessage, getMessages, startCall, getFollowing } = useStore();
+  const { currentUser, sendMessage, getMessages, startCall } = useStore();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -39,10 +39,19 @@ export default function Messages() {
   const selectedUser = followingUsers.find(u => u.id === selectedUserId);
 
   useEffect(() => {
-    // Load following users
-    const following = getFollowing();
-    setFollowingUsers(following as User[]);
-  }, []);
+    // Load following users from API
+    const fetchFollowing = async () => {
+      if (!currentUser) return;
+      try {
+        const res = await fetch(`/api/following/${currentUser.id}`);
+        const data = await res.json();
+        setFollowingUsers(data);
+      } catch (error) {
+        console.error("Error loading following users:", error);
+      }
+    };
+    fetchFollowing();
+  }, [currentUser]);
 
   useEffect(() => {
     if (!currentUser) return;
