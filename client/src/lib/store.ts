@@ -129,7 +129,7 @@ export const useStore = create<StoreState>((set, get) => ({
               get().loadNotifications().catch(err => console.warn('Notifications load failed:', err))
             ]);
           } else {
-            set({ currentUser: null, isAuthenticated: false });
+            set({ currentUser: null, isAuthenticated: false, posts: [], allUsers: [], notifications: [], stories: [], pendingGoogleUser: null });
           }
         } catch (error: any) {
           if (error?.code === 'unavailable' || error?.message?.includes('offline')) {
@@ -149,10 +149,11 @@ export const useStore = create<StoreState>((set, get) => ({
             });
           } else {
             console.error('Error loading user data:', error);
+            set({ currentUser: null, isAuthenticated: false, posts: [], allUsers: [], notifications: [], stories: [], pendingGoogleUser: null });
           }
         }
       } else {
-        set({ currentUser: null, isAuthenticated: false });
+        set({ currentUser: null, isAuthenticated: false, posts: [], allUsers: [], notifications: [], stories: [], pendingGoogleUser: null });
       }
     });
   },
@@ -291,8 +292,21 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   logout: async () => {
-    await signOut(auth);
-    set({ currentUser: null, isAuthenticated: false, posts: [], allUsers: [] });
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+    // Completely clear all state
+    set({ 
+      currentUser: null, 
+      isAuthenticated: false, 
+      posts: [], 
+      allUsers: [],
+      notifications: [],
+      stories: [],
+      pendingGoogleUser: null
+    });
   },
 
   setUser: (user) => set({ currentUser: user, isAuthenticated: true }),
