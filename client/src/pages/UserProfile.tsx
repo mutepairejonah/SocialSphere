@@ -14,29 +14,19 @@ export default function UserProfile() {
   const [, setLocation] = useLocation();
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadUser = async () => {
-      if (params?.id) {
+      if (params?.id && allUsers.length > 0) {
         const foundUser = allUsers.find(u => u.id === params.id);
         if (foundUser) {
           const followStatus = await loadFollowStatus(foundUser.id);
           setUser({ ...foundUser, isFollowing: followStatus });
         }
       }
-      setLoading(false);
     };
     loadUser();
-  }, [params?.id, allUsers]);
-
-  if (loading) {
-    return (
-      <div className="max-w-md mx-auto min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
+  }, [params?.id, allUsers, loadFollowStatus]);
 
   if (!user) {
     return (
