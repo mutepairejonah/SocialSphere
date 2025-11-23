@@ -232,68 +232,67 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       </div>
 
-        {/* Likes & Caption */}
-        <div className="space-y-1.5">
-          <div className="text-sm font-semibold">{post.likes.toLocaleString()} {post.likes === 1 ? 'like' : 'likes'}</div>
-          <div className="text-sm leading-snug">
-            <span className="font-semibold mr-2">{post.username || post.userId}</span>
-            {post.caption}
-          </div>
-          {post.comments > 0 && (
-            <button 
-              onClick={handleComment}
-              data-testid="button-view-comments"
-              className="text-muted-foreground text-sm cursor-pointer mt-1 hover:text-foreground transition-colors"
-            >
-              View all {post.comments} comments
-            </button>
-          )}
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wide mt-1">{post.timestamp}</div>
+      {/* Likes & Caption */}
+      <div className="px-4 py-3 space-y-1.5 border-t border-border">
+        <div className="text-sm font-semibold">{post.likes.toLocaleString()} {post.likes === 1 ? 'like' : 'likes'}</div>
+        <div className="text-sm leading-snug">
+          <span className="font-semibold mr-2">{post.username || post.userId}</span>
+          {post.caption}
         </div>
+        {post.comments > 0 && (
+          <button 
+            onClick={handleComment}
+            data-testid="button-view-comments"
+            className="text-muted-foreground text-sm cursor-pointer mt-1 hover:text-foreground transition-colors"
+          >
+            View all {post.comments} comments
+          </button>
+        )}
+        <div className="text-[10px] text-muted-foreground uppercase tracking-wide mt-1">{post.timestamp}</div>
+      </div>
 
-        {/* Comments Section */}
-        {showComments && (
-          <div className="mt-4 pt-4 border-t border-border space-y-3">
-            <div className="max-h-40 overflow-y-auto space-y-2">
-              <div className="text-sm">
-                <span className="font-semibold text-xs text-muted-foreground">2 comments</span>
-                <div className="mt-2 space-y-2">
-                  <div className="text-xs">
-                    <span className="font-semibold">user_123:</span> Amazing post! 🔥
-                  </div>
-                  <div className="text-xs">
-                    <span className="font-semibold">user_456:</span> Love this content
-                  </div>
+      {/* Comments Section */}
+      {showComments && (
+        <div className="px-4 py-3 border-t border-border space-y-3">
+          <div className="max-h-40 overflow-y-auto space-y-2">
+            <div className="text-sm">
+              <span className="font-semibold text-xs text-muted-foreground">2 comments</span>
+              <div className="mt-2 space-y-2">
+                <div className="text-xs">
+                  <span className="font-semibold">user_123:</span> Amazing post! 🔥
+                </div>
+                <div className="text-xs">
+                  <span className="font-semibold">user_456:</span> Love this content
                 </div>
               </div>
             </div>
-            <div className="flex gap-2 items-center">
-              <Input
-                placeholder="Add a comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendComment();
-                  }
-                }}
-                className="h-8 text-sm"
-                data-testid="input-comment"
-              />
-              <Button
-                size="sm"
-                onClick={handleSendComment}
-                disabled={!commentText.trim()}
-                className="h-8"
-                data-testid="button-post-comment"
-              >
-                Post
-              </Button>
-            </div>
           </div>
-        )}
-      </div>
+          <div className="flex gap-2 items-center">
+            <Input
+              placeholder="Add a comment..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendComment();
+                }
+              }}
+              className="h-8 text-sm"
+              data-testid="input-comment"
+            />
+            <Button
+              size="sm"
+              onClick={handleSendComment}
+              disabled={!commentText.trim()}
+              className="h-8"
+              data-testid="button-post-comment"
+            >
+              Post
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
