@@ -3,11 +3,16 @@ import { useStore } from "@/lib/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
+import { LogOut, Settings, Heart, Send } from "lucide-react";
 
 export default function Activity() {
-  const { notifications, allUsers, toggleFollow } = useStore();
+  const { notifications, allUsers, toggleFollow, currentUser, logout } = useStore();
   const [, setLocation] = useLocation();
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   // Group by timeframe (mock logic)
   const newNotifs = notifications.filter(n => !n.read);
@@ -17,12 +22,69 @@ export default function Activity() {
   const suggestedUsers = allUsers.filter(u => !u.isFollowing).slice(0, 3);
 
   return (
-    <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center">
-        <h1 className="font-bold text-xl">Activity</h1>
+    <div className="pb-20 min-h-screen bg-[#f0f2f5]">
+      {/* Compact Header */}
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="w-full px-2 sm:px-4 py-1.5 flex items-center justify-between">
+          {/* Logo */}
+          <div className="text-lg font-bold text-[#1877F2] whitespace-nowrap">Authentic</div>
+
+          {/* Right Icons */}
+          <div className="flex items-center gap-1">
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              data-testid="button-logout"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4 text-gray-700" />
+            </button>
+
+            {/* Settings Button */}
+            <button
+              onClick={() => setLocation("/profile")}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              data-testid="button-settings"
+              title="Settings"
+            >
+              <Settings className="w-4 h-4 text-gray-700" />
+            </button>
+
+            {/* Notifications */}
+            <Link href="/activity">
+              <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" data-testid="button-notifications">
+                <Heart className="w-4 h-4 text-gray-700" />
+              </button>
+            </Link>
+
+            {/* Messages */}
+            <Link href="/messages">
+              <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors relative" data-testid="button-messages">
+                <Send className="w-4 h-4 text-gray-700 -rotate-[15deg]" />
+              </button>
+            </Link>
+
+            {/* Profile Avatar */}
+            <Link href="/profile">
+              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#1877F2] cursor-pointer hover:opacity-80 transition-opacity">
+                <img
+                  src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100"}
+                  className="w-full h-full object-cover"
+                  alt="Profile"
+                />
+              </div>
+            </Link>
+          </div>
+        </div>
       </header>
 
-      <main className="divide-y divide-border/0">
+      {/* Activity Title */}
+      <div className="max-w-2xl mx-auto px-2 sm:px-4 py-3 border-b border-gray-200 bg-white">
+        <h1 className="font-bold text-lg">Activity</h1>
+      </div>
+
+      <main className="max-w-2xl mx-auto divide-y divide-gray-200 bg-white">
         {newNotifs.length > 0 && (
           <div className="pt-4 pb-2">
             <h2 className="font-bold px-4 mb-3 text-base">New</h2>
@@ -42,20 +104,20 @@ export default function Activity() {
              <div className="mt-6">
                <h2 className="font-bold px-4 mb-3 text-base">Suggested for you</h2>
                {suggestedUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between py-3 px-4 hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => setLocation(`/user/${user.id}`)}>
+                  <div key={user.id} className="flex items-center justify-between py-3 px-4 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setLocation(`/user/${user.id}`)}>
                      <div className="flex items-center gap-3 flex-1">
-                      <Avatar className="h-11 w-11 border border-border">
+                      <Avatar className="h-11 w-11 border border-gray-300">
                         <AvatarImage src={user.avatar} />
                         <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="text-sm flex flex-col">
                         <span className="font-semibold">{user.username}</span>
-                        <span className="text-xs text-muted-foreground">{user.followers} followers</span>
+                        <span className="text-xs text-gray-500">{user.followers} followers</span>
                       </div>
                     </div>
                     <Button 
                       size="sm" 
-                      className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white"
+                      className="h-8 px-5 font-semibold bg-[#1877F2] hover:bg-[#1877F2]/90 text-white"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleFollow(user.id);

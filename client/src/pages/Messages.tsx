@@ -1,10 +1,10 @@
 import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Send, Phone, Video, MessageCircle, MoreVertical, Image as ImageIcon, Heart } from "lucide-react";
+import { ArrowLeft, Send, Phone, Video, MessageCircle, MoreVertical, Image as ImageIcon, Heart, LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useStore } from "@/lib/store";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { initializeSocket, emitMessage, onMessageReceived, onMessagesLoaded, offAllEvents } from "@/lib/socket";
@@ -27,8 +27,12 @@ interface User {
 }
 
 export default function Messages() {
-  const { currentUser, sendMessage, getMessages, startCall } = useStore();
+  const { currentUser, sendMessage, getMessages, startCall, logout } = useStore();
   const [, setLocation] = useLocation();
+
+  const handleLogout = async () => {
+    await logout();
+  };
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState("");
