@@ -521,9 +521,47 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   loadPosts: async () => {
-    // Instagram API posts are disabled - no posts will be displayed
-    console.log('Instagram API posts disabled - showing zero posts');
-    set({ posts: [] });
+    try {
+      console.log('Loading Instagram API videos (Home page only)...');
+      
+      // Fetch posts from Instagram API
+      const instagramPosts = await getUserMedia();
+      
+      if (instagramPosts && Array.isArray(instagramPosts) && instagramPosts.length > 0) {
+        // Only show VIDEO posts
+        const videoPosts = instagramPosts.filter((igPost: any) => igPost.media_type === 'VIDEO');
+        
+        const posts = videoPosts.map((igPost: any, index: number) => {
+          const timestamp = igPost.timestamp || new Date().toISOString();
+          
+          return {
+            id: igPost.id || `ig_${index}`,
+            userId: 'dbcMML2G74Rl4YKhT8VupNOSlDo1',
+            username: 'jonah m',
+            userAvatar: 'https://lh3.googleusercontent.com/a/ACg8ocJBPGZKLpDAwumlRjUllijfadBvFA6XLAR9rGfXt4dnlnS88w=s96-c',
+            imageUrl: igPost.thumbnail_url || '',
+            videoUrl: igPost.media_url,
+            mediaType: 'VIDEO' as const,
+            caption: igPost.caption || '(No caption)',
+            likes: igPost.like_count || 0,
+            location: '',
+            timestamp: new Date(timestamp).toLocaleString(),
+            comments: igPost.comments_count || 0,
+            isLiked: false,
+            isSaved: false
+          } as Post;
+        });
+        
+        console.log('Loaded Instagram videos:', posts);
+        set({ posts });
+      } else {
+        console.log('No Instagram videos found');
+        set({ posts: [] });
+      }
+    } catch (error) {
+      console.error('Error loading Instagram videos:', error);
+      set({ posts: [] });
+    }
   },
 
   loadUsers: async () => {

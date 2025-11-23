@@ -90,9 +90,9 @@ export default function Home() {
           })}
       </div>
 
-      {/* Feed - Grid Layout */}
+      {/* Feed - Grid Layout (Videos Only) */}
       <main className="min-h-[calc(100vh-150px)] p-4">
-        {posts.length > 0 ? (
+        {posts && posts.length > 0 ? (
           <div className="grid grid-cols-1 gap-6">
             {posts.map((post) => (
               <PostCard key={post.id} post={post} />
@@ -100,7 +100,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-             <p className="text-center">No posts yet. Follow someone to see their content!</p>
+             <p className="text-center">No videos available</p>
           </div>
         )}
       </main>
