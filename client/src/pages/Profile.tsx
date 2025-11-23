@@ -10,11 +10,15 @@ import { useState, useRef, useEffect } from "react";
 const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
 
 export default function Profile() {
-  const { currentUser, isAuthenticated, logout, posts } = useStore();
+  const { currentUser, isAuthenticated, logout, userPosts, loadUserPosts } = useStore();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'tagged'>('posts');
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadUserPosts();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -78,7 +82,7 @@ export default function Profile() {
             </div>
             <div className="flex-1 flex justify-around text-center ml-4">
               <div>
-                <div className="font-bold text-lg leading-tight">0</div>
+                <div className="font-bold text-lg leading-tight">{userPosts.length}</div>
                 <div className="text-xs text-muted-foreground">Posts</div>
               </div>
               <div 
@@ -157,7 +161,19 @@ export default function Profile() {
 
         {/* Content Grid */}
         <div className="grid grid-cols-3 gap-0.5 pb-4">
-          {activeTab === 'posts' && (
+          {activeTab === 'posts' && userPosts.length > 0 && userPosts.map((post) => (
+            <div key={post.id} className="aspect-square bg-muted relative group cursor-pointer overflow-hidden">
+              {post.mediaType === 'VIDEO' ? (
+                <video src={post.videoUrl} className="w-full h-full object-cover" />
+              ) : (
+                <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover" />
+              )}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <div className="text-white font-semibold text-sm">{post.likes} likes</div>
+              </div>
+            </div>
+          ))}
+          {activeTab === 'posts' && userPosts.length === 0 && (
             <div className="col-span-3 py-20 flex flex-col items-center text-muted-foreground">
               <Grid className="w-16 h-16 stroke-1 mb-4" />
               <h3 className="text-xl font-bold text-foreground">No Posts Yet</h3>

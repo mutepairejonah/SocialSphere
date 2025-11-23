@@ -65,6 +65,7 @@ interface StoreState {
   currentUser: User | null;
   pendingGoogleUser: {uid: string, displayName: string, email: string, photoURL: string} | null;
   posts: Post[];
+  userPosts: Post[];
   notifications: Notification[];
   stories: Story[];
   allUsers: User[];
@@ -81,6 +82,7 @@ interface StoreState {
   getFollowing: () => User[];
   addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'timestamp' | 'isLiked' | 'isSaved'>) => Promise<void>;
   loadPosts: () => Promise<void>;
+  loadUserPosts: () => Promise<void>;
   loadUsers: () => Promise<void>;
   loadNotifications: () => Promise<void>;
   toggleLike: (postId: string) => Promise<void>;
@@ -103,6 +105,7 @@ export const useStore = create<StoreState>((set, get) => ({
   currentUser: null,
   pendingGoogleUser: null,
   posts: [],
+  userPosts: [],
   notifications: [],
   stories: [],
   allUsers: [],
@@ -561,6 +564,44 @@ export const useStore = create<StoreState>((set, get) => ({
     } catch (error) {
       console.error('Error loading Instagram videos:', error);
       set({ posts: [] });
+    }
+  },
+
+  loadUserPosts: async () => {
+    const currentUser = get().currentUser;
+    if (!currentUser) {
+      set({ userPosts: [] });
+      return;
+    }
+
+    try {
+      const postsQuery = query(collection(db, 'posts'), where('userId', '==', currentUser.id));
+      const snapshot = await getDocs(postsQuery);
+      
+      const userPostsData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          userId: data.userId,
+          username: data.username || currentUser.username,
+          userAvatar: data.userAvatar || currentUser.avatar,
+          imageUrl: data.imageUrl,
+          videoUrl: data.videoUrl,
+          caption: data.caption,
+          location: data.location,
+          mediaType: data.mediaType,
+          timestamp: new Date(data.createdAt.toDate()).toLocaleString(),
+          likes: data.likes || 0,
+          comments: data.commentCount || 0,
+          isLiked: false,
+          isSaved: false
+        } as Post;
+      });
+
+      set({ userPosts: userPostsData });
+    } catch (error) {
+      console.error('Error loading user posts:', error);
+      set({ userPosts: [] });
     }
   },
 
