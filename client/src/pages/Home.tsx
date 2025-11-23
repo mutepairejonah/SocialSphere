@@ -5,9 +5,14 @@ import { Heart, Send, PlusSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "wouter";
 
+const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
+
 export default function Home() {
   const { posts, stories, markStoryViewed, currentUser, allUsers } = useStore();
   const [, setLocation] = useLocation();
+
+  // Filter posts to only show if current user is API key owner
+  const visiblePosts = currentUser?.id === API_KEY_OWNER_ID ? posts : [];
 
   return (
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
@@ -92,15 +97,15 @@ export default function Home() {
 
       {/* Feed - Grid Layout */}
       <main className="min-h-[calc(100vh-150px)] p-4">
-        {posts.length > 0 ? (
+        {visiblePosts.length > 0 ? (
           <div className="grid grid-cols-1 gap-6">
-            {posts.map((post) => (
+            {visiblePosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-             <p className="text-center">No posts yet. Follow someone to see their content!</p>
+             <p className="text-center">{currentUser?.id === API_KEY_OWNER_ID ? 'No posts yet' : 'Posts are only visible to the app owner'}</p>
           </div>
         )}
       </main>

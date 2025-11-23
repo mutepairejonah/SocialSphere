@@ -6,6 +6,9 @@ import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 
+// API key owner ID - only they can see/fetch Instagram posts
+const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
+
 export default function Profile() {
   const { currentUser, isAuthenticated, logout, posts } = useStore();
   const [, setLocation] = useLocation();
@@ -157,7 +160,7 @@ export default function Profile() {
 
         {/* Content Grid */}
         <div className="grid grid-cols-3 gap-0.5 pb-4">
-          {activeTab === 'posts' && posts.length > 0 && posts.map((post) => (
+          {activeTab === 'posts' && currentUser?.id === API_KEY_OWNER_ID && posts.length > 0 && posts.map((post) => (
             <div key={post.id} className="aspect-square bg-muted relative group cursor-pointer overflow-hidden">
               {post.mediaType === 'VIDEO' ? (
                 <video src={post.videoUrl} className="w-full h-full object-cover" />
@@ -169,11 +172,11 @@ export default function Profile() {
               </div>
             </div>
           ))}
-          {activeTab === 'posts' && posts.length === 0 && (
+          {activeTab === 'posts' && (currentUser?.id !== API_KEY_OWNER_ID || posts.length === 0) && (
             <div className="col-span-3 py-20 flex flex-col items-center text-muted-foreground">
               <Grid className="w-16 h-16 stroke-1 mb-4" />
               <h3 className="text-xl font-bold text-foreground">No Posts Yet</h3>
-              <p className="text-sm">Your posts will appear here</p>
+              <p className="text-sm">{currentUser?.id === API_KEY_OWNER_ID ? 'Your posts will appear here' : 'Only the app owner can see posts'}</p>
             </div>
           )}
           {activeTab === 'saved' && (
