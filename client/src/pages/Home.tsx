@@ -1,18 +1,43 @@
 import { BottomNav } from "@/components/BottomNav";
 import { PostCard } from "@/components/PostCard";
 import { useStore } from "@/lib/store";
-import { Heart, Send, PlusSquare } from "lucide-react";
+import { Heart, Send, PlusSquare, Menu, Home as HomeIcon, Compass, Plus, MessageCircle, User, LogOut, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "wouter";
+import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 export default function Home() {
-  const { posts, stories, markStoryViewed, currentUser, allUsers } = useStore();
+  const { posts, stories, markStoryViewed, currentUser, allUsers, logout } = useStore();
   const [, setLocation] = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleNavigation = (path: string) => {
+    setLocation(path);
+    setMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setMenuOpen(false);
+  };
 
   return (
     <div className="pb-20 max-w-2xl mx-auto min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border px-4 h-14 flex items-center justify-between">
+        <button
+          onClick={() => setMenuOpen(true)}
+          className="hover:opacity-70 transition-opacity p-2 -ml-2"
+          data-testid="button-menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
         <h1 className="font-bold text-2xl select-none cursor-pointer text-primary">Authentic</h1>
         <div className="flex items-center gap-4">
           <Link href="/activity">
@@ -106,6 +131,77 @@ export default function Home() {
       </main>
 
       <BottomNav />
+
+      {/* Navigation Drawer */}
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="left" className="w-64 flex flex-col">
+          <SheetHeader className="border-b border-border pb-4">
+            <SheetTitle className="text-2xl font-bold text-primary">Authentic</SheetTitle>
+          </SheetHeader>
+
+          <nav className="flex-1 py-6 space-y-2">
+            <button
+              onClick={() => handleNavigation("/")}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
+              data-testid="nav-home"
+            >
+              <HomeIcon className="w-5 h-5" />
+              <span className="font-medium">Home</span>
+            </button>
+            <button
+              onClick={() => handleNavigation("/explore")}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
+              data-testid="nav-explore"
+            >
+              <Compass className="w-5 h-5" />
+              <span className="font-medium">Explore</span>
+            </button>
+            <button
+              onClick={() => handleNavigation("/create")}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
+              data-testid="nav-create"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="font-medium">Create</span>
+            </button>
+            <button
+              onClick={() => handleNavigation("/messages")}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
+              data-testid="nav-messages"
+            >
+              <MessageCircle className="w-5 h-5" />
+              <span className="font-medium">Messages</span>
+            </button>
+            <button
+              onClick={() => handleNavigation("/profile")}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
+              data-testid="nav-profile"
+            >
+              <User className="w-5 h-5" />
+              <span className="font-medium">Profile</span>
+            </button>
+          </nav>
+
+          <div className="border-t border-border pt-4 space-y-2">
+            <button
+              onClick={() => handleNavigation("/profile/edit")}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-foreground"
+              data-testid="nav-settings"
+            >
+              <Settings className="w-5 h-5" />
+              <span className="font-medium">Settings</span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-destructive/10 transition-colors text-destructive"
+              data-testid="nav-logout"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
