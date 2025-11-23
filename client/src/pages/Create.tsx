@@ -16,27 +16,19 @@ export default function Create() {
   const [locationTag, setLocationTag] = useState("");
   const [step, setStep] = useState<'picker' | 'details'>('picker');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isPosting, setIsPosting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recentImages, setRecentImages] = useState<string[]>([]);
 
-  const handlePost = async () => {
+  const handlePost = () => {
     if (!currentUser || !selectedImage) return;
     
-    setIsPosting(true);
-    try {
-      await addPost({
-        userId: currentUser.id,
-        imageUrl: selectedImage,
-        caption,
-        location: locationTag || undefined,
-      });
-      setLocation("/");
-    } catch (error) {
-      console.error('Post failed:', error);
-    } finally {
-      setIsPosting(false);
-    }
+    addPost({
+      userId: currentUser.id,
+      imageUrl: selectedImage,
+      caption,
+      location: locationTag || undefined,
+    });
+    setLocation("/");
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,13 +153,8 @@ export default function Create() {
           </Button>
           <h1 className="font-bold text-lg">New Post</h1>
         </div>
-        <Button 
-          variant="ghost" 
-          className="text-blue-500 font-bold hover:text-blue-600" 
-          onClick={handlePost}
-          disabled={isPosting}
-        >
-          {isPosting ? "Posting..." : "Share"}
+        <Button variant="ghost" className="text-blue-500 font-bold hover:text-blue-600" onClick={handlePost}>
+          Share
         </Button>
       </header>
 
