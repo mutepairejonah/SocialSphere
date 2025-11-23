@@ -433,7 +433,7 @@ export const useStore = create<StoreState>((set, get) => ({
 
     try {
       // Handle video uploads to Firebase Storage
-      let videoUrl = newPost.videoUrl;
+      let videoUrl = null;
       if (newPost.videoUrl && newPost.videoUrl.startsWith('data:')) {
         try {
           const response = await fetch(newPost.videoUrl);
@@ -446,30 +446,43 @@ export const useStore = create<StoreState>((set, get) => ({
         }
       }
 
-      const postRef = await addDoc(collection(db, 'posts'), {
+      const postData = {
         userId: currentUser.id,
-        username: currentUser.username,
-        userAvatar: currentUser.avatar,
-        imageUrl: newPost.imageUrl,
-        videoUrl: videoUrl,
-        caption: newPost.caption || '',
-        location: newPost.location || '',
+        username: currentUser.username || '',
+        userAvatar: currentUser.avatar || '',
+        imageUrl: newPost.imageUrl || null,
+        caption: (newPost.caption || '').trim(),
+        location: (newPost.location || '').trim(),
         mediaType: newPost.mediaType || 'IMAGE',
         createdAt: Timestamp.now(),
         likes: 0,
-        likedBy: [],
         commentCount: 0,
-      });
+      } as any;
 
-      const postData = await getDoc(postRef);
-      if (postData.exists()) {
+      // Only add videoUrl if it exists
+      if (videoUrl) {
+        postData.videoUrl = videoUrl;
+      }
+
+      const postRef = await addDoc(collection(db, 'posts'), postData);
+
+      const postSnapshot = await getDoc(postRef);
+      if (postSnapshot.exists()) {
+        const data = postSnapshot.data();
         set(state => ({
           posts: [{
-            id: postData.id,
-            ...postData.data(),
-            timestamp: new Date(postData.data().createdAt.toDate()).toLocaleString(),
-            likes: 0,
-            comments: 0,
+            id: postSnapshot.id,
+            userId: data.userId,
+            username: data.username,
+            userAvatar: data.userAvatar,
+            imageUrl: data.imageUrl,
+            videoUrl: data.videoUrl,
+            caption: data.caption,
+            location: data.location,
+            mediaType: data.mediaType,
+            timestamp: new Date(data.createdAt.toDate()).toLocaleString(),
+            likes: data.likes || 0,
+            comments: data.commentCount || 0,
             isLiked: false,
             isSaved: false
           } as Post, ...state.posts]
