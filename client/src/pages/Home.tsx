@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Link, useLocation } from "wouter";
 
 export default function Home() {
-  const { posts, stories, markStoryViewed, currentUser } = useStore();
+  const { posts, stories, markStoryViewed, currentUser, allUsers } = useStore();
   const [, setLocation] = useLocation();
 
   return (
@@ -52,30 +52,42 @@ export default function Home() {
         </div>
 
         {/* Other Stories */}
-        {stories.map((story) => (
-          <div 
-            key={story.id} 
-            className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer group"
-            onClick={() => {
-              markStoryViewed(story.id);
-              setLocation("/stories");
-            }}
-            data-testid={`story-${story.id}`}
-          >
-            <div className={cn(
-              "w-[72px] h-[72px] rounded-full p-[2px]",
-              story.isViewed ? "bg-border" : "bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600"
-            )}>
-              <div className="w-full h-full rounded-full border-[2px] border-background overflow-hidden bg-muted group-hover:scale-110 transition-transform">
-                <img 
-                  src={story.imageUrl} 
-                  className="w-full h-full object-cover" 
-                />
+        {stories
+          .filter(story => {
+            // Show user's own story + stories from followed users
+            if (story.userId === (currentUser?.username || currentUser?.id)) {
+              return true;
+            }
+            const storyUser = allUsers.find(u => u.username === story.userId || u.id === story.userId);
+            return storyUser && storyUser.isFollowing;
+          })
+          .map((story) => {
+            const storyUser = allUsers.find(u => u.username === story.userId || u.id === story.userId);
+            return (
+              <div 
+                key={story.id} 
+                className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer group"
+                onClick={() => {
+                  markStoryViewed(story.id);
+                  setLocation("/stories");
+                }}
+                data-testid={`story-${story.id}`}
+              >
+                <div className={cn(
+                  "w-[72px] h-[72px] rounded-full p-[2px]",
+                  story.isViewed ? "bg-border" : "bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600"
+                )}>
+                  <div className="w-full h-full rounded-full border-[2px] border-background overflow-hidden bg-muted group-hover:scale-110 transition-transform">
+                    <img 
+                      src={story.imageUrl} 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                </div>
+                <span className="text-xs truncate w-16 text-center">{storyUser?.username || story.userId}</span>
               </div>
-            </div>
-            <span className="text-xs truncate w-16 text-center">{story.userId}</span>
-          </div>
-        ))}
+            );
+          })}
       </div>
 
       {/* Feed */}
