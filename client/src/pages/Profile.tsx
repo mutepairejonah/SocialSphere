@@ -67,6 +67,18 @@ export default function Profile() {
           <div className="flex justify-center items-center h-96">
             <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
           </div>
+        ) : !activeToken ? (
+          <div className="flex flex-col justify-center items-center h-96 text-center px-4">
+            <p className={`font-semibold mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Instagram Account Not Connected</p>
+            <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Connect your Instagram account to view your profile and manage accounts.</p>
+            <button
+              onClick={() => setLocation("/profile/connect-instagram")}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              data-testid="button-connect-instagram-profile"
+            >
+              Connect Instagram
+            </button>
+          </div>
         ) : profile ? (
           <div className="space-y-6">
             {/* Profile Header */}
@@ -298,7 +310,7 @@ export default function Profile() {
               </div>
             )}
           </div>
-        ) : (
+        ) : profile ? null : (
           <div className={`flex justify-center items-center h-96 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
             <p>Failed to load profile</p>
           </div>

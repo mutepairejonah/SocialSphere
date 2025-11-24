@@ -51,37 +51,41 @@ export default function Home() {
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>instagram</h1>
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setLocation("/search")}
-              className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
-              data-testid="button-search"
-              title="Search"
-            >
-              <SearchIcon className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setLocation("/bookmarks")}
-              className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
-              data-testid="button-bookmarks"
-              title="Saved posts"
-            >
-              <Bookmark className="w-5 h-5" />
-            </button>
-            <button
-              onClick={toggleDarkMode}
-              className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
-              data-testid="button-dark-mode"
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-            <button
-              onClick={() => setLocation("/following")}
-              className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
-              data-testid="button-following"
-              title="View people you follow"
-            >
-              <Users className="w-5 h-5" />
-            </button>
+            {activeToken && (
+              <>
+                <button
+                  onClick={() => setLocation("/search")}
+                  className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
+                  data-testid="button-search"
+                  title="Search"
+                >
+                  <SearchIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setLocation("/bookmarks")}
+                  className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
+                  data-testid="button-bookmarks"
+                  title="Saved posts"
+                >
+                  <Bookmark className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={toggleDarkMode}
+                  className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
+                  data-testid="button-dark-mode"
+                >
+                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={() => setLocation("/following")}
+                  className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
+                  data-testid="button-following"
+                  title="View people you follow"
+                >
+                  <Users className="w-5 h-5" />
+                </button>
+              </>
+            )}
             <button
               onClick={() => setLocation("/profile")}
               className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
