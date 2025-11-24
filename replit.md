@@ -1,8 +1,8 @@
-# Instagram Clone - Social Media Application
+# InstaClone - Social Media Application
 
 ## Overview
 
-This is a full-stack Instagram clone built with React, TypeScript, and Firebase. The application provides core social media functionality including user authentication, profile management, post creation and sharing, real-time messaging, and audio/video calling capabilities. The frontend uses React with Vite for fast development, styled with Tailwind CSS and shadcn/ui components. Firebase handles all backend services including authentication, Firestore for data storage, Firebase Storage for media files, and Realtime Database for live features.
+This is a full-stack Instagram clone (InstaClone) built with React, TypeScript, and Firebase. The application provides core social media functionality including user authentication, profile management, post creation and sharing, real-time messaging, and audio/video calling capabilities. The frontend uses React with Vite for fast development, styled with Tailwind CSS and shadcn/ui components. Firebase handles all backend services including authentication, Firestore for data storage, Firebase Storage for media files, and Realtime Database for live features.
 
 ## User Preferences
 
