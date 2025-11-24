@@ -1,193 +1,229 @@
-# Instagram Clone - Full-Stack Social Media App
+# Authentic - Telegram-Style Messaging Platform
 
-A complete Instagram clone built with React, TypeScript, and Firebase featuring authentication, posts, messaging, and video/audio calling.
+A real-time Telegram-inspired messaging platform with Instagram Graph API integration, built with React, TypeScript, Node.js, Socket.io, PostgreSQL, and Drizzle ORM.
 
 ## 🚀 Features
 
 ### Authentication
 - **Google Sign-In** with unique username selection
 - **Email/Password** signup and login
-- Automatic unique username generation
 - Secure session management with Firebase Auth
+- Automatic unique username generation
 
-### User Profiles
-- **Unique usernames** enforced in database
+### Real-Time Messaging
+- **Socket.io** powered live chat
+- **User-to-user messaging** without follow requirements
+- **Direct conversations** with any user
+- Real-time message delivery and typing indicators
+- Message history stored in PostgreSQL
+
+### Instagram Integration
+- **Instagram Graph API** integration
+- **Video content** displayed on home feed only
+- Live Instagram videos embedded in feed
+- Automatic video loading and caching
+
+### User Features
 - **Editable profiles**: name, bio, website, avatar
-- **Avatar uploads** to Firebase Storage
-- **Follow/Unfollow** system
-- Follower and following counts
-
-### Posts & Content
-- **Image/Video uploads** (max 100MB)
-- Caption and location tagging
-- Like and save functionality
-- Feed with posts from followed users
-- Post creation with real-time updates
-
-### Social Features
 - **User search** by username or full name
-- **Real-time search** results in Explore tab
-- **Follow from search** results
-- See follow status for each user
+- **Real-time search** results
+- Clean Telegram-style interface
 
-### Messaging & Calls
-- **Real-time messaging** between followers (Firestore)
-- **Audio calling** initiation
-- **Video calling** initiation
-- Conversation history
-- Message timestamps
+### Posts
+- **Create posts** with images and captions
+- **Location tagging** for posts
+- Posts stored in PostgreSQL database
+- Like and comment functionality (coming soon)
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, TypeScript, Vite
-- **Styling**: Tailwind CSS, shadcn/ui components
-- **Backend**: Firebase
-  - Authentication (Google & Email)
-  - Firestore Database
-  - Firebase Storage
-- **Routing**: Wouter
-- **State Management**: Zustand
-- **UI Components**: Radix UI primitives
+### Frontend
+- **React** with TypeScript
+- **Vite** for fast development
+- **Tailwind CSS** for styling
+- **shadcn/ui** components (Radix UI primitives)
+- **Wouter** for routing
+- **Zustand** for state management
+- **Socket.io Client** for real-time updates
+
+### Backend
+- **Node.js** with Express
+- **Socket.io** for real-time communication
+- **PostgreSQL** database with Drizzle ORM
+- **TypeScript** for type safety
+
+### External APIs
+- **Firebase** for authentication
+- **Instagram Graph API** for video content
+- **Google Fonts** for typography
 
 ## 📋 Prerequisites
 
-Before running this app, you must configure Firebase:
-
-1. **Firebase Project**: chatapp-d92e7
-2. **Firestore Database Rules** (See FIREBASE_SETUP.md)
-3. **Storage Rules** (See FIREBASE_SETUP.md)
+### Required Setup
+1. **Instagram Graph API** - Configure Instagram Business Account access token
+2. **Firebase Project** - Set up authentication
+3. **PostgreSQL Database** - Replit provides automatic database setup
+4. **Environment Variables** - Set up VITE_INSTAGRAM_ACCESS_TOKEN
 
 ## ⚙️ Installation
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mutepairejonah/Connect.git
+   cd Connect
+   ```
+
 2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. **CRITICAL**: Update Firebase rules (see FIREBASE_SETUP.md)
+3. Set up environment variables:
+   - Add `VITE_INSTAGRAM_ACCESS_TOKEN` for Instagram API access
+   - Database connection is automatically configured on Replit
 
-4. Start the development server:
+4. Push database schema:
+   ```bash
+   npm run db:push
+   ```
+
+5. Start the development server:
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:5000](http://localhost:5000)
+6. Open [http://localhost:5000](http://localhost:5000)
 
-## 🔒 Firebase Configuration
-
-### Current Configuration
-- **API Key**: AIzaSyAYc4hqiWsrzIYvoybXUK_2HglHj_Ut1Mo
-- **Auth Domain**: chatapp-d92e7.firebaseapp.com
-- **Project ID**: chatapp-d92e7
-- **Storage Bucket**: chatapp-d92e7.firebasestorage.app
-
-⚠️ **IMPORTANT**: You MUST update Firestore and Storage rules in Firebase Console for the app to work. See `FIREBASE_SETUP.md` for detailed instructions.
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 ├── client/
 │   └── src/
-│       ├── components/        # Reusable UI components
+│       ├── components/              # Reusable UI components
 │       ├── lib/
-│       │   ├── firebase.ts    # Firebase configuration
-│       │   └── store.ts       # Zustand state management
-│       ├── pages/             # Application pages
-│       │   ├── Login.tsx      # Authentication page
-│       │   ├── SetupProfile.tsx  # Username setup
-│       │   ├── Home.tsx       # Main feed
-│       │   ├── Explore.tsx    # User search
-│       │   ├── Messages.tsx   # Messaging & calls
-│       │   ├── Profile.tsx    # User profile
+│       │   ├── firebase.ts          # Firebase configuration
+│       │   ├── store.ts             # Zustand state management
+│       │   └── instagram-api.ts     # Instagram Graph API
+│       ├── pages/                   # Application pages
+│       │   ├── Login.tsx
+│       │   ├── Home.tsx             # Main feed with Instagram videos
+│       │   ├── Messages.tsx         # Real-time messaging
+│       │   ├── Create.tsx           # Create posts
+│       │   ├── Profile.tsx
 │       │   └── ...
-│       └── App.tsx            # Main app component
-├── firestore.rules            # Firestore security rules
-├── storage.rules              # Storage security rules
-└── FIREBASE_SETUP.md          # Firebase setup guide
+│       └── App.tsx
+├── server/
+│   ├── index.ts                     # Express server
+│   ├── routes.ts                    # API routes
+│   ├── storage.ts                   # PostgreSQL operations
+│   └── index-dev.ts                 # Development server
+├── shared/
+│   ├── schema.ts                    # Drizzle ORM schema
+│   └── db.ts                        # Database configuration
+├── drizzle.config.ts                # Drizzle configuration
+└── package.json
 ```
 
 ## 🔐 Security
 
-- All Firebase operations require authentication
-- Username uniqueness enforced at database level
-- Storage rules protect user uploads
-- Messages only accessible by sender/recipient
-- Profile updates restricted to profile owner
+- Firebase handles authentication securely
+- PostgreSQL database for encrypted data storage
+- Environment variables for sensitive credentials
+- Message history protected at database level
+- User data isolated by authentication
 
 ## 🎨 Design
 
-- **Instagram-inspired UI** with clean, modern aesthetics
-- **Responsive design** optimized for mobile
+- **Telegram-inspired UI** - Clean, minimal design
+- **Mobile-optimized** - Responsive layout
+- **Real-time updates** - Instant message delivery
 - **Dark/Light mode** support
-- **Grand Hotel font** for logo
-- **Inter font** for UI text
+- **Modern typography** - Inter font family
 
-## 🧪 Key Functionality
+## 💬 Real-Time Features
 
-### Username Uniqueness
-- Real-time availability checking during signup
-- Automatic unique username generation for email signups
-- Case-insensitive username matching
+### Socket.io Events
+- `message:send` - Send a new message
+- `message:receive` - Receive incoming messages
+- `user:typing` - Show typing indicators
+- `user:online` - User presence updates
 
-### Follow System
-- Follow/unfollow functionality
-- Follower and following counts
-- Follow status displayed in search results
-- Following list used for messaging
-
-### Messaging
-- Conversation IDs based on sorted user IDs
-- Real-time message delivery via Firestore
-- Message timestamps
-- Only followers can message each other
-
-### Search
-- Search users by username or full name
-- Case-insensitive search
-- Real-time results
-- Follow buttons in search results
+### Database Events
+- Real-time message syncing
+- User activity tracking
+- Message persistence
 
 ## 🐛 Troubleshooting
 
-**Permission Denied Errors?**
-- Make sure you've updated Firestore rules in Firebase Console
-- Check that Storage rules are also updated
-- Wait 30 seconds after publishing rules
+**Can't connect to messages?**
+- Ensure Socket.io server is running
+- Check browser console for connection errors
+- Verify both users are authenticated
 
-**Can't Upload Avatar?**
-- Verify Storage rules are published
-- Check file size (max 100MB)
-- Ensure you're logged in
+**Instagram videos not loading?**
+- Verify VITE_INSTAGRAM_ACCESS_TOKEN is set
+- Check Instagram Business Account permissions
+- Ensure token has media access scope
 
-**Search Not Working?**
-- Make sure Firestore rules allow read access
-- Check that you're authenticated
-- Verify at least one other user exists
+**Database errors?**
+- Run `npm run db:push` to sync schema
+- Check PostgreSQL connection in logs
+- Verify DATABASE_URL environment variable
 
-**Messages Not Sending?**
-- Ensure Firestore rules are updated
-- Check that you're following the user
-- Verify you're authenticated
+**Posts not appearing?**
+- Ensure user is logged in
+- Check database for post records
+- Verify imageUrl is valid
 
-## 📝 Next Steps
+## 🚀 Deployment
 
-To make this production-ready:
+### Deploy on Replit
+1. Push code to GitHub repository
+2. Import repository into Replit
+3. Set environment variables in Secrets
+4. Click "Run" to start the application
 
-1. ✅ Update Firebase rules (CRITICAL)
-2. ✅ Test all features end-to-end
-3. 🔜 Add real-time WebRTC for audio/video calls
-4. 🔜 Implement push notifications
-5. 🔜 Add comment functionality on posts
-6. 🔜 Implement stories feature
-7. 🔜 Add email verification
-8. 🔜 Implement password reset
+### Production Checklist
+- [ ] Set all environment variables
+- [ ] Configure Instagram Graph API
+- [ ] Test all messaging features
+- [ ] Verify database backups
+- [ ] Enable production logging
+
+## 📝 API Endpoints
+
+### Posts
+- `GET /api/posts` - Get all posts
+- `POST /api/posts` - Create a new post
+- `GET /api/posts/user/:userId` - Get user's posts
+- `GET /api/stories` - Get stories
+
+### Users
+- `POST /api/users` - Create new user
+- `GET /api/search/users` - Search users
+
+### Messages
+- `GET /api/messages/:conversationId` - Get message history
+
+## 🎯 Roadmap
+
+- ✅ Real-time messaging with Socket.io
+- ✅ Instagram API integration
+- ✅ PostgreSQL database
+- ✅ User authentication
+- 🔜 Video calls with WebRTC
+- 🔜 Group messaging
+- 🔜 Message encryption
+- 🔜 File sharing
+- 🔜 Push notifications
+- 🔜 Message search
 
 ## 📄 License
 
-This is a demo project built for educational purposes.
+Built for educational purposes. Open source and available for learning.
 
 ---
 
-**Built with ❤️ using Replit**
-# Connect
+**Built with ❤️ using Replit, React, and Node.js**
+
+GitHub: [https://github.com/mutepairejonah/Connect](https://github.com/mutepairejonah/Connect)
