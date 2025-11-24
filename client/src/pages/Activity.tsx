@@ -3,6 +3,7 @@ import { useStore } from "@/lib/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLocation, Link } from "wouter";
 import { LogOut, Settings, Heart, Send } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Activity() {
   const { notifications, currentUser, logout } = useStore();
