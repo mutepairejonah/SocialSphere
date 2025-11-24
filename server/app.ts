@@ -29,6 +29,15 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
+// Set permissive CSP headers to allow scripts to load
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://* wss://*; img-src 'self' data: https:; media-src 'self' https:; frame-src 'self'"
+  );
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
