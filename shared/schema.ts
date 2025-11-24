@@ -43,16 +43,6 @@ export const posts = pgTable("posts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// ========== FOLLOWS TABLE ==========
-export const follows = pgTable("follows", {
-  id: varchar("id").primaryKey(),
-  followerId: varchar("follower_id").notNull().references(() => users.id),
-  followingId: varchar("following_id").notNull().references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => [
-  unique("unique_follow").on(table.followerId, table.followingId)
-]);
-
 // ========== MESSAGES TABLE ==========
 export const messages = pgTable("messages", {
   id: varchar("id").primaryKey(),
@@ -88,8 +78,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   stories: many(stories),
   messagesFrom: many(messages, { relationName: "sender" }),
   messagesTo: many(messages, { relationName: "recipient" }),
-  followedBy: many(follows, { relationName: "follower" }),
-  following: many(follows, { relationName: "following" }),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -134,6 +122,5 @@ export type Post = typeof posts.$inferSelect;
 export type InsertPost = z.infer<typeof insertPostSchema>;
 export type Story = typeof stories.$inferSelect;
 export type InsertStory = z.infer<typeof insertStorySchema>;
-export type Follow = typeof follows.$inferSelect;
 export type Message = typeof messages.$inferSelect;
 export type Comment = typeof comments.$inferSelect;

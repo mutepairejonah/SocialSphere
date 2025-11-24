@@ -96,26 +96,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/followers/:userId", async (req, res) => {
-    try {
-      const followers = await storage.getFollowers(req.params.userId);
-      res.json(followers);
-    } catch (error) {
-      console.error("Error fetching followers:", error);
-      res.json([]);
-    }
-  });
-
-  app.get("/api/following/:userId", async (req, res) => {
-    try {
-      const following = await storage.getFollowing(req.params.userId);
-      res.json(following);
-    } catch (error) {
-      console.error("Error fetching following:", error);
-      res.json([]);
-    }
-  });
-
   app.post("/api/stories", async (req, res) => {
     try {
       const { userId, imageUrl } = req.body;
@@ -177,23 +157,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error syncing user:", error);
       res.status(500).json({ error: "Failed to sync user" });
-    }
-  });
-
-  app.post("/api/follow/:userId", async (req, res) => {
-    try {
-      const { followerId } = req.body;
-      const isFollowing = await storage.toggleFollow(followerId, req.params.userId);
-      
-      // Create follow notification
-      if (isFollowing) {
-        await storage.createNotification(req.params.userId, followerId, 'follow');
-      }
-      
-      res.json({ isFollowing });
-    } catch (error) {
-      console.error("Error toggling follow:", error);
-      res.status(500).json({ error: "Failed to toggle follow" });
     }
   });
 

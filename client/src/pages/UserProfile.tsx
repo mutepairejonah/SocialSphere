@@ -1,4 +1,4 @@
-import { ArrowLeft, MoreHorizontal, MessageCircle, Grid, Menu, LogOut, Settings, Heart, Send } from "lucide-react";
+import { ArrowLeft, MessageCircle, Grid, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { useLocation, useRoute } from "wouter";
@@ -10,9 +10,8 @@ import { User } from "@/lib/store";
 
 export default function UserProfile() {
   const [, params] = useRoute("/user/:id");
-  const { allUsers, toggleFollow, loadFollowStatus, currentUser, logout } = useStore();
+  const { allUsers, currentUser, logout } = useStore();
   const [, setLocation] = useLocation();
-  const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [showMenu, setShowMenu] = useState(false);
 
@@ -66,8 +65,6 @@ export default function UserProfile() {
       setIsFollowing(null);
     }, 200);
   };
-
-  const currentFollowState = isFollowing !== null ? isFollowing : user.isFollowing;
 
   return (
     <div className="pb-20 max-w-md mx-auto min-h-screen bg-white">
@@ -128,18 +125,6 @@ export default function UserProfile() {
                 <div className="font-bold text-lg leading-tight">0</div>
                 <div className="text-sm text-foreground">Posts</div>
               </div>
-              <div 
-                className="cursor-pointer hover:opacity-70 transition-opacity"
-                onClick={() => setLocation(`/followers/${user.id}`)}
-                data-testid="button-view-followers"
-              >
-                <div className="font-bold text-lg leading-tight">{user.followers}</div>
-                <div className="text-sm text-foreground">Followers</div>
-              </div>
-              <div>
-                <div className="font-bold text-lg leading-tight">{user.following}</div>
-                <div className="text-sm text-foreground">Following</div>
-              </div>
             </div>
           </div>
 
@@ -152,30 +137,10 @@ export default function UserProfile() {
           </div>
 
           <div className="flex gap-2">
-            <motion.div 
-              className="flex-1"
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button 
-                className="w-full font-semibold h-10 text-sm"
-                onClick={handleFollowToggle}
-                variant={currentFollowState ? "secondary" : "default"}
-              >
-                <motion.span
-                  key={currentFollowState ? "following" : "follow"}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {currentFollowState ? "Following" : "Follow"}
-                </motion.span>
-              </Button>
-            </motion.div>
             <Button 
-              className="flex-1 font-semibold h-10 text-sm" 
-              variant="secondary"
+              className="flex-1 font-semibold h-10 text-sm bg-blue-500 text-white hover:bg-blue-600"
               onClick={() => setLocation("/messages")}
+              data-testid="button-message"
             >
               <MessageCircle className="w-4 h-4 mr-1" />
               Message
