@@ -1,13 +1,11 @@
 import { BottomNav } from "@/components/BottomNav";
 import { useStore } from "@/lib/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useLocation, Link } from "wouter";
 import { LogOut, Settings, Heart, Send } from "lucide-react";
 
 export default function Activity() {
-  const { notifications, allUsers, toggleFollow, currentUser, logout } = useStore();
+  const { notifications, currentUser, logout } = useStore();
   const [, setLocation] = useLocation();
 
   const handleLogout = async () => {
@@ -17,9 +15,6 @@ export default function Activity() {
   // Group by timeframe (mock logic)
   const newNotifs = notifications.filter(n => !n.read);
   const oldNotifs = notifications.filter(n => n.read);
-  
-  // Get suggested users (not yet followed)
-  const suggestedUsers = allUsers.filter(u => !u.isFollowing).slice(0, 3);
 
   return (
     <div className="pb-20 min-h-screen bg-[#f0f2f5]">
@@ -96,38 +91,14 @@ export default function Activity() {
         
         <div className="pt-4 pb-2">
            <h2 className="font-bold px-4 mb-3 text-base">This Week</h2>
-           {oldNotifs.map((notif) => (
+           {oldNotifs.length > 0 ? (
+            oldNotifs.map((notif) => (
               <NotificationItem key={notif.id} notification={notif} />
-            ))}
-           {/* Suggestions from real users */}
-           {suggestedUsers.length > 0 && (
-             <div className="mt-6">
-               <h2 className="font-bold px-4 mb-3 text-base">Suggested for you</h2>
-               {suggestedUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between py-3 px-4 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setLocation(`/user/${user.id}`)}>
-                     <div className="flex items-center gap-3 flex-1">
-                      <Avatar className="h-11 w-11 border border-gray-300">
-                        <AvatarImage src={user.avatar} />
-                        <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div className="text-sm flex flex-col">
-                        <span className="font-semibold">{user.username}</span>
-                        <span className="text-xs text-gray-500">{user.followers} followers</span>
-                      </div>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      className="h-8 px-5 font-semibold bg-[#1877F2] hover:bg-[#1877F2]/90 text-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFollow(user.id);
-                      }}
-                    >
-                      Follow
-                    </Button>
-                  </div>
-               ))}
-             </div>
+            ))
+           ) : (
+            <div className="py-6 px-4 text-center text-gray-500 text-sm">
+              No activity yet
+            </div>
            )}
         </div>
       </main>
@@ -152,15 +123,12 @@ function NotificationItem({ notification }: { notification: any }) {
           <span className="font-semibold mr-1">{fromUser?.username || notification.fromUserId || 'User'}</span>
           {notification.type === 'like' && <span className="text-foreground">liked your photo.</span>}
           {notification.type === 'comment' && <span className="text-foreground">commented on your post.</span>}
-          {notification.type === 'follow' && <span className="text-foreground">started following you.</span>}
           {notification.type === 'message' && <span className="text-foreground">sent you a message.</span>}
           <span className="text-muted-foreground ml-1 text-xs">{notification.timestamp}</span>
         </div>
       </div>
       
-      {notification.type === 'follow' ? (
-         <Button size="sm" className="h-8 px-5 font-semibold bg-primary hover:bg-primary/90 text-white text-xs">Follow</Button>
-      ) : notification.type === 'message' ? (
+      {notification.type === 'message' ? (
          <div className="w-11 h-11 bg-muted rounded-lg overflow-hidden border border-border flex items-center justify-center text-foreground font-bold">
             💬
          </div>

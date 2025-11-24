@@ -354,7 +354,7 @@ export default function Messages() {
           <div className="hidden md:flex flex-1 items-center justify-center bg-gray-50">
             <div className="text-center text-gray-500">
               <p className="text-lg font-semibold">Select a conversation to start</p>
-              <p className="text-sm">Choose from your followers to message them</p>
+              <p className="text-sm">Choose a user to begin messaging</p>
             </div>
           </div>
         )}

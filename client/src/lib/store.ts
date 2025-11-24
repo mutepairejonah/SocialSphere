@@ -551,15 +551,9 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   loadUserPosts: async () => {
-    const currentUser = get().currentUser;
-    if (!currentUser) {
-      set({ userPosts: [] });
-      return;
-    }
-
     try {
-      // Fetch posts from users that current user follows
-      const res = await fetch(`/api/posts/following/${currentUser.id}`);
+      // Fetch all public posts from the database
+      const res = await fetch(`/api/posts`);
       const userPostsData = await res.json();
       
       const formattedPosts = userPostsData.map((data: any) => ({
@@ -581,7 +575,7 @@ export const useStore = create<StoreState>((set, get) => ({
 
       set({ userPosts: formattedPosts });
     } catch (error) {
-      console.error('Error loading following posts:', error);
+      console.error('Error loading posts:', error);
       set({ userPosts: [] });
     }
   },
@@ -610,8 +604,6 @@ export const useStore = create<StoreState>((set, get) => ({
             email: data.email || '',
             avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${doc.id}`,
             bio: data.bio || '',
-            followers: data.followers || 0,
-            following: data.following || 0,
             website: data.website
           } as User;
         });
@@ -747,11 +739,8 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   loadStories: async () => {
-    const currentUser = get().currentUser;
-    if (!currentUser) return;
-
     try {
-      const response = await fetch(`/api/stories/following/${currentUser.id}`);
+      const response = await fetch(`/api/stories`);
       const dbStories = await response.json();
       
       const storyList = dbStories.map((story: any) => ({
