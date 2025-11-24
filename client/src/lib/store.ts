@@ -292,10 +292,17 @@ export const useStore = create<StoreState>((set, get) => ({
     if (!currentUser) throw new Error('No current user');
 
     try {
+      // Fetch Instagram profile to get email/phone for recommendations
+      const { getUserProfile } = await import('./instagram');
+      const profileData = await getUserProfile('me', token);
+      
       // Add to Firestore
       const newAccount = {
         token,
         accountName: accountName || `Account ${(currentUser.instagramAccounts?.length || 0) + 1}`,
+        instagramUsername: profileData?.username,
+        instagramEmail: profileData?.email,
+        instagramPhone: profileData?.phone_number,
         createdAt: Timestamp.now()
       };
 
@@ -317,7 +324,10 @@ export const useStore = create<StoreState>((set, get) => ({
           body: JSON.stringify({
             userId: currentUser.id,
             token,
-            accountName: accountName || `Account ${accounts.length + 1}`
+            accountName: accountName || `Account ${accounts.length + 1}`,
+            instagramUsername: profileData?.username,
+            instagramEmail: profileData?.email,
+            instagramPhone: profileData?.phone_number
           })
         });
       } catch (err) {

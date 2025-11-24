@@ -34,6 +34,9 @@ export const instagramAccounts = pgTable("instagram_accounts", {
   userId: varchar("user_id").notNull(),
   token: text("token").notNull(),
   accountName: varchar("account_name", { length: 100 }),
+  instagramUsername: varchar("instagram_username", { length: 100 }),
+  instagramEmail: varchar("instagram_email", { length: 255 }),
+  instagramPhone: varchar("instagram_phone", { length: 20 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -43,6 +46,9 @@ export const insertInstagramAccountSchema = z.object({
   userId: z.string(),
   token: z.string(),
   accountName: z.string().max(100).optional(),
+  instagramUsername: z.string().max(100).optional(),
+  instagramEmail: z.string().email().optional(),
+  instagramPhone: z.string().max(20).optional(),
 });
 
 export type InsertInstagramAccount = z.infer<typeof insertInstagramAccountSchema>;

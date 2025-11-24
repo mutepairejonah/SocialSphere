@@ -3,6 +3,8 @@ import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getUserProfile } from "@/lib/instagram";
+import { AccountRecommendations } from "./AccountRecommendations";
 
 export default function ConnectInstagram() {
   const { currentUser, addInstagramAccount } = useStore();
@@ -10,6 +12,23 @@ export default function ConnectInstagram() {
   const [token, setToken] = useState("");
   const [accountName, setAccountName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [previewData, setPreviewData] = useState<any>(null);
+
+  const handleTokenChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newToken = e.target.value;
+    setToken(newToken);
+
+    if (newToken.trim() && newToken.length > 50) {
+      try {
+        const profile = await getUserProfile('me', newToken);
+        setPreviewData(profile);
+      } catch (error) {
+        setPreviewData(null);
+      }
+    } else {
+      setPreviewData(null);
+    }
+  };
 
   const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +105,7 @@ export default function ConnectInstagram() {
               <textarea
                 id="token"
                 value={token}
-                onChange={(e) => setToken(e.target.value)}
+                onChange={handleTokenChange}
                 placeholder="Paste your Instagram access token here..."
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={4}
@@ -94,6 +113,24 @@ export default function ConnectInstagram() {
                 data-testid="input-token"
               />
             </div>
+
+            {previewData && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <p className="text-sm font-semibold text-gray-700 mb-2">✓ Account Preview:</p>
+                <div className="text-sm space-y-1 text-gray-600">
+                  {previewData.username && <p>👤 Username: <strong>@{previewData.username}</strong></p>}
+                  {previewData.name && <p>📝 Name: <strong>{previewData.name}</strong></p>}
+                  {previewData.email && <p>✉️ Email: <strong>{previewData.email}</strong></p>}
+                  {previewData.phone_number && <p>📞 Phone: <strong>{previewData.phone_number}</strong></p>}
+                </div>
+              </div>
+            )}
+
+            <AccountRecommendations 
+              newEmail={previewData?.email}
+              newPhone={previewData?.phone_number}
+              newUsername={previewData?.username}
+            />
 
             <button
               type="submit"

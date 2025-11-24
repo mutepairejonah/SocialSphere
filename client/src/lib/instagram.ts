@@ -146,7 +146,7 @@ export async function getUserInsights(userId: string = 'me'): Promise<any> {
 export async function getUserProfile(userId: string = 'me', userToken?: string): Promise<any> {
   try {
     const response = await makeInstagramRequest(
-      `${userId}?fields=id,name,biography,website,profile_picture_url,followers_count,follows_count,media_count`,
+      `${userId}?fields=id,name,biography,website,profile_picture_url,followers_count,follows_count,media_count,username,email,phone_number`,
       'GET',
       undefined,
       userToken

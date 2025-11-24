@@ -67,13 +67,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Instagram accounts endpoints (stub for now - real data in Firestore)
+  // Instagram accounts endpoints
   app.post("/api/instagram-accounts", async (req, res) => {
     try {
-      res.json({ success: true });
+      const { userId, token, accountName, instagramUsername, instagramEmail, instagramPhone } = req.body;
+      if (!userId || !token) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      res.json({ success: true, message: "Account added" });
     } catch (error) {
       console.error("Error adding Instagram account:", error);
       res.status(500).json({ error: "Failed to add account" });
+    }
+  });
+
+  app.get("/api/instagram-accounts/recommendations", async (req, res) => {
+    try {
+      const { email, phone } = req.query;
+      // This is a stub - real data is in Firestore
+      res.json({ recommendations: [] });
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      res.status(500).json({ error: "Failed to fetch recommendations" });
     }
   });
 
