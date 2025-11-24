@@ -58,7 +58,7 @@ export default function Home() {
       {/* Header */}
       <header className={`sticky top-0 z-50 ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>instagram</h1>
+          <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-black'}`} style={{ fontFamily: "'Grand Hotel', cursive" }}>InstaClone</h1>
           <div className="flex items-center gap-4">
             {activeToken && (
               <>

@@ -65,9 +65,9 @@ export default function Login() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 max-w-md mx-auto bg-background">
       <div className="w-full max-w-xs space-y-6">
         <div className="text-center mb-8">
-          <h1 className="font-bold text-5xl mb-4 text-primary">Authentic</h1>
+          <h1 className="text-6xl mb-4 text-primary" style={{ fontFamily: "'Grand Hotel', cursive" }}>InstaClone</h1>
           <p className="text-muted-foreground">
-            {isSignUp ? "Connect authentically with people you care about." : "Log in to connect authentically."}
+            {isSignUp ? "Share your moments with the world." : "Log in to your account."}
           </p>
         </div>
 

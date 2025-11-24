@@ -50,7 +50,7 @@ export default function Profile() {
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>{currentUser?.username}</h1>
+          <h1 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-black'}`} data-testid="text-profile-title">{currentUser?.username}</h1>
           <button
             onClick={handleLogout}
             className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
