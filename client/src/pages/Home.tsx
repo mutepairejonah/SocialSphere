@@ -138,54 +138,43 @@ export default function Home() {
           </div>
         ) : (
           <div className={`divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
-            {/* Stories Section */}
+            {/* Stories Section - Instagram Style */}
             {stories && stories.length > 0 && (
-              <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} px-4 py-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className={`text-sm font-semibold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-black'}`}>
-                    <Zap className="w-4 h-4 text-yellow-500" />
-                    Your Stories
-                  </h2>
-                  <button
-                    onClick={() => setLocation("/stories")}
-                    className={`text-xs font-semibold ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
-                    data-testid="button-view-all-stories"
-                  >
-                    View All
-                  </button>
-                </div>
-                <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
-                  {stories.slice(0, 5).map((story, idx) => (
+              <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} px-4 py-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} sticky top-[60px] z-40`}>
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory">
+                  {stories.map((story, idx) => (
                     <button
                       key={`story-${idx}`}
                       onClick={() => setLocation("/stories")}
-                      className="flex-shrink-0 relative group"
+                      className="flex-shrink-0 relative group focus:outline-none"
                       data-testid={`story-thumbnail-${idx}`}
                     >
-                      <div className="w-16 h-20 bg-gray-300 rounded-lg overflow-hidden border-2 border-gray-300 hover:border-yellow-500 transition-colors">
-                        {story.media_url && (
-                          story.media_type === "VIDEO" ? (
-                            <video
-                              src={story.media_url}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <img
-                              src={story.media_url}
-                              alt="Story"
-                              className="w-full h-full object-cover"
-                            />
-                          )
-                        )}
+                      {/* Gradient Ring Border */}
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 via-purple-500 to-pink-500 p-[2px] group-hover:shadow-lg transition-all">
+                        {/* Inner Circle - Story Thumbnail */}
+                        <div className={`w-full h-full rounded-full overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} border-2 ${darkMode ? 'border-gray-800' : 'border-white'}`}>
+                          {story.media_url && (
+                            story.media_type === "VIDEO" ? (
+                              <video
+                                src={story.media_url}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <img
+                                src={story.media_url}
+                                alt="Story"
+                                className="w-full h-full object-cover"
+                              />
+                            )
+                          )}
+                        </div>
                       </div>
-                      <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 ${darkMode ? 'bg-yellow-400' : 'bg-yellow-500'} rounded-full`} />
+                      {/* Story Index Badge */}
+                      <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white ${darkMode ? 'bg-blue-600' : 'bg-blue-500'}`}>
+                        {idx + 1}
+                      </div>
                     </button>
                   ))}
-                  {stories.length > 5 && (
-                    <div className="flex-shrink-0 w-16 h-20 flex items-center justify-center text-sm font-semibold text-gray-600">
-                      +{stories.length - 5}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
