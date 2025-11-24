@@ -85,7 +85,6 @@ export async function getUserMedia(userId?: string, userToken?: string): Promise
   try {
     // Use business account ID if available, otherwise use 'me'
     const accountId = userId || INSTAGRAM_API_CONFIG.businessAccountId || 'me';
-    console.log('Fetching media for account:', accountId);
     
     // Fetch media with engagement metrics using the correct endpoint format
     const response = await makeInstagramRequest(
@@ -94,17 +93,14 @@ export async function getUserMedia(userId?: string, userToken?: string): Promise
       undefined,
       userToken
     );
-    console.log('Instagram API response:', response);
     
     // Handle response format: response.data contains the media array
     if (response.data && Array.isArray(response.data)) {
-      console.log('Extracted media array:', response.data);
       return response.data;
     }
     if (Array.isArray(response)) {
       return response;
     }
-    console.warn('Could not extract media from response:', response);
     return [];
   } catch (error) {
     console.error('Error fetching user media:', error);
@@ -151,7 +147,6 @@ export async function getUserProfile(userId: string = 'me', userToken?: string):
       undefined,
       userToken
     );
-    console.log('Profile response:', response);
     return response;
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -164,14 +159,10 @@ export async function getUserProfile(userId: string = 'me', userToken?: string):
  */
 export async function getUserFollowing(userId: string = 'me'): Promise<any[]> {
   try {
-    console.log('Attempting to fetch following list for:', userId);
-    
     // Try the standard endpoint first
     const response = await makeInstagramRequest(
       `${userId}/ig_followed_users?fields=id,name,username,profile_picture_url,biography,website`
     );
-    
-    console.log('Following response:', response);
     
     if (response.data && Array.isArray(response.data)) {
       return response.data;
@@ -183,7 +174,6 @@ export async function getUserFollowing(userId: string = 'me'): Promise<any[]> {
     return [];
   } catch (error) {
     console.error('Error fetching following list:', error);
-    // Return empty array but log the error for debugging
     throw error;
   }
 }
