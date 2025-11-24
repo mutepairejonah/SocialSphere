@@ -71,19 +71,22 @@ export default function Messages() {
     const loadConversations = async () => {
       if (!currentUser) return;
       try {
-        const res = await fetch(`/api/following/${currentUser.id}`);
+        // Load all users for messaging
+        const res = await fetch(`/api/search/users?q=`);
         const data = await res.json();
         
-        const convoList: Conversation[] = data.map((user: any) => ({
-          userId: user.id,
-          username: user.username,
-          fullName: user.fullName,
-          avatar: user.avatar,
-          lastMessage: "No messages yet",
-          lastMessageTime: "",
-          isOnline: Math.random() > 0.5, // Simulate online status
-          unread: 0
-        }));
+        const convoList: Conversation[] = data
+          .filter((user: any) => user.id !== currentUser.id) // Exclude current user
+          .map((user: any) => ({
+            userId: user.id,
+            username: user.username,
+            fullName: user.fullName,
+            avatar: user.avatar,
+            lastMessage: "No messages yet",
+            lastMessageTime: "",
+            isOnline: Math.random() > 0.5,
+            unread: 0
+          }));
 
         setConversations(convoList.sort((a, b) => b.lastMessageTime.localeCompare(a.lastMessageTime)));
       } catch (error) {

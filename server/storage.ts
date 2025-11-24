@@ -1,5 +1,5 @@
 import { db } from "../shared/db";
-import { users, posts, stories, follows, messages, comments, notifications } from "../shared/schema";
+import { users, posts, stories, messages, comments, notifications } from "../shared/schema";
 import { eq, like, and, desc, sql, inArray } from "drizzle-orm";
 import type { InsertUser, InsertPost, InsertStory, User, Post, Story } from "../shared/schema";
 
@@ -9,7 +9,6 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User>;
-  getFollowingIds(userId: string): Promise<string[]>;
   
   // Posts
   getPosts(): Promise<Post[]>;
@@ -27,12 +26,6 @@ export interface IStorage {
   // Search
   searchPosts(query: string): Promise<Post[]>;
   searchUsers(query: string): Promise<User[]>;
-  
-  // Follows
-  toggleFollow(followerId: string, followingId: string): Promise<boolean>;
-  isFollowing(followerId: string, followingId: string): Promise<boolean>;
-  getFollowers(userId: string): Promise<User[]>;
-  getFollowing(userId: string): Promise<User[]>;
   
   // Messages
   getMessages(senderId: string, recipientId: string): Promise<any[]>;

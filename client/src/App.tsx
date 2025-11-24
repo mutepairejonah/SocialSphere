@@ -12,8 +12,6 @@ import Create from "./pages/Create";
 import Activity from "./pages/Activity";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
-import Following from "./pages/Following";
-import Followers from "./pages/Followers";
 import Messages from "./pages/Messages";
 import Stories from "./pages/Stories";
 import CreateStory from "./pages/CreateStory";
@@ -49,8 +47,6 @@ function App() {
         <Route path="/profile" component={Profile} />
         <Route path="/profile/edit" component={EditProfile} />
         <Route path="/user/:id" component={UserProfile} />
-        <Route path="/following" component={Following} />
-        <Route path="/followers" component={Followers} />
       </Router>
       <Toaster />
     </>

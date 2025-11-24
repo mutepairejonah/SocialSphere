@@ -27,13 +27,12 @@ export default function UserProfile() {
       if (params?.id && allUsers.length > 0) {
         const foundUser = allUsers.find(u => u.id === params.id);
         if (foundUser) {
-          const followStatus = await loadFollowStatus(foundUser.id);
-          setUser({ ...foundUser, isFollowing: followStatus });
+          setUser(foundUser);
         }
       }
     };
     loadUser();
-  }, [params?.id, allUsers, loadFollowStatus]);
+  }, [params?.id, allUsers]);
 
   // Block access to API key owner's profile
   if (params?.id === API_KEY_OWNER_ID) {
@@ -57,14 +56,6 @@ export default function UserProfile() {
       </div>
     );
   }
-
-  const handleFollowToggle = () => {
-    setIsFollowing(!user.isFollowing);
-    setTimeout(() => {
-      toggleFollow(user.id);
-      setIsFollowing(null);
-    }, 200);
-  };
 
   return (
     <div className="pb-20 max-w-md mx-auto min-h-screen bg-white">

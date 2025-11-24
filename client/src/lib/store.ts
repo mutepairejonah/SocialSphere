@@ -619,15 +619,7 @@ export const useStore = create<StoreState>((set, get) => ({
           } as User;
         });
 
-      // Load follow status for each user
-      const usersWithFollowStatus = await Promise.all(
-        users.map(async (user) => {
-          const isFollowing = await get().loadFollowStatus(user.id);
-          return { ...user, isFollowing };
-        })
-      );
-      
-      set({ allUsers: usersWithFollowStatus });
+      set({ allUsers: users });
     } catch (error) {
       console.warn('Error loading users:', error);
       set({ allUsers: [] });
@@ -658,18 +650,6 @@ export const useStore = create<StoreState>((set, get) => ({
       set({ notifications });
     } catch (error) {
       console.warn('Error loading notifications:', error);
-    }
-  },
-
-  createFollowNotification: async (userId: string, fromUserId: string) => {
-    try {
-      await fetch(`/api/follow/${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ followerId: fromUserId })
-      });
-    } catch (error) {
-      console.error('Error creating notification:', error);
     }
   },
 
