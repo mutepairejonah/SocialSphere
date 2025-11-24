@@ -2,33 +2,33 @@
 @import "tw-animate-css";
 
 @theme inline {
-  --color-background: 50 7.7% 98.1%;
-  --color-foreground: 217 32.6% 17.5%;
+  --color-background: 210 40% 96%;
+  --color-foreground: 210 11% 15%;
   
   --color-card: 0 0% 100%;
-  --color-card-foreground: 217 32.6% 17.5%;
+  --color-card-foreground: 210 11% 15%;
   
   --color-popover: 0 0% 100%;
-  --color-popover-foreground: 217 32.6% 17.5%;
+  --color-popover-foreground: 210 11% 15%;
   
-  --color-primary: 262 80% 50.4%;
+  --color-primary: 210 100% 50%;
   --color-primary-foreground: 0 0% 100%;
   
-  --color-secondary: 0 87.7% 62.7%;
+  --color-secondary: 210 89% 61%;
   --color-secondary-foreground: 0 0% 100%;
   
-  --color-muted: 0 0% 93%;
-  --color-muted-foreground: 217 16.7% 43.1%;
+  --color-muted: 210 14% 90%;
+  --color-muted-foreground: 210 8% 50%;
   
-  --color-accent: 160 84.1% 39.4%;
+  --color-accent: 210 100% 50%;
   --color-accent-foreground: 0 0% 100%;
   
-  --color-destructive: 0 87.7% 62.7%;
+  --color-destructive: 0 84% 60%;
   --color-destructive-foreground: 0 0% 100%;
   
-  --color-border: 220 13% 91%;
-  --color-input: 220 13% 91%;
-  --color-ring: 262 80% 50.4%;
+  --color-border: 210 14% 90%;
+  --color-input: 210 14% 90%;
+  --color-ring: 210 100% 50%;
   
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
