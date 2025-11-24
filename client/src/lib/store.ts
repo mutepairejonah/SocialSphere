@@ -440,14 +440,14 @@ export const useStore = create<StoreState>((set, get) => ({
     try {
       const postData = {
         userId: currentUser.id,
-        caption: (newPost.caption || '').trim(),
-        imageUrl: newPost.imageUrl || null,
-        videoUrl: newPost.videoUrl || null,
+        caption: newPost.caption ? (newPost.caption || '').trim() : '',
+        imageUrl: newPost.imageUrl && newPost.imageUrl !== '' ? newPost.imageUrl : null,
+        videoUrl: newPost.videoUrl && newPost.videoUrl !== '' ? newPost.videoUrl : null,
         mediaType: newPost.mediaType || 'IMAGE',
-        location: (newPost.location || '').trim(),
+        location: newPost.location ? (newPost.location || '').trim() : '',
       };
 
-      console.log('Sending post data to API:', postData);
+      console.log('Sending post data to API - userId:', postData.userId, 'caption:', postData.caption?.substring(0, 30), 'has image:', !!postData.imageUrl, 'has video:', !!postData.videoUrl);
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

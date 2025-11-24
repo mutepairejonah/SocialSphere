@@ -60,15 +60,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/posts", async (req, res) => {
     try {
       const { userId, caption, imageUrl, videoUrl, mediaType, location } = req.body;
+      console.log("Creating post with data:", { userId, caption: caption?.substring(0, 50), imageUrl: imageUrl ? "yes" : "no", videoUrl: videoUrl ? "yes" : "no", mediaType, location });
+      
       const post = await storage.createPost({
         id: nanoid(),
         userId,
-        caption,
-        imageUrl,
-        videoUrl,
-        mediaType,
-        location,
+        caption: caption || null,
+        imageUrl: imageUrl || null,
+        videoUrl: videoUrl || null,
+        mediaType: mediaType || "IMAGE",
+        location: location || null,
       });
+      
+      console.log("Post created:", post.id);
       
       // Fetch user data to include in response
       const user = await storage.getUser(userId);
@@ -77,9 +81,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: user?.username,
         userAvatar: user?.avatar,
       });
-    } catch (error) {
-      console.error("Error creating post:", error);
-      res.status(500).json({ error: "Failed to create post" });
+    } catch (error: any) {
+      console.error("Error creating post:", error?.message, error?.stack);
+      res.status(500).json({ error: error?.message || "Failed to create post" });
     }
   });
 
