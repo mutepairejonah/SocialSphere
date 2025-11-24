@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark, Link2, Plus, Trash2, Check } from "lucide-react";
+import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark, Link2, Plus, Trash2, Check, Zap } from "lucide-react";
 import { getUserProfile, getUserMedia } from "@/lib/instagram";
 
 export default function Profile() {
@@ -102,14 +102,25 @@ export default function Profile() {
                     <h2 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`} data-testid="text-username">
                       {profile.name || currentUser?.username}
                     </h2>
-                    <button
-                      onClick={() => setLocation("/profile/edit")}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
-                      data-testid="button-edit-profile"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                      Edit
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setLocation("/stories")}
+                        className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                        data-testid="button-view-stories"
+                        title="View your stories"
+                      >
+                        <Zap className="w-4 h-4" />
+                        Stories
+                      </button>
+                      <button
+                        onClick={() => setLocation("/profile/edit")}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                        data-testid="button-edit-profile"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                        Edit
+                      </button>
+                    </div>
                   </div>
                   <div className="flex flex-col gap-2">
                     <button

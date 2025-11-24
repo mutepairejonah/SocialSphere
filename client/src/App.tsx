@@ -12,6 +12,7 @@ import ConnectInstagram from "./pages/ConnectInstagram";
 import Search from "./pages/Search";
 import HashtagFeed from "./pages/HashtagFeed";
 import Bookmarks from "./pages/Bookmarks";
+import Stories from "./pages/Stories";
 
 function App() {
   const { isAuthenticated, initializeAuth } = useStore();
@@ -36,6 +37,7 @@ function App() {
         <Route path="/search" component={Search} />
         <Route path="/hashtag/:id" component={HashtagFeed} />
         <Route path="/bookmarks" component={Bookmarks} />
+        <Route path="/stories" component={Stories} />
       </Router>
       <Toaster />
     </>
