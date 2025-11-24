@@ -18,10 +18,7 @@ export interface User {
   email: string;
   avatar: string;
   bio: string;
-  followers: number;
-  following: number;
   website?: string;
-  isFollowing?: boolean;
 }
 
 export interface Post {

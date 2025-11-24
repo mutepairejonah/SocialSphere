@@ -80,24 +80,10 @@ export default function Profile() {
             <div className="w-20 h-20 rounded-full border border-border cursor-pointer overflow-hidden">
               <img src={currentUser.avatar} alt="Profile" className="w-full h-full object-cover" />
             </div>
-            <div className="flex-1 flex justify-around text-center ml-4">
+            <div className="flex-1 text-center ml-4">
               <div>
                 <div className="font-bold text-lg leading-tight">{userPosts.length}</div>
                 <div className="text-xs text-muted-foreground">Posts</div>
-              </div>
-              <div 
-                className="cursor-pointer hover:opacity-70 transition-opacity"
-                onClick={() => setLocation("/followers")}
-              >
-                <div className="font-bold text-lg leading-tight">{currentUser.followers}</div>
-                <div className="text-xs text-muted-foreground">Followers</div>
-              </div>
-              <div 
-                className="cursor-pointer hover:opacity-70 transition-opacity"
-                onClick={() => setLocation("/following")}
-              >
-                <div className="font-bold text-lg leading-tight">{currentUser.following}</div>
-                <div className="text-xs text-muted-foreground">Following</div>
               </div>
             </div>
           </div>
