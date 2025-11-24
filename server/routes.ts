@@ -51,5 +51,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/users/:id", async (req, res) => {
+    try {
+      const { fullName, bio, website, avatar } = req.body;
+      const user = await storage.updateUser(req.params.id, {
+        fullName,
+        bio,
+        website,
+        avatar,
+      });
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
   return httpServer;
 }

@@ -22,6 +22,7 @@ interface StoreState {
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (email: string, pass: string, fullName: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (updates: {fullName?: string, bio?: string, website?: string, avatar?: string}) => Promise<void>;
   initializeAuth: () => void;
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   completeGoogleSignup: (username: string) => Promise<void>;
@@ -241,5 +242,26 @@ export const useStore = create<StoreState>((set, get) => ({
       isAuthenticated: false, 
       pendingGoogleUser: null
     });
+  },
+
+  updateProfile: async (updates) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) throw new Error('No current user');
+
+    try {
+      const response = await fetch(`/api/users/${currentUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) throw new Error('Failed to update profile');
+      
+      const updatedUser = await response.json();
+      set({ currentUser: { ...currentUser, ...updatedUser } });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
   },
 }));

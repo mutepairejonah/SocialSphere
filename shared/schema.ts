@@ -8,6 +8,8 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   fullName: varchar("full_name", { length: 100 }),
   avatar: text("avatar"),
+  bio: text("bio"),
+  website: varchar("website", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -18,7 +20,9 @@ export const insertUserSchema = z.object({
   username: z.string().min(3).max(30),
   email: z.string().email(),
   fullName: z.string().max(100).optional(),
-  avatar: z.string().url().optional(),
+  avatar: z.string().optional(),
+  bio: z.string().max(500).optional(),
+  website: z.string().max(500).optional(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
