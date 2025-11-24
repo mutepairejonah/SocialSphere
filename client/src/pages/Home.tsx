@@ -1,18 +1,51 @@
 import { PostCard } from "@/components/PostCard";
 import { BottomNav } from "@/components/BottomNav";
 import { useStore } from "@/lib/store";
-import { Heart, Send, Plus, LogOut, Settings } from "lucide-react";
+import { Heart, Send, Plus, LogOut, Settings, Search as SearchIcon, X, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
-  const { posts, userPosts, stories, markStoryViewed, currentUser, logout, loadUserPosts, loadPosts } = useStore();
+  const { posts, userPosts, stories, markStoryViewed, currentUser, logout, loadUserPosts, loadPosts, searchUsers } = useStore();
   const [, setLocation] = useLocation();
   const [allPostsLoaded, setAllPostsLoaded] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     Promise.all([loadPosts(), loadUserPosts()]).then(() => setAllPostsLoaded(true));
   }, [loadPosts, loadUserPosts]);
+
+  const handleSearch = async (value: string) => {
+    setSearchTerm(value);
+    
+    if (!value || value.trim().length === 0) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const results = await searchUsers(value);
+      setSearchResults(results);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    setSearchResults([]);
+    setShowSearchResults(false);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -29,14 +62,15 @@ export default function Home() {
     <div className="min-h-screen bg-[#f0f2f5] pb-20">
       {/* Compact Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-        <div className="w-full px-2 sm:px-4 py-1.5 flex items-center justify-between">
-          {/* Logo */}
-          <div className="text-lg font-bold text-[#1877F2] whitespace-nowrap">Authentic</div>
+        <div className="w-full px-2 sm:px-4 py-2">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            {/* Logo */}
+            <div className="text-lg font-bold text-[#1877F2] whitespace-nowrap">Authentic</div>
 
-          {/* Right Icons */}
-          <div className="flex items-center gap-1">
-            {/* Logout Button */}
-            <button
+            {/* Right Icons */}
+            <div className="flex items-center gap-1">
+              {/* Logout Button */}
+              <button
               onClick={handleLogout}
               className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               data-testid="button-logout"
@@ -82,7 +116,62 @@ export default function Home() {
                 />
               </div>
             </Link>
+            </div>
           </div>
+        </div>
+
+        {/* Instagram-style Search Bar */}
+        <div className="px-2 sm:px-4 pb-2">
+          <div className="relative w-full max-w-sm mx-auto">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+            <Input
+              placeholder="Search users..."
+              className="pl-9 pr-9 bg-gray-100 border-0 h-9 rounded-full focus-visible:ring-0 focus-visible:bg-gray-100 text-sm"
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              onFocus={() => searchTerm && setShowSearchResults(true)}
+              data-testid="input-search"
+            />
+            {searchTerm && (
+              <button
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                data-testid="button-clear-search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            {searching && (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-gray-500" />
+            )}
+          </div>
+
+          {/* Search Results Dropdown */}
+          {showSearchResults && searchResults.length > 0 && (
+            <div className="absolute left-2 right-2 sm:left-4 sm:right-4 top-20 bg-white border border-gray-200 rounded-lg shadow-lg z-40 max-h-96 overflow-y-auto">
+              {searchResults.map(user => (
+                <div
+                  key={user.id}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-0"
+                  onClick={() => {
+                    setLocation(`/user/${user.id}`);
+                    clearSearch();
+                  }}
+                  data-testid={`search-result-${user.id}`}
+                >
+                  <img
+                    src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100"}
+                    alt={user.username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{user.username}</p>
+                    <p className="text-xs text-gray-500 truncate">{user.fullName}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
