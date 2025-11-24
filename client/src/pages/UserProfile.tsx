@@ -1,4 +1,4 @@
-import { ArrowLeft, MoreHorizontal, MessageCircle, Grid } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, MessageCircle, Grid, Menu, LogOut, Settings, Heart, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { useLocation, useRoute } from "wouter";
@@ -10,10 +10,15 @@ import { User } from "@/lib/store";
 
 export default function UserProfile() {
   const [, params] = useRoute("/user/:id");
-  const { allUsers, toggleFollow, loadFollowStatus } = useStore();
+  const { allUsers, toggleFollow, loadFollowStatus, currentUser, logout } = useStore();
   const [, setLocation] = useLocation();
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   // API key owner's user ID
   const API_KEY_OWNER_ID = 'dbcMML2G74Rl4YKhT8VupNOSlDo1';
@@ -65,15 +70,37 @@ export default function UserProfile() {
   const currentFollowState = isFollowing !== null ? isFollowing : user.isFollowing;
 
   return (
-    <div className="pb-20 max-w-md mx-auto min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-background border-b border-border px-4 h-[50px] flex items-center justify-between">
-        <Button variant="ghost" size="icon" onClick={() => setLocation("/")}>
-          <ArrowLeft className="w-6 h-6" />
+    <div className="pb-20 max-w-md mx-auto min-h-screen bg-white">
+      {/* Telegram-style Header */}
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setLocation("/")}
+          className="hover:bg-gray-100"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
         </Button>
-        <h1 className="font-bold text-xl">{user.username}</h1>
-        <Button variant="ghost" size="icon">
-          <MoreHorizontal className="w-6 h-6" />
-        </Button>
+        <h1 className="font-semibold text-gray-900">{user.username}</h1>
+        <div className="relative">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            data-testid="button-user-menu"
+          >
+            <Menu className="w-5 h-5 text-gray-700" />
+          </button>
+          {showMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <button className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 text-sm">
+                Report User
+              </button>
+              <button className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm" onClick={() => setShowMenu(false)}>
+                Block User
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main>
@@ -102,8 +129,9 @@ export default function UserProfile() {
                 <div className="text-sm text-foreground">Posts</div>
               </div>
               <div 
-                className="cursor-pointer hover:opacity-70"
-                onClick={() => {}}
+                className="cursor-pointer hover:opacity-70 transition-opacity"
+                onClick={() => setLocation(`/followers/${user.id}`)}
+                data-testid="button-view-followers"
               >
                 <div className="font-bold text-lg leading-tight">{user.followers}</div>
                 <div className="text-sm text-foreground">Followers</div>
