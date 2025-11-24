@@ -77,16 +77,13 @@ interface StoreState {
   logout: () => Promise<void>;
   setUser: (user: User) => void;
   updateProfile: (updates: Partial<User>) => Promise<void>;
-  toggleFollow: (userId: string) => Promise<void>;
   getUser: (userId: string) => Promise<User | undefined>;
-  getFollowing: () => User[];
   addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'timestamp' | 'isLiked' | 'isSaved'>) => Promise<void>;
   loadPosts: () => Promise<void>;
   loadUserPosts: () => Promise<void>;
   loadStories: () => Promise<void>;
   loadUsers: () => Promise<void>;
   loadNotifications: () => Promise<void>;
-  createFollowNotification: (userId: string, fromUserId: string) => Promise<void>;
   toggleLike: (postId: string) => Promise<void>;
   toggleSave: (postId: string) => Promise<void>;
   addComment: (postId: string, text: string) => Promise<void>;
@@ -96,7 +93,6 @@ interface StoreState {
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   completeGoogleSignup: (username: string) => Promise<void>;
   searchUsers: (searchTerm: string) => Promise<User[]>;
-  loadFollowStatus: (userId: string) => Promise<boolean>;
   sendMessage: (recipientId: string, message: string) => Promise<void>;
   getMessages: (recipientId: string) => Promise<any[]>;
   startCall: (recipientId: string, callType: 'audio' | 'video') => Promise<string>;
@@ -421,33 +417,6 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   },
 
-  toggleFollow: async (userId) => {
-    const currentUser = get().currentUser;
-    if (!currentUser) return;
-
-    try {
-      const response = await fetch(`/api/follow/${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ followerId: currentUser.id })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to toggle follow');
-      }
-
-      const data = await response.json();
-
-      set(state => ({
-        allUsers: state.allUsers.map(u =>
-          u.id === userId ? { ...u, isFollowing: data.isFollowing } : u
-        )
-      }));
-    } catch (error) {
-      console.error('Error toggling follow:', error);
-    }
-  },
-
   getUser: async (userId) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', userId));
@@ -461,10 +430,6 @@ export const useStore = create<StoreState>((set, get) => ({
       console.error('Error getting user:', error);
     }
     return undefined;
-  },
-
-  getFollowing: () => {
-    return get().allUsers.filter(u => u.isFollowing);
   },
 
   addPost: async (newPost) => {
@@ -870,46 +835,17 @@ export const useStore = create<StoreState>((set, get) => ({
   })),
 
   searchUsers: async (searchTerm: string) => {
-    const currentUser = get().currentUser;
-    if (!currentUser || !searchTerm || searchTerm.trim().length === 0) {
+    if (!searchTerm || searchTerm.trim().length === 0) {
       return [];
     }
 
     try {
       const response = await fetch(`/api/search/users?q=${encodeURIComponent(searchTerm)}`);
       const data = await response.json();
-      
-      // Get following list to determine follow status
-      const followingRes = await fetch(`/api/following/${currentUser.id}`);
-      const followingList = await followingRes.json();
-      const followingIds = new Set(followingList.map((u: any) => u.id));
-
-      // Map follow status
-      return data.map((user: any) => ({
-        ...user,
-        isFollowing: followingIds.has(user.id)
-      }));
+      return data;
     } catch (error) {
       console.error('Error searching users:', error);
       return [];
-    }
-  },
-
-  loadFollowStatus: async (userId: string) => {
-    const currentUser = get().currentUser;
-    if (!currentUser) return false;
-
-    try {
-      const followRef = query(
-        collection(db, 'follows'),
-        where('followerId', '==', currentUser.id),
-        where('followingId', '==', userId)
-      );
-      const followDocs = await getDocs(followRef);
-      return !followDocs.empty;
-    } catch (error) {
-      console.error('Error loading follow status:', error);
-      return false;
     }
   },
 
