@@ -9,6 +9,9 @@ import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Following from "./pages/Following";
 import ConnectInstagram from "./pages/ConnectInstagram";
+import Search from "./pages/Search";
+import HashtagFeed from "./pages/HashtagFeed";
+import Bookmarks from "./pages/Bookmarks";
 
 function App() {
   const { isAuthenticated, initializeAuth } = useStore();
@@ -30,6 +33,9 @@ function App() {
         <Route path="/profile/edit" component={EditProfile} />
         <Route path="/profile/connect-instagram" component={ConnectInstagram} />
         <Route path="/following" component={Following} />
+        <Route path="/search" component={Search} />
+        <Route path="/hashtag/:id" component={HashtagFeed} />
+        <Route path="/bookmarks" component={Bookmarks} />
       </Router>
       <Toaster />
     </>

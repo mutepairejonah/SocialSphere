@@ -21,6 +21,8 @@ interface StoreState {
   currentUser: User | null;
   pendingGoogleUser: {uid: string, displayName: string, email: string, photoURL: string} | null;
   isAuthenticated: boolean;
+  darkMode: boolean;
+  bookmarkedPosts: string[];
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (email: string, pass: string, fullName: string) => Promise<void>;
@@ -30,12 +32,17 @@ interface StoreState {
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   completeGoogleSignup: (username: string) => Promise<void>;
   setInstagramToken: (token: string) => Promise<void>;
+  toggleDarkMode: () => void;
+  bookmarkPost: (postId: string) => void;
+  removeBookmark: (postId: string) => void;
 }
 
 export const useStore = create<StoreState>((set, get) => ({
   currentUser: null,
   pendingGoogleUser: null,
   isAuthenticated: false,
+  darkMode: false,
+  bookmarkedPosts: [],
 
   initializeAuth: () => {
     onAuthStateChanged(auth, async (firebaseUser) => {
@@ -299,5 +306,21 @@ export const useStore = create<StoreState>((set, get) => ({
       console.error('Error setting Instagram token:', error);
       throw error;
     }
+  },
+
+  toggleDarkMode: () => {
+    set(state => ({ darkMode: !state.darkMode }));
+  },
+
+  bookmarkPost: (postId: string) => {
+    set(state => ({
+      bookmarkedPosts: [...state.bookmarkedPosts, postId]
+    }));
+  },
+
+  removeBookmark: (postId: string) => {
+    set(state => ({
+      bookmarkedPosts: state.bookmarkedPosts.filter(id => id !== postId)
+    }));
   },
 }));
