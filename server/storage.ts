@@ -2,6 +2,7 @@ import { db } from "../shared/db";
 import { users, posts, stories, messages, comments, notifications } from "../shared/schema";
 import { eq, like, and, desc, sql, inArray } from "drizzle-orm";
 import type { InsertUser, InsertPost, InsertStory, User, Post, Story } from "../shared/schema";
+import { leftJoin } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -57,12 +58,49 @@ export class PostgresStorage implements IStorage {
     return result[0];
   }
 
-  async getPosts(): Promise<Post[]> {
-    return db.select().from(posts).orderBy(desc(posts.createdAt));
+  async getPosts(): Promise<any[]> {
+    const result = await db.select({
+      id: posts.id,
+      userId: posts.userId,
+      caption: posts.caption,
+      imageUrl: posts.imageUrl,
+      videoUrl: posts.videoUrl,
+      mediaType: posts.mediaType,
+      location: posts.location,
+      likes: posts.likes,
+      commentCount: posts.commentCount,
+      createdAt: posts.createdAt,
+      updatedAt: posts.updatedAt,
+      username: users.username,
+      userAvatar: users.avatar,
+    })
+    .from(posts)
+    .leftJoin(users, eq(posts.userId, users.id))
+    .orderBy(desc(posts.createdAt));
+    return result;
   }
 
-  async getPostsByUser(userId: string): Promise<Post[]> {
-    return db.select().from(posts).where(eq(posts.userId, userId)).orderBy(desc(posts.createdAt));
+  async getPostsByUser(userId: string): Promise<any[]> {
+    const result = await db.select({
+      id: posts.id,
+      userId: posts.userId,
+      caption: posts.caption,
+      imageUrl: posts.imageUrl,
+      videoUrl: posts.videoUrl,
+      mediaType: posts.mediaType,
+      location: posts.location,
+      likes: posts.likes,
+      commentCount: posts.commentCount,
+      createdAt: posts.createdAt,
+      updatedAt: posts.updatedAt,
+      username: users.username,
+      userAvatar: users.avatar,
+    })
+    .from(posts)
+    .leftJoin(users, eq(posts.userId, users.id))
+    .where(eq(posts.userId, userId))
+    .orderBy(desc(posts.createdAt));
+    return result;
   }
 
   async createPost(post: InsertPost): Promise<Post> {
@@ -110,8 +148,26 @@ export class PostgresStorage implements IStorage {
       .limit(10);
   }
 
-  async getPostsFromFollowing(userId: string): Promise<Post[]> {
-    return db.select().from(posts).orderBy(desc(posts.createdAt));
+  async getPostsFromFollowing(userId: string): Promise<any[]> {
+    const result = await db.select({
+      id: posts.id,
+      userId: posts.userId,
+      caption: posts.caption,
+      imageUrl: posts.imageUrl,
+      videoUrl: posts.videoUrl,
+      mediaType: posts.mediaType,
+      location: posts.location,
+      likes: posts.likes,
+      commentCount: posts.commentCount,
+      createdAt: posts.createdAt,
+      updatedAt: posts.updatedAt,
+      username: users.username,
+      userAvatar: users.avatar,
+    })
+    .from(posts)
+    .leftJoin(users, eq(posts.userId, users.id))
+    .orderBy(desc(posts.createdAt));
+    return result;
   }
 
   async getStoriesFromFollowing(userId: string): Promise<Story[]> {
