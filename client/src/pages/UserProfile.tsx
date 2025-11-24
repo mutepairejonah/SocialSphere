@@ -144,7 +144,11 @@ export default function UserProfile() {
                 </motion.span>
               </Button>
             </motion.div>
-            <Button className="flex-1 font-semibold h-10 text-sm" variant="secondary">
+            <Button 
+              className="flex-1 font-semibold h-10 text-sm" 
+              variant="secondary"
+              onClick={() => setLocation("/messages")}
+            >
               <MessageCircle className="w-4 h-4 mr-1" />
               Message
             </Button>
