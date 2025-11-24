@@ -75,9 +75,9 @@ export default function Create() {
       } else {
         await addPost({
           userId: currentUser.id,
-          imageUrl: mediaType === 'image' ? selectedMedia : undefined,
-          videoUrl: mediaType === 'video' ? selectedMedia : undefined,
-          mediaType,
+          imageUrl: mediaType === 'image' ? selectedMedia : '',
+          videoUrl: mediaType === 'video' ? selectedMedia : '',
+          mediaType: (mediaType === 'image' ? 'IMAGE' : 'VIDEO') as any,
           caption,
           location: locationTag || undefined,
         });
