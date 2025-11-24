@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { ArrowLeft, LogOut, Loader2 } from "lucide-react";
+import { ArrowLeft, LogOut, Loader2, Edit2 } from "lucide-react";
 import { getUserProfile } from "@/lib/instagram";
 
 export default function Profile() {
@@ -63,7 +63,7 @@ export default function Profile() {
         ) : profile ? (
           <div className="space-y-6">
             {/* Profile Header */}
-            <div className="flex gap-8 items-center">
+            <div className="flex gap-8 items-start">
               {/* Avatar */}
               <div className="w-24 h-24 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
                 {profile.profile_picture_url && (
@@ -78,10 +78,18 @@ export default function Profile() {
 
               {/* Info */}
               <div className="flex-1 space-y-4">
-                <div>
+                <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold" data-testid="text-username">
                     {profile.name || currentUser?.username}
                   </h2>
+                  <button
+                    onClick={() => setLocation("/profile/edit")}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                    data-testid="button-edit-profile"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    Edit
+                  </button>
                 </div>
 
                 {/* Stats */}
@@ -102,27 +110,55 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Bio */}
-            {profile.biography && (
-              <div data-testid="text-bio">
-                <p className="text-sm whitespace-pre-wrap">{profile.biography}</p>
-              </div>
-            )}
+            {/* Bio Section */}
+            <div className="border-t border-gray-200 pt-6 space-y-3">
+              {profile.biography && (
+                <div data-testid="text-bio">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Bio</p>
+                  <p className="text-sm whitespace-pre-wrap text-gray-600">{profile.biography}</p>
+                </div>
+              )}
 
-            {/* Website */}
-            {profile.website && (
-              <div>
-                <a
-                  href={profile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline text-sm"
-                  data-testid="link-website"
-                >
-                  {profile.website}
-                </a>
-              </div>
-            )}
+              {currentUser?.bio && (
+                <div data-testid="text-user-bio">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Personal Bio</p>
+                  <p className="text-sm whitespace-pre-wrap text-gray-600">{currentUser.bio}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Website Section */}
+            <div className="space-y-3">
+              {profile.website && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Website</p>
+                  <a
+                    href={profile.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline text-sm break-all"
+                    data-testid="link-instagram-website"
+                  >
+                    {profile.website}
+                  </a>
+                </div>
+              )}
+
+              {currentUser?.website && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">Personal Website</p>
+                  <a
+                    href={currentUser.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline text-sm break-all"
+                    data-testid="link-personal-website"
+                  >
+                    {currentUser.website}
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex justify-center items-center h-96 text-gray-400">

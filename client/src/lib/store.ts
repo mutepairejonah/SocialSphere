@@ -12,6 +12,8 @@ export interface User {
   fullName: string;
   email: string;
   avatar: string;
+  bio?: string;
+  website?: string;
 }
 
 interface StoreState {

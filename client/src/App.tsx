@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   const { isAuthenticated, initializeAuth } = useStore();
@@ -24,6 +25,7 @@ function App() {
         <Route path="/login" component={Login} />
         <Route path="/" component={Home} />
         <Route path="/profile" component={Profile} />
+        <Route path="/profile/edit" component={EditProfile} />
       </Router>
       <Toaster />
     </>
