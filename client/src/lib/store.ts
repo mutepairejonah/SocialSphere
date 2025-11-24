@@ -284,7 +284,6 @@ export const useStore = create<StoreState>((set, get) => ({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            id: currentUser.id,
             ...currentUser,
             instagramToken: token
           })
