@@ -14,6 +14,7 @@ export interface User {
   avatar: string;
   bio?: string;
   website?: string;
+  instagramToken?: string;
 }
 
 interface StoreState {
@@ -24,10 +25,11 @@ interface StoreState {
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (email: string, pass: string, fullName: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateProfile: (updates: {fullName?: string, bio?: string, website?: string, avatar?: string}) => Promise<void>;
+  updateProfile: (updates: {fullName?: string, bio?: string, website?: string, avatar?: string, instagramToken?: string}) => Promise<void>;
   initializeAuth: () => void;
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   completeGoogleSignup: (username: string) => Promise<void>;
+  setInstagramToken: (token: string) => Promise<void>;
 }
 
 export const useStore = create<StoreState>((set, get) => ({

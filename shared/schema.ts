@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   avatar: text("avatar"),
   bio: text("bio"),
   website: varchar("website", { length: 500 }),
+  instagramToken: text("instagram_token"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

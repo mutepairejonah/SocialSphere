@@ -40,12 +40,13 @@ export function getInstagramBusinessAccountId(): string {
 export async function makeInstagramRequest(
   endpoint: string,
   method: 'GET' | 'POST' | 'PUT' = 'GET',
-  data?: Record<string, any>
+  data?: Record<string, any>,
+  userToken?: string
 ): Promise<any> {
-  const accessToken = getInstagramAccessToken();
+  const accessToken = userToken || getInstagramAccessToken();
   
   if (!accessToken) {
-    throw new Error('Instagram API token not configured. Please set VITE_INSTAGRAM_ACCESS_TOKEN environment variable.');
+    throw new Error('Instagram API token not configured. Please connect your Instagram account.');
   }
 
   const url = new URL(`${INSTAGRAM_API_CONFIG.apiBaseUrl}/${INSTAGRAM_API_CONFIG.apiVersion}/${endpoint}`);
@@ -80,7 +81,7 @@ export async function makeInstagramRequest(
 /**
  * Get user media from Instagram with engagement metrics
  */
-export async function getUserMedia(userId?: string): Promise<any> {
+export async function getUserMedia(userId?: string, userToken?: string): Promise<any> {
   try {
     // Use business account ID if available, otherwise use 'me'
     const accountId = userId || INSTAGRAM_API_CONFIG.businessAccountId || 'me';
@@ -88,7 +89,10 @@ export async function getUserMedia(userId?: string): Promise<any> {
     
     // Fetch media with engagement metrics using the correct endpoint format
     const response = await makeInstagramRequest(
-      `${accountId}/media?fields=id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count`
+      `${accountId}/media?fields=id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count`,
+      'GET',
+      undefined,
+      userToken
     );
     console.log('Instagram API response:', response);
     
@@ -139,9 +143,14 @@ export async function getUserInsights(userId: string = 'me'): Promise<any> {
 /**
  * Get user profile data
  */
-export async function getUserProfile(userId: string = 'me'): Promise<any> {
+export async function getUserProfile(userId: string = 'me', userToken?: string): Promise<any> {
   try {
-    const response = await makeInstagramRequest(`${userId}?fields=id,name,biography,website,profile_picture_url,followers_count,follows_count,media_count`);
+    const response = await makeInstagramRequest(
+      `${userId}?fields=id,name,biography,website,profile_picture_url,followers_count,follows_count,media_count`,
+      'GET',
+      undefined,
+      userToken
+    );
     console.log('Profile response:', response);
     return response;
   } catch (error) {
