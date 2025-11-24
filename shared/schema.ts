@@ -103,11 +103,11 @@ export const insertUserSchema = z.object({
 export const insertPostSchema = z.object({
   id: z.string(),
   userId: z.string(),
-  caption: z.string().max(2200).optional(),
-  imageUrl: z.string().url().optional(),
-  videoUrl: z.string().url().optional(),
+  caption: z.string().max(2200).nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  videoUrl: z.string().nullable().optional(),
   mediaType: z.string().optional(),
-  location: z.string().optional(),
+  location: z.string().nullable().optional(),
 });
 
 export const insertStorySchema = z.object({

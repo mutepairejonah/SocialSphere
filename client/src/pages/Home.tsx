@@ -53,9 +53,9 @@ export default function Home() {
   };
 
   // Combine Instagram videos and user posts
-  const allPosts = allPostsLoaded ? [...posts, ...userPosts].sort((a, b) => {
-    const timeA = new Date(a.timestamp).getTime();
-    const timeB = new Date(b.timestamp).getTime();
+  const allPosts = allPostsLoaded ? [...posts, ...userPosts].sort((a: any, b: any) => {
+    const timeA = new Date(a.timestamp || a.createdAt).getTime();
+    const timeB = new Date(b.timestamp || b.createdAt).getTime();
     return timeB - timeA;
   }) : posts;
 
