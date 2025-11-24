@@ -29,11 +29,11 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
-// Set permissive CSP headers to allow scripts to load
+// Disable restrictive CSP to allow all resources
 app.use((req, res, next) => {
   res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://* wss://*; img-src 'self' data: https:; media-src 'self' https:; frame-src 'self'"
+    'Content-Security-Policy-Report-Only',
+    "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src * 'unsafe-inline'; media-src *; object-src 'none'"
   );
   next();
 });
