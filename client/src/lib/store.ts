@@ -304,8 +304,6 @@ export const useStore = create<StoreState>((set, get) => ({
         token,
         accountName: accountName || `Account ${(currentUser.instagramAccounts?.length || 0) + 1}`,
         instagramUsername: profileData?.username,
-        instagramEmail: profileData?.email,
-        instagramPhone: profileData?.phone_number,
         createdAt: Timestamp.now()
       };
 
@@ -328,9 +326,7 @@ export const useStore = create<StoreState>((set, get) => ({
             userId: currentUser.id,
             token,
             accountName: accountName || `Account ${accounts.length + 1}`,
-            instagramUsername: profileData?.username,
-            instagramEmail: profileData?.email,
-            instagramPhone: profileData?.phone_number
+            instagramUsername: profileData?.username
           })
         });
       } catch (err) {
