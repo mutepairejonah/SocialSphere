@@ -10,12 +10,16 @@ export default function Following() {
   const [following, setFollowing] = useState<any[]>([]);
   const [followingMedia, setFollowingMedia] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadFollowing = async () => {
       setLoading(true);
+      setError("");
       try {
+        console.log("Starting to load following list...");
         const followingList = await getUserFollowing();
+        console.log("Following list loaded:", followingList);
         setFollowing(followingList);
 
         // Load media for each person they follow (limit to first 5 for performance)
@@ -25,8 +29,12 @@ export default function Following() {
           mediaMap[user.id] = media.slice(0, 6); // Get first 6 posts per user
         }
         setFollowingMedia(mediaMap);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to load following:", error);
+        setError(
+          error?.message || 
+          "Instagram Graph API doesn't support listing followed users with your current token. This is a limitation of Instagram's API - only certain account types and permissions can access this feature."
+        );
       } finally {
         setLoading(false);
       }
@@ -56,6 +64,16 @@ export default function Following() {
         {loading ? (
           <div className="flex justify-center items-center h-96">
             <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col justify-center items-center h-96 text-center px-4">
+            <p className="text-red-600 font-semibold mb-2">API Limitation</p>
+            <p className="text-gray-600 text-sm">{error}</p>
+            {currentUser && (
+              <p className="text-gray-500 text-xs mt-4">
+                The API doesn't support listing who you follow. Go to Instagram to see your following list.
+              </p>
+            )}
           </div>
         ) : following.length === 0 ? (
           <div className="flex justify-center items-center h-96 text-gray-400">

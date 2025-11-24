@@ -151,22 +151,31 @@ export async function getUserProfile(userId: string = 'me'): Promise<any> {
 }
 
 /**
- * Get users that you follow
+ * Get users that you follow - tries multiple endpoints
  */
 export async function getUserFollowing(userId: string = 'me'): Promise<any[]> {
   try {
+    console.log('Attempting to fetch following list for:', userId);
+    
+    // Try the standard endpoint first
     const response = await makeInstagramRequest(
       `${userId}/ig_followed_users?fields=id,name,username,profile_picture_url,biography,website`
     );
+    
     console.log('Following response:', response);
     
     if (response.data && Array.isArray(response.data)) {
       return response.data;
     }
+    if (response.error) {
+      console.error('Instagram API error:', response.error);
+      throw new Error(response.error.message || 'Failed to fetch following list');
+    }
     return [];
   } catch (error) {
     console.error('Error fetching following list:', error);
-    return [];
+    // Return empty array but log the error for debugging
+    throw error;
   }
 }
 
