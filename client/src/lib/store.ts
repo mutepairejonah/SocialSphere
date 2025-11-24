@@ -302,9 +302,10 @@ export const useStore = create<StoreState>((set, get) => ({
       const userRef = doc(db, 'users', currentUser.id);
       const accounts = currentUser.instagramAccounts || [];
       const isFirst = accounts.length === 0;
+      const accountToStore = { ...newAccount, id: accounts.length };
       
       await updateDoc(userRef, {
-        instagramAccounts: [...accounts, newAccount],
+        instagramAccounts: [...accounts, accountToStore],
         ...(isFirst && { activeInstagramAccountId: 0 })
       });
 
@@ -323,7 +324,7 @@ export const useStore = create<StoreState>((set, get) => ({
         console.warn('Database sync failed:', err);
       }
 
-      const updatedAccounts = [...accounts, newAccount];
+      const updatedAccounts = [...accounts, accountToStore];
       set(state => ({
         currentUser: state.currentUser ? { 
           ...state.currentUser, 

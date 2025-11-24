@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark, Link2 } from "lucide-react";
+import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark, Link2, Plus, Trash2, Check } from "lucide-react";
 import { getUserProfile, getUserMedia } from "@/lib/instagram";
 
 export default function Profile() {
-  const { currentUser, logout, darkMode } = useStore();
+  const { currentUser, logout, darkMode, getActiveInstagramToken, switchInstagramAccount, removeInstagramAccount } = useStore();
   const [, setLocation] = useLocation();
   const [profile, setProfile] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const activeToken = getActiveInstagramToken();
 
   useEffect(() => {
     const loadProfile = async () => {
       setLoading(true);
       try {
-        const instagramProfile = await getUserProfile('me', currentUser?.instagramToken);
+        const instagramProfile = await getUserProfile('me', activeToken);
         setProfile(instagramProfile);
         
-        const instagramMedia = await getUserMedia(undefined, currentUser?.instagramToken);
+        const instagramMedia = await getUserMedia(undefined, activeToken);
         setMedia(instagramMedia);
       } catch (error) {
         console.error("Failed to load profile:", error);
@@ -29,7 +31,7 @@ export default function Profile() {
     };
 
     loadProfile();
-  }, [currentUser?.instagramToken]);
+  }, [activeToken]);
 
   const handleLogout = async () => {
     await logout();
@@ -97,16 +99,48 @@ export default function Profile() {
                       Edit
                     </button>
                   </div>
-                  {!currentUser?.instagramToken && (
+                  <div className="flex flex-col gap-2">
                     <button
-                      onClick={() => setLocation("/profile/connect-instagram")}
+                      onClick={() => setShowAccountMenu(!showAccountMenu)}
                       className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors w-fit text-sm"
-                      data-testid="button-connect-instagram"
+                      data-testid="button-accounts-menu"
                     >
-                      <Link2 className="w-4 h-4" />
-                      Connect Instagram
+                      <Plus className="w-4 h-4" />
+                      {currentUser?.instagramAccounts?.length ? 'Manage Accounts' : 'Connect Instagram'}
                     </button>
-                  )}
+                    
+                    {showAccountMenu && currentUser?.instagramAccounts && currentUser.instagramAccounts.length > 0 && (
+                      <div className={`border rounded-lg p-3 space-y-2 ${darkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+                        {currentUser.instagramAccounts.map((acc, idx) => (
+                          <div key={idx} className={`flex items-center justify-between p-2 rounded ${idx === (currentUser.activeInstagramAccountId || 0) ? (darkMode ? 'bg-gray-700' : 'bg-blue-100') : ''}`}>
+                            <button
+                              onClick={() => switchInstagramAccount(idx)}
+                              className={`flex-1 text-left flex items-center gap-2 text-sm ${idx === (currentUser.activeInstagramAccountId || 0) ? 'font-semibold' : ''}`}
+                              data-testid={`button-account-${idx}`}
+                            >
+                              {idx === (currentUser.activeInstagramAccountId || 0) && <Check className="w-4 h-4 text-blue-500" />}
+                              {acc.accountName}
+                            </button>
+                            <button
+                              onClick={() => removeInstagramAccount(idx)}
+                              className={`text-red-500 hover:text-red-700 p-1 ${currentUser.instagramAccounts.length === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              disabled={currentUser.instagramAccounts.length === 1}
+                              data-testid={`button-delete-account-${idx}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          onClick={() => setLocation("/profile/connect-instagram")}
+                          className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 py-1"
+                          data-testid="button-add-another-account"
+                        >
+                          + Add Another Account
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Stats */}

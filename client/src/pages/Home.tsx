@@ -5,16 +5,17 @@ import { LogOut, Heart, MessageCircle, Share2, Loader2, User, Users, Search as S
 import { getUserMedia } from "@/lib/instagram";
 
 export default function Home() {
-  const { currentUser, logout, darkMode, toggleDarkMode, bookmarkedPosts, bookmarkPost, removeBookmark } = useStore();
+  const { currentUser, logout, darkMode, toggleDarkMode, bookmarkedPosts, bookmarkPost, removeBookmark, getActiveInstagramToken } = useStore();
   const [, setLocation] = useLocation();
   const [media, setMedia] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const activeToken = getActiveInstagramToken();
 
   useEffect(() => {
     const loadMedia = async () => {
       setLoading(true);
       try {
-        const instagramMedia = await getUserMedia(undefined, currentUser?.instagramToken);
+        const instagramMedia = await getUserMedia(undefined, activeToken);
         setMedia(instagramMedia);
       } catch (error) {
         console.error("Failed to load media:", error);
@@ -24,7 +25,7 @@ export default function Home() {
     };
 
     loadMedia();
-  }, [currentUser?.instagramToken]);
+  }, [activeToken]);
 
   const handleLogout = async () => {
     await logout();
@@ -34,7 +35,7 @@ export default function Home() {
   const refreshMedia = async () => {
     setLoading(true);
     try {
-      const instagramMedia = await getUserMedia(undefined, currentUser?.instagramToken);
+      const instagramMedia = await getUserMedia(undefined, activeToken);
       setMedia(instagramMedia);
     } catch (error) {
       console.error("Failed to load media:", error);
@@ -106,10 +107,10 @@ export default function Home() {
           <div className="flex justify-center items-center h-96">
             <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
           </div>
-        ) : !currentUser?.instagramToken ? (
+        ) : !activeToken ? (
           <div className="flex flex-col justify-center items-center h-96 text-center px-4">
-            <p className="text-gray-600 font-semibold mb-4">Instagram Account Not Connected</p>
-            <p className="text-gray-500 text-sm mb-6">Connect your Instagram account to see your feed and posts.</p>
+            <p className={`font-semibold mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Instagram Account Not Connected</p>
+            <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Connect your Instagram account to see your feed and posts.</p>
             <button
               onClick={() => setLocation("/profile/connect-instagram")}
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"

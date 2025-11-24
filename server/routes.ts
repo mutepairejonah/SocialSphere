@@ -67,5 +67,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Instagram accounts endpoints (stub for now - real data in Firestore)
+  app.post("/api/instagram-accounts", async (req, res) => {
+    try {
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error adding Instagram account:", error);
+      res.status(500).json({ error: "Failed to add account" });
+    }
+  });
+
+  app.delete("/api/instagram-accounts/:id", async (req, res) => {
+    try {
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error removing Instagram account:", error);
+      res.status(500).json({ error: "Failed to remove account" });
+    }
+  });
+
   return httpServer;
 }

@@ -5,9 +5,10 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ConnectInstagram() {
-  const { currentUser, setInstagramToken } = useStore();
+  const { currentUser, addInstagramAccount } = useStore();
   const [, setLocation] = useLocation();
   const [token, setToken] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleConnect = async (e: React.FormEvent) => {
@@ -20,7 +21,7 @@ export default function ConnectInstagram() {
 
     setLoading(true);
     try {
-      await setInstagramToken(token);
+      await addInstagramAccount(token, accountName || undefined);
       toast.success("Instagram account connected!");
       setLocation("/profile");
     } catch (error) {
@@ -63,6 +64,22 @@ export default function ConnectInstagram() {
 
           <form onSubmit={handleConnect} className="space-y-4">
             <div>
+              <label htmlFor="accountName" className="block text-sm font-medium text-gray-700 mb-2">
+                Account Name (Optional)
+              </label>
+              <input
+                id="accountName"
+                type="text"
+                value={accountName}
+                onChange={(e) => setAccountName(e.target.value)}
+                placeholder="e.g., My Main Account, Business Account..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={loading}
+                data-testid="input-account-name"
+              />
+            </div>
+
+            <div>
               <label htmlFor="token" className="block text-sm font-medium text-gray-700 mb-2">
                 Instagram Access Token
               </label>
@@ -89,10 +106,10 @@ export default function ConnectInstagram() {
             </button>
           </form>
 
-          {currentUser?.instagramToken && (
+          {currentUser?.instagramAccounts && currentUser.instagramAccounts.length > 0 && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-800">
-              <p className="font-semibold">✓ Instagram account connected</p>
-              <p className="text-xs mt-1">Your Instagram data will now display on your profile and home feed.</p>
+              <p className="font-semibold">✓ {currentUser.instagramAccounts.length} account(s) connected</p>
+              <p className="text-xs mt-1">You can manage all your accounts from your profile.</p>
             </div>
           )}
 
