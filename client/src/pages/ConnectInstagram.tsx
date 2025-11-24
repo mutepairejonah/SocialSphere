@@ -4,7 +4,6 @@ import { useLocation } from "wouter";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { getUserProfile } from "@/lib/instagram";
-import { AccountRecommendations } from "./AccountRecommendations";
 
 export default function ConnectInstagram() {
   const { currentUser, addInstagramAccount } = useStore();
@@ -120,17 +119,9 @@ export default function ConnectInstagram() {
                 <div className="text-sm space-y-1 text-gray-600">
                   {previewData.username && <p>👤 Username: <strong>@{previewData.username}</strong></p>}
                   {previewData.name && <p>📝 Name: <strong>{previewData.name}</strong></p>}
-                  {previewData.email && <p>✉️ Email: <strong>{previewData.email}</strong></p>}
-                  {previewData.phone_number && <p>📞 Phone: <strong>{previewData.phone_number}</strong></p>}
                 </div>
               </div>
             )}
-
-            <AccountRecommendations 
-              newEmail={previewData?.email}
-              newPhone={previewData?.phone_number}
-              newUsername={previewData?.username}
-            />
 
             <button
               type="submit"
