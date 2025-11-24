@@ -5,7 +5,7 @@ import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark, Link2 } from "luc
 import { getUserProfile, getUserMedia } from "@/lib/instagram";
 
 export default function Profile() {
-  const { currentUser, logout } = useStore();
+  const { currentUser, logout, darkMode } = useStore();
   const [, setLocation] = useLocation();
   const [profile, setProfile] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
@@ -37,21 +37,21 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+      <header className={`sticky top-0 z-50 ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => setLocation("/")}
-            className="text-gray-600 hover:text-black transition-colors"
+            className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
             data-testid="button-back"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-lg font-semibold">{currentUser?.username}</h1>
+          <h1 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>{currentUser?.username}</h1>
           <button
             onClick={handleLogout}
-            className="text-gray-600 hover:text-black transition-colors"
+            className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors`}
             data-testid="button-logout"
           >
             <LogOut className="w-5 h-5" />
@@ -85,7 +85,7 @@ export default function Profile() {
               <div className="flex-1 space-y-4">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold" data-testid="text-username">
+                    <h2 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-black'}`} data-testid="text-username">
                       {profile.name || currentUser?.username}
                     </h2>
                     <button
@@ -112,34 +112,34 @@ export default function Profile() {
                 {/* Stats */}
                 <div className="flex gap-8 text-sm">
                   <div data-testid="stat-posts">
-                    <span className="font-semibold">{profile.media_count || 0}</span>
-                    <p className="text-gray-600">posts</p>
+                    <span className={`font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>{profile.media_count || 0}</span>
+                    <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>posts</p>
                   </div>
                   <div data-testid="stat-followers">
-                    <span className="font-semibold">{profile.followers_count || 0}</span>
-                    <p className="text-gray-600">followers</p>
+                    <span className={`font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>{profile.followers_count || 0}</span>
+                    <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>followers</p>
                   </div>
                   <div data-testid="stat-following">
-                    <span className="font-semibold">{profile.follows_count || 0}</span>
-                    <p className="text-gray-600">following</p>
+                    <span className={`font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>{profile.follows_count || 0}</span>
+                    <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>following</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Bio Section */}
-            <div className="border-t border-gray-200 pt-6 space-y-3">
+            <div className={`border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} pt-6 space-y-3`}>
               {profile.biography && (
                 <div data-testid="text-bio">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Bio</p>
-                  <p className="text-sm whitespace-pre-wrap text-gray-600">{profile.biography}</p>
+                  <p className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Bio</p>
+                  <p className={`text-sm whitespace-pre-wrap ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{profile.biography}</p>
                 </div>
               )}
 
               {currentUser?.bio && (
                 <div data-testid="text-user-bio">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Personal Bio</p>
-                  <p className="text-sm whitespace-pre-wrap text-gray-600">{currentUser.bio}</p>
+                  <p className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Personal Bio</p>
+                  <p className={`text-sm whitespace-pre-wrap ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{currentUser.bio}</p>
                 </div>
               )}
             </div>
@@ -148,7 +148,7 @@ export default function Profile() {
             <div className="space-y-3">
               {profile.website && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Website</p>
+                  <p className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Website</p>
                   <a
                     href={profile.website}
                     target="_blank"
@@ -163,7 +163,7 @@ export default function Profile() {
 
               {currentUser?.website && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Personal Website</p>
+                  <p className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Personal Website</p>
                   <a
                     href={currentUser.website}
                     target="_blank"
@@ -178,14 +178,14 @@ export default function Profile() {
             </div>
 
             {/* Tabs Section */}
-            <div className="border-t border-gray-200 mt-8">
+            <div className={`border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} mt-8`}>
               <div className="flex items-center justify-center gap-8">
                 <button
                   onClick={() => setActiveTab("posts")}
                   className={`py-4 px-4 flex items-center gap-2 transition-colors border-t-2 ${
                     activeTab === "posts"
-                      ? "border-gray-900 text-gray-900"
-                      : "border-transparent text-gray-600 hover:text-gray-800"
+                      ? darkMode ? "border-white text-white" : "border-gray-900 text-gray-900"
+                      : darkMode ? "border-transparent text-gray-400 hover:text-white" : "border-transparent text-gray-600 hover:text-gray-800"
                   }`}
                   data-testid="tab-posts"
                 >
@@ -196,8 +196,8 @@ export default function Profile() {
                   onClick={() => setActiveTab("saved")}
                   className={`py-4 px-4 flex items-center gap-2 transition-colors border-t-2 ${
                     activeTab === "saved"
-                      ? "border-gray-900 text-gray-900"
-                      : "border-transparent text-gray-600 hover:text-gray-800"
+                      ? darkMode ? "border-white text-white" : "border-gray-900 text-gray-900"
+                      : darkMode ? "border-transparent text-gray-400 hover:text-white" : "border-transparent text-gray-600 hover:text-gray-800"
                   }`}
                   data-testid="tab-saved"
                 >
@@ -211,7 +211,7 @@ export default function Profile() {
             {activeTab === "posts" && (
               <div className="mt-6">
                 {media.length === 0 ? (
-                  <div className="flex justify-center items-center h-96 text-gray-400">
+                  <div className={`flex justify-center items-center h-96 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                     <p>No posts yet</p>
                   </div>
                 ) : (
@@ -219,7 +219,7 @@ export default function Profile() {
                     {media.map((item) => (
                       <div
                         key={item.id}
-                        className="aspect-square bg-gray-100 overflow-hidden hover:opacity-80 transition-opacity cursor-pointer group relative"
+                        className={`aspect-square ${darkMode ? 'bg-gray-800' : 'bg-gray-100'} overflow-hidden hover:opacity-80 transition-opacity cursor-pointer group relative`}
                         data-testid={`media-grid-${item.id}`}
                       >
                         {item.media_type === "VIDEO" ? (
@@ -258,14 +258,14 @@ export default function Profile() {
             {/* Saved Tab */}
             {activeTab === "saved" && (
               <div className="mt-6">
-                <div className="flex justify-center items-center h-96 text-gray-400">
+                <div className={`flex justify-center items-center h-96 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                   <p>No saved posts yet</p>
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="flex justify-center items-center h-96 text-gray-400">
+          <div className={`flex justify-center items-center h-96 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
             <p>Failed to load profile</p>
           </div>
         )}
