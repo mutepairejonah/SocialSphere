@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { ArrowLeft, LogOut, Loader2, Edit2 } from "lucide-react";
-import { getUserProfile } from "@/lib/instagram";
+import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark } from "lucide-react";
+import { getUserProfile, getUserMedia } from "@/lib/instagram";
 
 export default function Profile() {
   const { currentUser, logout } = useStore();
   const [, setLocation] = useLocation();
   const [profile, setProfile] = useState<any>(null);
+  const [media, setMedia] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("posts");
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -16,6 +18,9 @@ export default function Profile() {
       try {
         const instagramProfile = await getUserProfile();
         setProfile(instagramProfile);
+        
+        const instagramMedia = await getUserMedia();
+        setMedia(instagramMedia);
       } catch (error) {
         console.error("Failed to load profile:", error);
       } finally {
@@ -159,6 +164,93 @@ export default function Profile() {
                 </div>
               )}
             </div>
+
+            {/* Tabs Section */}
+            <div className="border-t border-gray-200 mt-8">
+              <div className="flex items-center justify-center gap-8">
+                <button
+                  onClick={() => setActiveTab("posts")}
+                  className={`py-4 px-4 flex items-center gap-2 transition-colors border-t-2 ${
+                    activeTab === "posts"
+                      ? "border-gray-900 text-gray-900"
+                      : "border-transparent text-gray-600 hover:text-gray-800"
+                  }`}
+                  data-testid="tab-posts"
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Posts</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("saved")}
+                  className={`py-4 px-4 flex items-center gap-2 transition-colors border-t-2 ${
+                    activeTab === "saved"
+                      ? "border-gray-900 text-gray-900"
+                      : "border-transparent text-gray-600 hover:text-gray-800"
+                  }`}
+                  data-testid="tab-saved"
+                >
+                  <Bookmark className="w-4 h-4" />
+                  <span className="text-sm font-medium">Saved</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Posts Grid Tab */}
+            {activeTab === "posts" && (
+              <div className="mt-6">
+                {media.length === 0 ? (
+                  <div className="flex justify-center items-center h-96 text-gray-400">
+                    <p>No posts yet</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-1 md:gap-2">
+                    {media.map((item) => (
+                      <div
+                        key={item.id}
+                        className="aspect-square bg-gray-100 overflow-hidden hover:opacity-80 transition-opacity cursor-pointer group relative"
+                        data-testid={`media-grid-${item.id}`}
+                      >
+                        {item.media_type === "VIDEO" ? (
+                          <video
+                            src={item.media_url}
+                            className="w-full h-full object-cover"
+                            data-testid={`grid-video-${item.id}`}
+                          />
+                        ) : (
+                          <img
+                            src={item.media_url}
+                            alt={item.caption || "Instagram post"}
+                            className="w-full h-full object-cover"
+                            data-testid={`grid-image-${item.id}`}
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-4 text-white">
+                            <div className="flex items-center gap-1">
+                              <span className="text-sm font-semibold">{item.like_count || 0}</span>
+                              <span className="text-xs">❤️</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-sm font-semibold">{item.comments_count || 0}</span>
+                              <span className="text-xs">💬</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Saved Tab */}
+            {activeTab === "saved" && (
+              <div className="mt-6">
+                <div className="flex justify-center items-center h-96 text-gray-400">
+                  <p>No saved posts yet</p>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex justify-center items-center h-96 text-gray-400">
