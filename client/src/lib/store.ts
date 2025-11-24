@@ -10,7 +10,10 @@ export interface InstagramAccount {
   id: number;
   accountName?: string;
   token: string;
-  createdAt?: string;
+  instagramUsername?: string;
+  instagramEmail?: string;
+  instagramPhone?: string;
+  createdAt?: string | any;
 }
 
 export interface User {
@@ -334,7 +337,7 @@ export const useStore = create<StoreState>((set, get) => ({
         console.warn('Database sync failed:', err);
       }
 
-      const updatedAccounts = [...accounts, accountToStore];
+      const updatedAccounts = [...accounts, accountToStore] as InstagramAccount[];
       set(state => ({
         currentUser: state.currentUser ? { 
           ...state.currentUser, 
