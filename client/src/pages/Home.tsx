@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { LogOut, Heart, MessageCircle, Share2, Loader2, User } from "lucide-react";
+import { LogOut, Heart, MessageCircle, Share2, Loader2, User, Users } from "lucide-react";
 import { getUserMedia } from "@/lib/instagram";
 
 export default function Home() {
@@ -39,6 +39,14 @@ export default function Home() {
           <h1 className="text-2xl font-bold text-black">instagram</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">{currentUser?.username}</span>
+            <button
+              onClick={() => setLocation("/following")}
+              className="text-gray-600 hover:text-black transition-colors"
+              data-testid="button-following"
+              title="View people you follow"
+            >
+              <Users className="w-5 h-5" />
+            </button>
             <button
               onClick={() => setLocation("/profile")}
               className="text-gray-600 hover:text-black transition-colors"

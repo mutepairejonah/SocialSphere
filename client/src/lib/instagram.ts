@@ -150,4 +150,43 @@ export async function getUserProfile(userId: string = 'me'): Promise<any> {
   }
 }
 
+/**
+ * Get users that you follow
+ */
+export async function getUserFollowing(userId: string = 'me'): Promise<any[]> {
+  try {
+    const response = await makeInstagramRequest(
+      `${userId}/ig_followed_users?fields=id,name,username,profile_picture_url,biography,website`
+    );
+    console.log('Following response:', response);
+    
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching following list:', error);
+    return [];
+  }
+}
+
+/**
+ * Get media for a specific user
+ */
+export async function getUserMediaById(userId: string): Promise<any[]> {
+  try {
+    const response = await makeInstagramRequest(
+      `${userId}/media?fields=id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count`
+    );
+    
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching media for user ${userId}:`, error);
+    return [];
+  }
+}
+
 export default INSTAGRAM_API_CONFIG;
