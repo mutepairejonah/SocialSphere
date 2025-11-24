@@ -6,6 +6,13 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 
+export interface InstagramAccount {
+  id: number;
+  accountName?: string;
+  token: string;
+  createdAt?: string;
+}
+
 export interface User {
   id: string;
   username: string;
@@ -14,7 +21,8 @@ export interface User {
   avatar: string;
   bio?: string;
   website?: string;
-  instagramToken?: string;
+  instagramAccounts?: InstagramAccount[];
+  activeInstagramAccountId?: number;
 }
 
 interface StoreState {
@@ -27,11 +35,14 @@ interface StoreState {
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (email: string, pass: string, fullName: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateProfile: (updates: {fullName?: string, bio?: string, website?: string, avatar?: string, instagramToken?: string}) => Promise<void>;
+  updateProfile: (updates: {fullName?: string, bio?: string, website?: string, avatar?: string}) => Promise<void>;
   initializeAuth: () => void;
   checkUsernameAvailable: (username: string) => Promise<boolean>;
   completeGoogleSignup: (username: string) => Promise<void>;
-  setInstagramToken: (token: string) => Promise<void>;
+  addInstagramAccount: (token: string, accountName?: string) => Promise<void>;
+  switchInstagramAccount: (accountId: number) => Promise<void>;
+  removeInstagramAccount: (accountId: number) => Promise<void>;
+  getActiveInstagramToken: () => string | undefined;
   toggleDarkMode: () => void;
   bookmarkPost: (postId: string) => void;
   removeBookmark: (postId: string) => void;
@@ -276,36 +287,114 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   },
 
-  setInstagramToken: async (token: string) => {
+  addInstagramAccount: async (token: string, accountName?: string) => {
     const currentUser = get().currentUser;
     if (!currentUser) throw new Error('No current user');
 
     try {
-      // Update Firestore
+      // Add to Firestore
+      const newAccount = {
+        token,
+        accountName: accountName || `Account ${(currentUser.instagramAccounts?.length || 0) + 1}`,
+        createdAt: Timestamp.now()
+      };
+
       const userRef = doc(db, 'users', currentUser.id);
-      await updateDoc(userRef, { instagramToken: token });
+      const accounts = currentUser.instagramAccounts || [];
+      const isFirst = accounts.length === 0;
+      
+      await updateDoc(userRef, {
+        instagramAccounts: [...accounts, newAccount],
+        ...(isFirst && { activeInstagramAccountId: 0 })
+      });
 
       // Sync to PostgreSQL
       try {
-        await fetch('/api/users', {
+        await fetch('/api/instagram-accounts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...currentUser,
-            instagramToken: token
+            userId: currentUser.id,
+            token,
+            accountName: accountName || `Account ${accounts.length + 1}`
           })
         });
       } catch (err) {
         console.warn('Database sync failed:', err);
       }
 
+      const updatedAccounts = [...accounts, newAccount];
       set(state => ({
-        currentUser: state.currentUser ? { ...state.currentUser, instagramToken: token } : null
+        currentUser: state.currentUser ? { 
+          ...state.currentUser, 
+          instagramAccounts: updatedAccounts,
+          activeInstagramAccountId: isFirst ? 0 : state.currentUser.activeInstagramAccountId
+        } : null
       }));
     } catch (error) {
-      console.error('Error setting Instagram token:', error);
+      console.error('Error adding Instagram account:', error);
       throw error;
     }
+  },
+
+  switchInstagramAccount: async (accountId: number) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) throw new Error('No current user');
+
+    try {
+      const userRef = doc(db, 'users', currentUser.id);
+      await updateDoc(userRef, { activeInstagramAccountId: accountId });
+
+      set(state => ({
+        currentUser: state.currentUser ? { 
+          ...state.currentUser, 
+          activeInstagramAccountId: accountId
+        } : null
+      }));
+    } catch (error) {
+      console.error('Error switching Instagram account:', error);
+      throw error;
+    }
+  },
+
+  removeInstagramAccount: async (accountId: number) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) throw new Error('No current user');
+
+    try {
+      const userRef = doc(db, 'users', currentUser.id);
+      const updatedAccounts = (currentUser.instagramAccounts || []).filter((_, idx) => idx !== accountId);
+      
+      await updateDoc(userRef, { 
+        instagramAccounts: updatedAccounts,
+        activeInstagramAccountId: currentUser.activeInstagramAccountId === accountId ? (updatedAccounts.length > 0 ? 0 : undefined) : currentUser.activeInstagramAccountId
+      });
+
+      // Sync to PostgreSQL
+      try {
+        await fetch(`/api/instagram-accounts/${accountId}`, { method: 'DELETE' });
+      } catch (err) {
+        console.warn('Database sync failed:', err);
+      }
+
+      set(state => ({
+        currentUser: state.currentUser ? { 
+          ...state.currentUser, 
+          instagramAccounts: updatedAccounts,
+          activeInstagramAccountId: state.currentUser.activeInstagramAccountId === accountId ? 0 : state.currentUser.activeInstagramAccountId
+        } : null
+      }));
+    } catch (error) {
+      console.error('Error removing Instagram account:', error);
+      throw error;
+    }
+  },
+
+  getActiveInstagramToken: () => {
+    const currentUser = get().currentUser;
+    if (!currentUser || !currentUser.instagramAccounts || currentUser.instagramAccounts.length === 0) return undefined;
+    const activeIdx = currentUser.activeInstagramAccountId || 0;
+    return currentUser.instagramAccounts[activeIdx]?.token;
   },
 
   toggleDarkMode: () => {

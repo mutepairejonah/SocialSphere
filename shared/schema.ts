@@ -1,4 +1,4 @@
-import { pgTable, varchar, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, timestamp, integer, serial, boolean } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
 // ========== USERS TABLE (Firebase auth sync only) ==========
@@ -10,7 +10,7 @@ export const users = pgTable("users", {
   avatar: text("avatar"),
   bio: text("bio"),
   website: varchar("website", { length: 500 }),
-  instagramToken: text("instagram_token"),
+  activeInstagramAccountId: integer("active_instagram_account_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -27,3 +27,22 @@ export const insertUserSchema = z.object({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+// ========== INSTAGRAM ACCOUNTS TABLE ==========
+export const instagramAccounts = pgTable("instagram_accounts", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  token: text("token").notNull(),
+  accountName: varchar("account_name", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type InstagramAccount = typeof instagramAccounts.$inferSelect;
+
+export const insertInstagramAccountSchema = z.object({
+  userId: z.string(),
+  token: z.string(),
+  accountName: z.string().max(100).optional(),
+});
+
+export type InsertInstagramAccount = z.infer<typeof insertInstagramAccountSchema>;
