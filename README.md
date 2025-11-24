@@ -1,229 +1,165 @@
-# Authentic - Telegram-Style Messaging Platform
+# Personal Instagram Clone
 
-A real-time Telegram-inspired messaging platform with Instagram Graph API integration, built with React, TypeScript, Node.js, Socket.io, PostgreSQL, and Drizzle ORM.
+A minimal, personal Instagram clone that displays your Instagram media feed with real engagement metrics. Built with React, TypeScript, Firebase Auth, and Instagram Graph API.
 
-## 🚀 Features
+## 🎯 What This Does
 
-### Authentication
-- **Google Sign-In** with unique username selection
-- **Email/Password** signup and login
-- Secure session management with Firebase Auth
-- Automatic unique username generation
+- **Login**: Firebase authentication (email/password or Google)
+- **Home Feed**: Display your Instagram media with real engagement metrics
+- **Profile**: View your Instagram profile data (followers, following, bio, website)
+- **API-Only**: Only features supported by the Instagram Graph API
 
-### Real-Time Messaging
-- **Socket.io** powered live chat
-- **User-to-user messaging** without follow requirements
-- **Direct conversations** with any user
-- Real-time message delivery and typing indicators
-- Message history stored in PostgreSQL
+## ❌ What This Doesn't Do
 
-### Instagram Integration
-- **Instagram Graph API** integration
-- **Video content** displayed on home feed only
-- Live Instagram videos embedded in feed
-- Automatic video loading and caching
-
-### User Features
-- **Editable profiles**: name, bio, website, avatar
-- **User search** by username or full name
-- **Real-time search** results
-- Clean Telegram-style interface
-
-### Posts
-- **Create posts** with images and captions
-- **Location tagging** for posts
-- Posts stored in PostgreSQL database
-- Like and comment functionality (coming soon)
+- ❌ Create posts (API read-only)
+- ❌ Messaging or real-time chat
+- ❌ Stories
+- ❌ Follow/unfollow system
+- ❌ Comments or likes (read-only)
+- ❌ User search
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **React** with TypeScript
-- **Vite** for fast development
-- **Tailwind CSS** for styling
-- **shadcn/ui** components (Radix UI primitives)
-- **Wouter** for routing
-- **Zustand** for state management
-- **Socket.io Client** for real-time updates
+- **Frontend**: React + TypeScript + Vite
+- **Styling**: Tailwind CSS
+- **Authentication**: Firebase Auth
+- **API**: Instagram Graph API
+- **Backend**: Node.js + Express (minimal - auth sync only)
+- **Database**: PostgreSQL (minimal - users sync only)
 
-### Backend
-- **Node.js** with Express
-- **Socket.io** for real-time communication
-- **PostgreSQL** database with Drizzle ORM
-- **TypeScript** for type safety
+## 🚀 Getting Started
 
-### External APIs
-- **Firebase** for authentication
-- **Instagram Graph API** for video content
-- **Google Fonts** for typography
+### Prerequisites
 
-## 📋 Prerequisites
+1. **Instagram Business Account** - Required for Graph API access
+2. **Instagram Access Token** - Create via Meta Developer Portal
+3. **Firebase Project** - For authentication
 
-### Required Setup
-1. **Instagram Graph API** - Configure Instagram Business Account access token
-2. **Firebase Project** - Set up authentication
-3. **PostgreSQL Database** - Replit provides automatic database setup
-4. **Environment Variables** - Set up VITE_INSTAGRAM_ACCESS_TOKEN
+### Installation
 
-## ⚙️ Installation
+```bash
+# 1. Clone repository
+git clone https://github.com/mutepairejonah/instaclone.git
+cd instaclone
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/mutepairejonah/Connect.git
-   cd Connect
-   ```
+# 2. Install dependencies
+npm install
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+# 3. Set up environment variables
+# Create .env file and add:
+VITE_INSTAGRAM_ACCESS_TOKEN=your_instagram_token_here
+VITE_INSTAGRAM_BUSINESS_ACCOUNT_ID=your_business_account_id
 
-3. Set up environment variables:
-   - Add `VITE_INSTAGRAM_ACCESS_TOKEN` for Instagram API access
-   - Database connection is automatically configured on Replit
+# 4. Sync database schema
+npm run db:push
 
-4. Push database schema:
-   ```bash
-   npm run db:push
-   ```
+# 5. Start development server
+npm run dev
+```
 
-5. Start the development server:
-   ```bash
-   npm run dev
-   ```
+Open [http://localhost:5000](http://localhost:5000)
 
-6. Open [http://localhost:5000](http://localhost:5000)
+## 📱 Features
 
-## 🏗️ Project Structure
+### Home Feed
+- Display all your Instagram media (photos & videos)
+- Real-time engagement metrics (likes, comments)
+- Timestamps and captions from Instagram
+
+### Profile Page
+- View your Instagram profile info
+- Follower/following counts
+- Bio and website link
+- Media count
+
+### Authentication
+- Sign up with email/password
+- Log in with Google
+- Firebase session management
+
+## 🔑 Environment Variables
+
+```
+VITE_INSTAGRAM_ACCESS_TOKEN      # Your Instagram Graph API token
+VITE_INSTAGRAM_BUSINESS_ACCOUNT_ID # Your business account ID (optional)
+```
+
+## 📂 Project Structure
 
 ```
 ├── client/
 │   └── src/
-│       ├── components/              # Reusable UI components
+│       ├── pages/
+│       │   ├── Login.tsx          # Authentication
+│       │   ├── Home.tsx           # Instagram feed
+│       │   └── Profile.tsx        # Profile page
 │       ├── lib/
-│       │   ├── firebase.ts          # Firebase configuration
-│       │   ├── store.ts             # Zustand state management
-│       │   └── instagram-api.ts     # Instagram Graph API
-│       ├── pages/                   # Application pages
-│       │   ├── Login.tsx
-│       │   ├── Home.tsx             # Main feed with Instagram videos
-│       │   ├── Messages.tsx         # Real-time messaging
-│       │   ├── Create.tsx           # Create posts
-│       │   ├── Profile.tsx
-│       │   └── ...
-│       └── App.tsx
+│       │   ├── firebase.ts        # Firebase config
+│       │   ├── instagram.ts       # Instagram API
+│       │   └── store.ts           # State management
+│       └── App.tsx                # Main routing
 ├── server/
-│   ├── index.ts                     # Express server
-│   ├── routes.ts                    # API routes
-│   ├── storage.ts                   # PostgreSQL operations
-│   └── index-dev.ts                 # Development server
+│   ├── routes.ts                  # API routes
+│   └── storage.ts                 # Database operations
 ├── shared/
-│   ├── schema.ts                    # Drizzle ORM schema
-│   └── db.ts                        # Database configuration
-├── drizzle.config.ts                # Drizzle configuration
+│   └── schema.ts                  # Database schema
 └── package.json
 ```
 
-## 🔐 Security
+## 🔗 Instagram API Endpoints Used
 
-- Firebase handles authentication securely
-- PostgreSQL database for encrypted data storage
-- Environment variables for sensitive credentials
-- Message history protected at database level
-- User data isolated by authentication
+- `GET /me/media` - Fetch user media
+- `GET /me` - Fetch user profile
+- Media fields: `id, caption, media_type, media_url, thumbnail_url, timestamp, like_count, comments_count`
 
-## 🎨 Design
+## ⚙️ How It Works
 
-- **Telegram-inspired UI** - Clean, minimal design
-- **Mobile-optimized** - Responsive layout
-- **Real-time updates** - Instant message delivery
-- **Dark/Light mode** support
-- **Modern typography** - Inter font family
-
-## 💬 Real-Time Features
-
-### Socket.io Events
-- `message:send` - Send a new message
-- `message:receive` - Receive incoming messages
-- `user:typing` - Show typing indicators
-- `user:online` - User presence updates
-
-### Database Events
-- Real-time message syncing
-- User activity tracking
-- Message persistence
-
-## 🐛 Troubleshooting
-
-**Can't connect to messages?**
-- Ensure Socket.io server is running
-- Check browser console for connection errors
-- Verify both users are authenticated
-
-**Instagram videos not loading?**
-- Verify VITE_INSTAGRAM_ACCESS_TOKEN is set
-- Check Instagram Business Account permissions
-- Ensure token has media access scope
-
-**Database errors?**
-- Run `npm run db:push` to sync schema
-- Check PostgreSQL connection in logs
-- Verify DATABASE_URL environment variable
-
-**Posts not appearing?**
-- Ensure user is logged in
-- Check database for post records
-- Verify imageUrl is valid
+1. **Login** → Firebase Auth creates user session
+2. **Home** → Fetch Instagram media via Graph API
+3. **Profile** → Display Instagram profile data
+4. **Logout** → Clear Firebase session
 
 ## 🚀 Deployment
 
-### Deploy on Replit
-1. Push code to GitHub repository
-2. Import repository into Replit
-3. Set environment variables in Secrets
-4. Click "Run" to start the application
+### Deploy on Render
 
-### Production Checklist
-- [ ] Set all environment variables
-- [ ] Configure Instagram Graph API
-- [ ] Test all messaging features
-- [ ] Verify database backups
-- [ ] Enable production logging
+1. Push code to GitHub
+2. Create Render account
+3. Connect GitHub repository
+4. Set environment variables in Render dashboard
+5. Deploy!
 
-## 📝 API Endpoints
+See `RENDER_DEPLOYMENT.md` for detailed steps.
 
-### Posts
-- `GET /api/posts` - Get all posts
-- `POST /api/posts` - Create a new post
-- `GET /api/posts/user/:userId` - Get user's posts
-- `GET /api/stories` - Get stories
+## 🐛 Troubleshooting
 
-### Users
-- `POST /api/users` - Create new user
-- `GET /api/search/users` - Search users
+**Instagram videos not loading?**
+- Verify `VITE_INSTAGRAM_ACCESS_TOKEN` is set
+- Check token has `instagram_graph_user_media` permission
+- Ensure token is valid and not expired
 
-### Messages
-- `GET /api/messages/:conversationId` - Get message history
+**Can't log in?**
+- Check Firebase configuration in `client/src/lib/firebase.ts`
+- Verify email/password is correct
+- Try Google sign-in instead
 
-## 🎯 Roadmap
+**Profile showing no data?**
+- Ensure Instagram token has `instagram_graph_user_profile` permission
+- Check that your Instagram account is a Business Account
 
-- ✅ Real-time messaging with Socket.io
-- ✅ Instagram API integration
-- ✅ PostgreSQL database
-- ✅ User authentication
-- 🔜 Video calls with WebRTC
-- 🔜 Group messaging
-- 🔜 Message encryption
-- 🔜 File sharing
-- 🔜 Push notifications
-- 🔜 Message search
+## 📝 Notes
+
+- This app displays your personal Instagram data only
+- No public user discovery or search
+- No data collection or sharing
+- Read-only access to Instagram media
 
 ## 📄 License
 
-Built for educational purposes. Open source and available for learning.
+Built for personal use. Open source and available for educational purposes.
 
 ---
 
-**Built with ❤️ using Replit, React, and Node.js**
+**Built with React, Firebase, and Instagram Graph API**
 
 GitHub: [https://github.com/mutepairejonah/Connect](https://github.com/mutepairejonah/Connect)
