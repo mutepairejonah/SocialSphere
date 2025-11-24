@@ -2,7 +2,6 @@ import { db } from "../shared/db";
 import { users, posts, stories, messages, comments, notifications } from "../shared/schema";
 import { eq, like, and, desc, sql, inArray } from "drizzle-orm";
 import type { InsertUser, InsertPost, InsertStory, User, Post, Story } from "../shared/schema";
-import { leftJoin } from "drizzle-orm";
 
 export interface IStorage {
   // Users
