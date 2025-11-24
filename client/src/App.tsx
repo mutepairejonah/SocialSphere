@@ -3,30 +3,16 @@ import { useEffect } from "react";
 import { useStore } from "@/lib/store";
 import { Toaster } from "sonner";
 
-// Pages
 import Login from "./pages/Login";
-import SetupProfile from "./pages/SetupProfile";
 import Home from "./pages/Home";
-import Explore from "./pages/Explore";
-import Create from "./pages/Create";
-import Activity from "./pages/Activity";
 import Profile from "./pages/Profile";
-import EditProfile from "./pages/EditProfile";
-import Messages from "./pages/Messages";
-import Stories from "./pages/Stories";
-import CreateStory from "./pages/CreateStory";
-import UserProfile from "./pages/UserProfile";
 
 function App() {
-  const { isAuthenticated, initializeAuth, pendingGoogleUser } = useStore();
+  const { isAuthenticated, initializeAuth } = useStore();
 
   useEffect(() => {
     initializeAuth();
   }, []);
-
-  if (pendingGoogleUser) {
-    return <SetupProfile />;
-  }
 
   if (!isAuthenticated) {
     return <Login />;
@@ -36,17 +22,8 @@ function App() {
     <>
       <Router base="/">
         <Route path="/login" component={Login} />
-        <Route path="/setup" component={SetupProfile} />
         <Route path="/" component={Home} />
-        <Route path="/explore" component={Explore} />
-        <Route path="/create" component={Create} />
-        <Route path="/stories" component={Stories} />
-        <Route path="/stories/create" component={CreateStory} />
-        <Route path="/activity" component={Activity} />
-        <Route path="/messages" component={Messages} />
         <Route path="/profile" component={Profile} />
-        <Route path="/profile/edit" component={EditProfile} />
-        <Route path="/user/:id" component={UserProfile} />
       </Router>
       <Toaster />
     </>
