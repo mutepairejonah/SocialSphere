@@ -62,17 +62,28 @@ export default function Create() {
   };
 
   const handlePost = async () => {
-    if (!currentUser || !selectedMedia) return;
+    console.log('handlePost called, currentUser:', currentUser, 'selectedMedia:', selectedMedia ? 'yes' : 'no', 'creationType:', creationType);
+    if (!currentUser || !selectedMedia) {
+      console.error('Missing currentUser or selectedMedia');
+      return;
+    }
 
     setUploading(true);
     try {
       if (creationType === 'story') {
+        console.log('Creating story...');
         await addStory(selectedMedia);
         toast({
           title: "Success",
           description: "Story created successfully"
         });
       } else {
+        console.log('Creating post with data:', {
+          userId: currentUser.id,
+          caption,
+          location: locationTag,
+          mediaType: mediaType === 'image' ? 'IMAGE' : 'VIDEO',
+        });
         await addPost({
           userId: currentUser.id,
           imageUrl: mediaType === 'image' ? selectedMedia : '',
@@ -81,6 +92,7 @@ export default function Create() {
           caption,
           location: locationTag || undefined,
         });
+        console.log('Post created successfully');
         toast({
           title: "Success",
           description: "Post uploaded successfully"
@@ -89,6 +101,7 @@ export default function Create() {
       
       setLocation("/");
     } catch (error: any) {
+      console.error('Error in handlePost:', error);
       toast({
         variant: "destructive",
         title: "Error",

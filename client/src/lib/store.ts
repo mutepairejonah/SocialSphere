@@ -431,7 +431,11 @@ export const useStore = create<StoreState>((set, get) => ({
 
   addPost: async (newPost) => {
     const currentUser = get().currentUser;
-    if (!currentUser) return;
+    console.log('addPost called with:', newPost, 'currentUser:', currentUser);
+    if (!currentUser) {
+      console.error('No current user');
+      return;
+    }
 
     try {
       const postData = {
@@ -443,17 +447,22 @@ export const useStore = create<StoreState>((set, get) => ({
         location: (newPost.location || '').trim(),
       };
 
+      console.log('Sending post data to API:', postData);
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postData)
       });
 
+      console.log('API response status:', response.status);
       if (!response.ok) {
-        throw new Error('Failed to create post');
+        const errorText = await response.text();
+        console.error('API error:', errorText);
+        throw new Error(`Failed to create post: ${errorText}`);
       }
 
       const post = await response.json();
+      console.log('Post created:', post);
       
       set(state => ({
         posts: [{
