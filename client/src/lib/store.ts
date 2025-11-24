@@ -268,4 +268,37 @@ export const useStore = create<StoreState>((set, get) => ({
       throw error;
     }
   },
+
+  setInstagramToken: async (token: string) => {
+    const currentUser = get().currentUser;
+    if (!currentUser) throw new Error('No current user');
+
+    try {
+      // Update Firestore
+      const userRef = doc(db, 'users', currentUser.id);
+      await updateDoc(userRef, { instagramToken: token });
+
+      // Sync to PostgreSQL
+      try {
+        await fetch('/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: currentUser.id,
+            ...currentUser,
+            instagramToken: token
+          })
+        });
+      } catch (err) {
+        console.warn('Database sync failed:', err);
+      }
+
+      set(state => ({
+        currentUser: state.currentUser ? { ...state.currentUser, instagramToken: token } : null
+      }));
+    } catch (error) {
+      console.error('Error setting Instagram token:', error);
+      throw error;
+    }
+  },
 }));

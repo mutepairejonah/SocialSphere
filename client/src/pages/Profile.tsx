@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark } from "lucide-react";
+import { ArrowLeft, LogOut, Loader2, Edit2, Grid3X3, Bookmark, Link2 } from "lucide-react";
 import { getUserProfile, getUserMedia } from "@/lib/instagram";
 
 export default function Profile() {
@@ -16,10 +16,10 @@ export default function Profile() {
     const loadProfile = async () => {
       setLoading(true);
       try {
-        const instagramProfile = await getUserProfile();
+        const instagramProfile = await getUserProfile('me', currentUser?.instagramToken);
         setProfile(instagramProfile);
         
-        const instagramMedia = await getUserMedia();
+        const instagramMedia = await getUserMedia(undefined, currentUser?.instagramToken);
         setMedia(instagramMedia);
       } catch (error) {
         console.error("Failed to load profile:", error);
@@ -29,7 +29,7 @@ export default function Profile() {
     };
 
     loadProfile();
-  }, []);
+  }, [currentUser?.instagramToken]);
 
   const handleLogout = async () => {
     await logout();
@@ -83,18 +83,30 @@ export default function Profile() {
 
               {/* Info */}
               <div className="flex-1 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold" data-testid="text-username">
-                    {profile.name || currentUser?.username}
-                  </h2>
-                  <button
-                    onClick={() => setLocation("/profile/edit")}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
-                    data-testid="button-edit-profile"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                    Edit
-                  </button>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold" data-testid="text-username">
+                      {profile.name || currentUser?.username}
+                    </h2>
+                    <button
+                      onClick={() => setLocation("/profile/edit")}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                      data-testid="button-edit-profile"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                  </div>
+                  {!currentUser?.instagramToken && (
+                    <button
+                      onClick={() => setLocation("/profile/connect-instagram")}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors w-fit text-sm"
+                      data-testid="button-connect-instagram"
+                    >
+                      <Link2 className="w-4 h-4" />
+                      Connect Instagram
+                    </button>
+                  )}
                 </div>
 
                 {/* Stats */}
