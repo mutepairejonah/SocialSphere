@@ -110,74 +110,15 @@ export class PostgresStorage implements IStorage {
       .limit(10);
   }
 
-  async toggleFollow(followerId: string, followingId: string): Promise<boolean> {
-    const existing = await db.select().from(follows)
-      .where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
-    
-    if (existing.length > 0) {
-      await db.delete(follows).where(and(
-        eq(follows.followerId, followerId),
-        eq(follows.followingId, followingId)
-      ));
-      return false;
-    } else {
-      await db.insert(follows).values({ id: crypto.randomUUID(), followerId, followingId });
-      return true;
-    }
-  }
-
-  async isFollowing(followerId: string, followingId: string): Promise<boolean> {
-    const result = await db.select().from(follows)
-      .where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
-    return result.length > 0;
-  }
-
-  async getFollowingIds(userId: string): Promise<string[]> {
-    const result = await db.select({ followingId: follows.followingId }).from(follows)
-      .where(eq(follows.followerId, userId));
-    return result.map(r => r.followingId);
-  }
-
   async getPostsFromFollowing(userId: string): Promise<Post[]> {
-    const followingIds = await this.getFollowingIds(userId);
-    if (followingIds.length === 0) return [];
-    
-    return db.select().from(posts)
-      .where(inArray(posts.userId, followingIds))
-      .orderBy(desc(posts.createdAt));
+    return db.select().from(posts).orderBy(desc(posts.createdAt));
   }
 
   async getStoriesFromFollowing(userId: string): Promise<Story[]> {
-    const followingIds = await this.getFollowingIds(userId);
-    if (followingIds.length === 0) return [];
-    
     const oneDay = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return db.select().from(stories)
-      .where(and(
-        inArray(stories.userId, followingIds),
-        sql`${stories.createdAt} > ${oneDay}`
-      ))
+      .where(sql`${stories.createdAt} > ${oneDay}`)
       .orderBy(desc(stories.createdAt));
-  }
-
-  async getFollowers(userId: string): Promise<User[]> {
-    const followerIds = await db.select({ followerId: follows.followerId }).from(follows)
-      .where(eq(follows.followingId, userId));
-    
-    if (followerIds.length === 0) return [];
-    
-    return db.select().from(users)
-      .where(inArray(users.id, followerIds.map(f => f.followerId)));
-  }
-
-  async getFollowing(userId: string): Promise<User[]> {
-    const followingIds = await db.select({ followingId: follows.followingId }).from(follows)
-      .where(eq(follows.followerId, userId));
-    
-    if (followingIds.length === 0) return [];
-    
-    return db.select().from(users)
-      .where(inArray(users.id, followingIds.map(f => f.followingId)));
   }
 
   async getMessages(senderId: string, recipientId: string): Promise<any[]> {

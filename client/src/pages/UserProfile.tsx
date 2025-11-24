@@ -100,16 +100,6 @@ export default function UserProfile() {
                 <AvatarImage src={user.avatar} />
                 <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
               </Avatar>
-              {currentFollowState && (
-                <motion.div 
-                  className="absolute bottom-0 right-0 bg-primary rounded-full w-6 h-6 flex items-center justify-center border-4 border-background text-white"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring" }}
-                >
-                  <span className="text-xs font-bold">✓</span>
-                </motion.div>
-              )}
             </div>
             <div className="flex-1 flex justify-around text-center ml-4">
               <div>
