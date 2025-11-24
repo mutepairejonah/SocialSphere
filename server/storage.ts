@@ -58,48 +58,39 @@ export class PostgresStorage implements IStorage {
   }
 
   async getPosts(): Promise<any[]> {
-    const result = await db.select({
-      id: posts.id,
-      userId: posts.userId,
-      caption: posts.caption,
-      imageUrl: posts.imageUrl,
-      videoUrl: posts.videoUrl,
-      mediaType: posts.mediaType,
-      location: posts.location,
-      likes: posts.likes,
-      commentCount: posts.commentCount,
-      createdAt: posts.createdAt,
-      updatedAt: posts.updatedAt,
-      username: users.username,
-      userAvatar: users.avatar,
-    })
-    .from(posts)
-    .leftJoin(users, eq(posts.userId, users.id))
-    .orderBy(desc(posts.createdAt));
-    return result;
+    const postsList = await db.select().from(posts).orderBy(desc(posts.createdAt));
+    
+    const postsWithUsers = await Promise.all(
+      postsList.map(async (post) => {
+        const user = await this.getUser(post.userId);
+        return {
+          ...post,
+          username: user?.username,
+          userAvatar: user?.avatar,
+        };
+      })
+    );
+    
+    return postsWithUsers;
   }
 
   async getPostsByUser(userId: string): Promise<any[]> {
-    const result = await db.select({
-      id: posts.id,
-      userId: posts.userId,
-      caption: posts.caption,
-      imageUrl: posts.imageUrl,
-      videoUrl: posts.videoUrl,
-      mediaType: posts.mediaType,
-      location: posts.location,
-      likes: posts.likes,
-      commentCount: posts.commentCount,
-      createdAt: posts.createdAt,
-      updatedAt: posts.updatedAt,
-      username: users.username,
-      userAvatar: users.avatar,
-    })
-    .from(posts)
-    .leftJoin(users, eq(posts.userId, users.id))
-    .where(eq(posts.userId, userId))
-    .orderBy(desc(posts.createdAt));
-    return result;
+    const postsList = await db.select().from(posts)
+      .where(eq(posts.userId, userId))
+      .orderBy(desc(posts.createdAt));
+    
+    const postsWithUsers = await Promise.all(
+      postsList.map(async (post) => {
+        const user = await this.getUser(post.userId);
+        return {
+          ...post,
+          username: user?.username,
+          userAvatar: user?.avatar,
+        };
+      })
+    );
+    
+    return postsWithUsers;
   }
 
   async createPost(post: InsertPost): Promise<Post> {
@@ -148,25 +139,20 @@ export class PostgresStorage implements IStorage {
   }
 
   async getPostsFromFollowing(userId: string): Promise<any[]> {
-    const result = await db.select({
-      id: posts.id,
-      userId: posts.userId,
-      caption: posts.caption,
-      imageUrl: posts.imageUrl,
-      videoUrl: posts.videoUrl,
-      mediaType: posts.mediaType,
-      location: posts.location,
-      likes: posts.likes,
-      commentCount: posts.commentCount,
-      createdAt: posts.createdAt,
-      updatedAt: posts.updatedAt,
-      username: users.username,
-      userAvatar: users.avatar,
-    })
-    .from(posts)
-    .leftJoin(users, eq(posts.userId, users.id))
-    .orderBy(desc(posts.createdAt));
-    return result;
+    const postsList = await db.select().from(posts).orderBy(desc(posts.createdAt));
+    
+    const postsWithUsers = await Promise.all(
+      postsList.map(async (post) => {
+        const user = await this.getUser(post.userId);
+        return {
+          ...post,
+          username: user?.username,
+          userAvatar: user?.avatar,
+        };
+      })
+    );
+    
+    return postsWithUsers;
   }
 
   async getStoriesFromFollowing(userId: string): Promise<Story[]> {
