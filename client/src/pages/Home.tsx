@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
-import { LogOut, Heart, MessageCircle, Share2, Loader2, User, Users, Search as SearchIcon, Moon, Sun, RefreshCw, Bookmark } from "lucide-react";
-import { getUserMedia } from "@/lib/instagram";
+import { LogOut, Heart, MessageCircle, Share2, Loader2, User, Users, Search as SearchIcon, Moon, Sun, RefreshCw, Bookmark, Zap } from "lucide-react";
+import { getUserMedia, getUserStories } from "@/lib/instagram";
 
 export default function Home() {
   const { currentUser, logout, darkMode, toggleDarkMode, bookmarkedPosts, bookmarkPost, removeBookmark, getActiveInstagramToken } = useStore();
   const [, setLocation] = useLocation();
   const [media, setMedia] = useState<any[]>([]);
+  const [stories, setStories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const activeToken = getActiveInstagramToken();
 
@@ -15,8 +16,12 @@ export default function Home() {
     const loadMedia = async () => {
       setLoading(true);
       try {
-        const instagramMedia = await getUserMedia(undefined, activeToken);
+        const [instagramMedia, instagramStories] = await Promise.all([
+          getUserMedia(undefined, activeToken),
+          getUserStories('me')
+        ]);
         setMedia(instagramMedia);
+        setStories(instagramStories);
       } catch (error) {
         console.error("Failed to load media:", error);
       } finally {
@@ -35,8 +40,12 @@ export default function Home() {
   const refreshMedia = async () => {
     setLoading(true);
     try {
-      const instagramMedia = await getUserMedia(undefined, activeToken);
+      const [instagramMedia, instagramStories] = await Promise.all([
+        getUserMedia(undefined, activeToken),
+        getUserStories('me')
+      ]);
       setMedia(instagramMedia);
+      setStories(instagramStories);
     } catch (error) {
       console.error("Failed to load media:", error);
     } finally {
@@ -128,16 +137,68 @@ export default function Home() {
             <p>No media found</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className={`divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
+            {/* Stories Section */}
+            {stories && stories.length > 0 && (
+              <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} px-4 py-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className={`text-sm font-semibold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-black'}`}>
+                    <Zap className="w-4 h-4 text-yellow-500" />
+                    Your Stories
+                  </h2>
+                  <button
+                    onClick={() => setLocation("/stories")}
+                    className={`text-xs font-semibold ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+                    data-testid="button-view-all-stories"
+                  >
+                    View All
+                  </button>
+                </div>
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+                  {stories.slice(0, 5).map((story, idx) => (
+                    <button
+                      key={`story-${idx}`}
+                      onClick={() => setLocation("/stories")}
+                      className="flex-shrink-0 relative group"
+                      data-testid={`story-thumbnail-${idx}`}
+                    >
+                      <div className="w-16 h-20 bg-gray-300 rounded-lg overflow-hidden border-2 border-gray-300 hover:border-yellow-500 transition-colors">
+                        {story.media_url && (
+                          story.media_type === "VIDEO" ? (
+                            <video
+                              src={story.media_url}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <img
+                              src={story.media_url}
+                              alt="Story"
+                              className="w-full h-full object-cover"
+                            />
+                          )
+                        )}
+                      </div>
+                      <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 ${darkMode ? 'bg-yellow-400' : 'bg-yellow-500'} rounded-full`} />
+                    </button>
+                  ))}
+                  {stories.length > 5 && (
+                    <div className="flex-shrink-0 w-16 h-20 flex items-center justify-center text-sm font-semibold text-gray-600">
+                      +{stories.length - 5}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
             {media.map((item) => (
-              <article key={item.id} className="bg-white" data-testid={`post-${item.id}`}>
+              <article key={item.id} className={darkMode ? 'bg-gray-800' : 'bg-white'} data-testid={`post-${item.id}`}>
                 {/* Post Header */}
-                <div className="px-4 py-3 flex items-center justify-between">
+                <div className={`px-4 py-3 flex items-center justify-between ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-gray-300 rounded-full" />
-                    <span className="text-sm font-semibold">{currentUser?.username}</span>
+                    <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>{currentUser?.username}</span>
                   </div>
-                  <button className="text-gray-600 hover:text-black" data-testid={`button-more-${item.id}`}>
+                  <button className={darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} data-testid={`button-more-${item.id}`}>
                     •••
                   </button>
                 </div>
@@ -163,13 +224,13 @@ export default function Home() {
 
                 {/* Actions */}
                 <div className="px-4 py-3 flex gap-4">
-                  <button className="text-gray-600 hover:text-black transition-colors" data-testid={`button-like-${item.id}`}>
+                  <button className={darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} data-testid={`button-like-${item.id}`}>
                     <Heart className="w-6 h-6" />
                   </button>
-                  <button className="text-gray-600 hover:text-black transition-colors" data-testid={`button-comment-${item.id}`}>
+                  <button className={darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} data-testid={`button-comment-${item.id}`}>
                     <MessageCircle className="w-6 h-6" />
                   </button>
-                  <button className="text-gray-600 hover:text-black transition-colors" data-testid={`button-share-${item.id}`}>
+                  <button className={darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} data-testid={`button-share-${item.id}`}>
                     <Share2 className="w-6 h-6" />
                   </button>
                 </div>
