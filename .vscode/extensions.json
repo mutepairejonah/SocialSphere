@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "dsznajder.es7-react-js-snippets",
+    "zxh404.vscode-react-snippets",
+    "eamodio.gitlens",
+    "gruntfuggly.todo-tree",
+    "charliermarsh.ruff",
+    "vue.volar",
+    "ms-vscode.remote-server"
+  ]
+}

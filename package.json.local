@@ -1,0 +1,14 @@
+# This file is for reference only
+# To use a custom npm registry or offline mode, configure in .npmrc instead
+
+For local development, ensure you have:
+- node_modules/ directory (created by npm install)
+- .node-gyp/ directory (auto-created)
+- .cache/ directory (auto-created)
+
+See package.json for all available scripts:
+- npm run dev     (development with hot reload)
+- npm run build   (production build)
+- npm run start   (run production build)
+- npm run check   (TypeScript type checking)
+- npm run db:push (sync database schema)
