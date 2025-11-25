@@ -1,17 +1,17 @@
-import { pgTable, varchar, text, timestamp, integer, serial, boolean } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
 import { z } from "zod";
 
 // ========== USERS TABLE (Firebase auth sync only) ==========
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey(),
-  username: varchar("username", { length: 30 }).notNull().unique(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  fullName: varchar("full_name", { length: 100 }),
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
+  fullName: text("full_name"),
   avatar: text("avatar"),
   bio: text("bio"),
-  website: varchar("website", { length: 500 }),
+  website: text("website"),
   activeInstagramAccountId: integer("active_instagram_account_id"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default(new Date().toISOString()),
 });
 
 export type User = typeof users.$inferSelect;
@@ -29,15 +29,15 @@ export const insertUserSchema = z.object({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
 // ========== INSTAGRAM ACCOUNTS TABLE ==========
-export const instagramAccounts = pgTable("instagram_accounts", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull(),
+export const instagramAccounts = sqliteTable("instagram_accounts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull(),
   token: text("token").notNull(),
-  accountName: varchar("account_name", { length: 100 }),
-  instagramUsername: varchar("instagram_username", { length: 100 }),
-  instagramEmail: varchar("instagram_email", { length: 255 }),
-  instagramPhone: varchar("instagram_phone", { length: 20 }),
-  createdAt: timestamp("created_at").defaultNow(),
+  accountName: text("account_name"),
+  instagramUsername: text("instagram_username"),
+  instagramEmail: text("instagram_email"),
+  instagramPhone: text("instagram_phone"),
+  createdAt: text("created_at").default(new Date().toISOString()),
 });
 
 export type InstagramAccount = typeof instagramAccounts.$inferSelect;

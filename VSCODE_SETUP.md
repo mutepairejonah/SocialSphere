@@ -40,37 +40,16 @@ Then edit `.env.local` and fill in:
    - `instagram_basic`
    - `instagram_graph_user_media`
 
-### 4. (Optional) Set Up PostgreSQL Database
+### 4. Database Setup
 
-If you want to use PostgreSQL for data persistence:
+SQLite is the default database - **no setup required!** 🎉
 
-```bash
-# Install PostgreSQL
-# macOS: brew install postgresql@15
-# Ubuntu: sudo apt-get install postgresql postgresql-contrib
-# Windows: Download from https://www.postgresql.org/
+Your app will automatically:
+- Create `./data/sqlite.db` on first run
+- Set up all tables automatically
+- Store all data locally
 
-# Start PostgreSQL
-# macOS: brew services start postgresql@15
-# Ubuntu: sudo service postgresql start
-# Windows: Use PostgreSQL Application
-
-# Create a database
-createdb instaclone
-
-# Update .env.local with your PostgreSQL URL
-# DATABASE_URL=postgresql://username:password@localhost:5432/instaclone
-```
-
-**Or use SQLite (simpler for local development):**
-
-Enable SQLite in `.env.local`:
-```bash
-USE_SQLITE=true
-SQLITE_DB_PATH=./data/sqlite.db
-```
-
-SQLite requires no additional setup!
+That's it! Your database is ready to use.
 
 ### 5. Run the Development Server
 
@@ -175,10 +154,10 @@ npm install
 - Check that your account is added as a tester in the Meta App
 - Ensure your token has `instagram_basic` and `instagram_graph_user_media` permissions
 
-### Database Connection Issues
-- Check if PostgreSQL is running
-- Verify DATABASE_URL in `.env.local`
-- For SQLite, ensure `data/` directory has write permissions
+### Database Issues
+- SQLite stores data in `./data/sqlite.db`
+- Ensure the `data/` directory has write permissions
+- To reset database: `rm -rf data/sqlite.db` (will recreate on next run)
 
 ## Deployment
 

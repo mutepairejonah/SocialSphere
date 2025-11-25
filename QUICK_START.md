@@ -16,7 +16,7 @@ cd instaclone
 npm install
 ```
 
-## Step 2: Set Up Environment (2 minutes)
+## Step 2: Set Up Environment (1 minute)
 
 ```bash
 cp .env.example .env.local
@@ -29,13 +29,17 @@ VITE_INSTAGRAM_ACCESS_TOKEN=your_token_here
 
 **Get your token:** https://developers.instagram.com → Your App → Tools → Graph Explorer → Generate token
 
-## Step 3: Start Development (1 minute)
+**Database:** SQLite is ready to use - no setup required! ✨
+
+## Step 3: Start Development
 
 ```bash
 npm run dev
 ```
 
 Open http://localhost:5000 in your browser! 🚀
+
+**Note:** SQLite database will auto-create on first run. No configuration needed!
 
 ## Available Commands
 
@@ -94,24 +98,11 @@ taskkill /PID <PID> /F
 - Check permissions: `instagram_basic`, `instagram_graph_user_media`
 - Get a fresh token from Meta Developers
 
-### Need PostgreSQL?
+### Database Issues?
+SQLite stores data in `./data/sqlite.db`. To reset:
 ```bash
-# macOS
-brew install postgresql@15
-brew services start postgresql@15
-
-# Ubuntu
-sudo apt-get install postgresql postgresql-contrib
-sudo service postgresql start
-
-# Then set DATABASE_URL in .env.local
-DATABASE_URL=postgresql://user:password@localhost:5432/instaclone
-```
-
-### Prefer SQLite?
-No setup needed! Just enable in `.env.local`:
-```
-USE_SQLITE=true
+# Delete the database (it will recreate on next run)
+rm -rf data/sqlite.db
 ```
 
 ## 📚 More Info
