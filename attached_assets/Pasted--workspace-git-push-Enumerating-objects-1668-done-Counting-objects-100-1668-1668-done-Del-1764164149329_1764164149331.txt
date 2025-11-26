@@ -1,0 +1,113 @@
+~/workspace$ git push
+Enumerating objects: 1668, done.
+Counting objects: 100% (1668/1668), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (1645/1645), done.
+Writing objects: 100% (1668/1668), 2.60 MiB | 9.03 MiB/s, done.
+Total 1668 (delta 1324), reused 142 (delta 10), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (1324/1324), done.
+To https://github.com/mutepairejonah/SocialSphere
+ ! [remote rejected] main -> main (refusing to allow an OAuth App to create or update workflow `.github/workflows/deploy.yml` without `workflow` scope)
+error: failed to push some refs to 'https://github.com/mutepairejonah/SocialSphere'
+~/workspace$ # 1. Remove the GitHub Actions workflow file
+rm -rf .github/workflows/deploy.yml
+
+# 2. Commit the removal
+git add .
+git commit -m "Remove GitHub Actions workflow"
+
+# 3. Push again
+git push origin main
+[main 192de50] Remove GitHub Actions workflow
+ 1 file changed, 32 deletions(-)
+ delete mode 100644 .github/workflows/deploy.yml
+Enumerating objects: 1673, done.
+Counting objects: 100% (1673/1673), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (1650/1650), done.
+Writing objects: 100% (1673/1673), 2.60 MiB | 8.14 MiB/s, done.
+Total 1673 (delta 1331), reused 141 (delta 10), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (1331/1331), done.
+To https://github.com/mutepairejonah/SocialSphere
+ * [new branch]      main -> main
+~/workspace$ npm run deploy
+npm warn config optional Use `--omit=optional` to exclude optional dependencies, or
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> rest-express@1.0.0 predeploy
+> npm run build
+
+npm warn config optional Use `--omit=optional` to exclude optional dependencies, or
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> rest-express@1.0.0 build
+> vite build
+
+vite v7.1.12 building for production...
+✓ 12 modules transformed.
+✗ Build failed in 837ms
+error during build:
+[vite:css] [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
+file: /home/runner/workspace/client/src/index.css:undefined:NaN
+    at ot (/home/runner/workspace/node_modules/tailwindcss/dist/lib.js:38:1629)
+    at LazyResult.runOnRoot (/home/runner/workspace/node_modules/postcss/lib/lazy-result.js:361:16)
+    at LazyResult.runAsync (/home/runner/workspace/node_modules/postcss/lib/lazy-result.js:290:26)
+    at LazyResult.async (/home/runner/workspace/node_modules/postcss/lib/lazy-result.js:192:30)
+    at LazyResult.then (/home/runner/workspace/node_modules/postcss/lib/lazy-result.js:436:17)
+~/workspace$ git add .
+git commit -m "Fix build: restore firebase and fix tailwind config"
+git push origin main
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+Enumerating objects: 10, done.
+Counting objects: 100% (10/10), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (6/6), 1.03 KiB | 1.03 MiB/s, done.
+Total 6 (delta 4), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (4/4), completed with 4 local objects.
+To https://github.com/mutepairejonah/SocialSphere
+   192de50..a2a6b0d  main -> main
+~/workspace$ git push
+Everything up-to-date
+~/workspace$ npm run deploy
+npm warn config optional Use `--omit=optional` to exclude optional dependencies, or
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> rest-express@1.0.0 predeploy
+> npm run build
+
+npm warn config optional Use `--omit=optional` to exclude optional dependencies, or
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> rest-express@1.0.0 build
+> vite build
+
+vite v7.1.12 building for production...
+✓ 1724 modules transformed.
+[plugin vite:reporter] 
+(!) /home/runner/workspace/client/src/lib/instagram.ts is dynamically imported by /home/runner/workspace/client/src/lib/store.ts but also statically imported by /home/runner/workspace/client/src/pages/Bookmarks.tsx, /home/runner/workspace/client/src/pages/ConnectInstagram.tsx, /home/runner/workspace/client/src/pages/Following.tsx, /home/runner/workspace/client/src/pages/HashtagFeed.tsx, /home/runner/workspace/client/src/pages/Home.tsx, /home/runner/workspace/client/src/pages/Profile.tsx, /home/runner/workspace/client/src/pages/Search.tsx, /home/runner/workspace/client/src/pages/Stories.tsx, dynamic import will not move module into another chunk.
+
+../dist/index.html                   1.40 kB │ gzip:   0.57 kB
+../dist/assets/index-K4iNbcAt.css   47.82 kB │ gzip:   8.71 kB
+../dist/assets/index-DeY73UV2.js   796.96 kB │ gzip: 207.15 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 8.67s
+
+> rest-express@1.0.0 deploy
+> gh-pages -d dist
