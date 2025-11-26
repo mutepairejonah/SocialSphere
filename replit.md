@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack Instagram clone (InstaClone) built with React, TypeScript, and Firebase. The application provides core social media functionality including user authentication, profile management, post creation and sharing, real-time messaging, and audio/video calling capabilities. The frontend uses React with Vite for fast development, styled with Tailwind CSS and shadcn/ui components. Firebase handles all backend services including authentication, Firestore for data storage, Firebase Storage for media files, and Realtime Database for live features.
+InstaClone is a social media web application that integrates with Instagram's Graph API to display and manage Instagram content. The application provides a modern, mobile-first interface for viewing posts, stories, and user profiles. Built with React and TypeScript on the frontend, it uses Firebase for authentication and data persistence, with Instagram API serving as the primary content source.
 
 ## User Preferences
 
@@ -12,115 +12,124 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Framework**: React with TypeScript running on Vite for fast development and hot module replacement. The application uses a client-side rendering approach with wouter for lightweight routing.
+**Framework & Build Tool**
+- React 18 with TypeScript for type-safe component development
+- Vite as the build tool and development server, configured for fast HMR and optimized production builds
+- Wouter for client-side routing (lightweight alternative to React Router)
 
-**State Management**: Zustand is used for global state management, primarily handling authentication state, user data, posts, notifications, and social interactions. The store (`client/src/lib/store.ts`) centralizes all Firebase interactions and manages the application's data flow.
+**UI Component System**
+- Radix UI primitives for accessible, unstyled components (dialogs, dropdowns, accordions, etc.)
+- Tailwind CSS v4 (using the new `@import` syntax) for utility-first styling
+- Custom design system with CSS variables for theming (light/dark mode support)
+- shadcn/ui-style component patterns for consistent UI elements
 
-**UI Components**: The application leverages shadcn/ui, a collection of Radix UI primitives styled with Tailwind CSS. This provides accessible, customizable components following the "new-york" style variant. Components are organized in `client/src/components/ui/`.
+**State Management**
+- Zustand for global state management (user authentication, bookmarks, preferences)
+- TanStack Query for server state management and API caching
+- Local state with React hooks for component-specific state
 
-**Styling**: Tailwind CSS v4 with custom theme configuration defined inline in `client/src/index.css`. The theme supports both light and dark modes with custom color tokens for background, foreground, primary, secondary, muted, accent, destructive, border, and input states.
+**Data Fetching Strategy**
+- Instagram Graph API as the primary data source for posts, stories, and user media
+- Firebase Firestore for user profiles and application-specific data
+- Client-side caching with localStorage for bookmarks and user preferences
 
-**Mobile-First Design**: The application is optimized for mobile with a bottom navigation bar (`BottomNav.tsx`), touch-friendly interactions, and responsive layouts constrained to a maximum width of `max-w-md` (448px) centered on screen.
+### Authentication & Authorization
 
-### Authentication System
+**Firebase Authentication**
+- Google OAuth for social sign-in
+- Email/password authentication as alternative
+- Custom username setup flow for new Google sign-ups
+- Session persistence with Firebase's built-in token management
 
-**Firebase Authentication**: Supports two authentication methods:
-- Google OAuth sign-in with popup flow
-- Email/password authentication (both signup and login)
+**Security Model**
+- Firebase security rules control access to Firestore documents
+- Users can only modify their own profile data
+- Public read access for user profiles and posts
+- Instagram API tokens stored securely in environment variables (never in client code)
 
-**Username Management**: Unique username system enforced at the database level. New Google users are directed to a setup flow (`SetupProfile.tsx`) to select a unique username before accessing the application. Username availability is checked in real-time against Firestore.
+### External Dependencies
 
-**Session Management**: Firebase Auth handles session persistence automatically. The auth state is initialized on app load via `onAuthStateChanged` listener, which updates Zustand store and redirects unauthenticated users to the login page.
+**Instagram Graph API Integration**
+- Business account required for API access
+- Permissions needed: `instagram_business_content_read`, `instagram_basic`
+- Environment variables: `VITE_INSTAGRAM_ACCESS_TOKEN`, `VITE_INSTAGRAM_BUSINESS_ACCOUNT_ID`
+- API endpoints used:
+  - `/me/media` - Fetch user's Instagram posts
+  - `/me/stories` - Retrieve user's active stories
+  - `/hashtag/{hashtag-id}` - Search and fetch hashtag content
+  - `/user/insights` - Get engagement metrics
+
+**Firebase Services**
+- **Authentication**: User sign-in/sign-up management
+- **Firestore Database**: User profiles, bookmarks, app-specific metadata
+- **Realtime Database**: Real-time features (if implemented)
+- **Cloud Storage**: Avatar uploads and media storage
+- Firebase config embedded in client code (public API keys)
+
+**Third-Party UI Libraries**
+- Lucide React for consistent iconography
+- Framer Motion for animations (noted as removed in package.json but still in dependencies)
+- Sonner for toast notifications
+- date-fns for date formatting
 
 ### Data Storage
 
-**Firestore Database**: Primary data store organized into collections:
-- `users`: User profiles with username, fullName, email, avatar, bio, website, followers/following counts
-- `posts`: Post content with userId, imageUrl, caption, location, likes, comments counts
-- `follows`: Follow relationships between users
-- `messages`: Real-time messaging between users
-- `notifications`: Activity feed for likes, comments, follows
-- `calls`: Call initiation and status tracking
+**Firebase Firestore Schema**
+- `users` collection: User profiles with fields for username, fullName, bio, avatar, instagramAccounts
+- Document-based structure with user ID as document key
+- Nested subcollections for user-specific data
 
-**Firebase Storage**: Stores user-uploaded media in organized paths:
-- `avatars/{userId}`: Profile pictures
-- `posts/{postId}`: Post images and videos (max 100MB)
+**Browser localStorage**
+- Bookmarked posts stored locally (array of post IDs)
+- User preferences (dark mode, default Instagram account)
+- Cached Instagram account data to reduce API calls
 
-**Realtime Database**: Used for real-time features like messaging and call signaling (`rtdb` instance in `firebase.ts`).
+**Instagram API as Source of Truth**
+- Posts, stories, and media always fetched from Instagram
+- No local duplication of Instagram content
+- Engagement metrics (likes, comments) from Instagram API
 
-**Security Rules**: Critical security configuration in `firestore.rules` and `storage.rules` files that must be deployed to Firebase Console. Rules enforce:
-- Authenticated users can read all user profiles
-- Users can only update their own profiles
-- Public read access to avatars and posts
-- Protected write access for user-specific data
+### Development Environment
 
-### Social Features
+**Replit-Specific Integrations**
+- Custom Vite plugins for Replit environment (`@replit/vite-plugin-cartographer`, `@replit/vite-plugin-dev-banner`)
+- Development server configured for Replit's networking (`host: "0.0.0.0"`)
+- Cartographer plugin for code navigation (development only)
 
-**Posts**: Users can create posts with images/videos, captions, and location tags. Posts support likes and saves, with state managed both locally (for instant feedback) and in Firestore (for persistence).
+**Path Aliases**
+- `@/*` maps to `client/src/*`
+- `@shared/*` for shared code
+- `@assets/*` for static assets
+- Configured in both `vite.config.ts` and `tsconfig.json`
 
-**Follow System**: Follow/unfollow functionality with bidirectional relationship tracking. Following users determines feed content and messaging availability.
+### Key Architectural Decisions
 
-**Search**: Real-time user search by username or full name in the Explore page. Search queries Firestore with case-insensitive matching.
+**Why Instagram API for Content**
+- Avoids duplicating Instagram's complex content delivery infrastructure
+- Ensures content is always up-to-date
+- Leverages Instagram's CDN for media delivery
+- Reduces storage and bandwidth costs
 
-**Notifications**: Activity tracking for social interactions (likes, comments, follows) with read/unread states.
+**Why Firebase for Authentication**
+- Proven OAuth integration with Google
+- Built-in session management and token refresh
+- Free tier suitable for early-stage development
+- Easy integration with Firestore for user data
 
-**Messaging**: Real-time messaging between users who follow each other. Messages are stored in Firestore with sender/recipient IDs and timestamps.
+**Why Zustand Over Redux**
+- Simpler API with less boilerplate
+- Better TypeScript inference
+- No need for actions/reducers for simple state
+- Hooks-based API aligns with React patterns
 
-**Calling**: Audio and video call initiation (UI present, full WebRTC implementation may require additional setup).
+**Why Vite Over Create React App**
+- Significantly faster dev server with native ESM
+- Faster production builds with Rollup
+- Better TypeScript integration out of the box
+- More flexible plugin system
 
-### Build and Deployment
-
-**Development**: Vite dev server runs on port 5000 with HMR, serving the client application while the Express server handles API routes (though most logic is client-side Firebase calls).
-
-**Production Build**: 
-- Client: Vite bundles React app to `dist/public`
-- Server: esbuild bundles Express server to `dist/index.js`
-- Static files served by Express in production
-
-**Environment**: The application expects Firebase configuration hardcoded in `client/src/lib/firebase.ts` for the `chatapp-d92e7` project.
-
-## External Dependencies
-
-### Firebase Services
-
-**Project**: chatapp-d92e7
-- **Firebase Auth**: Google OAuth and Email/Password authentication
-- **Firestore**: NoSQL document database for users, posts, follows, messages, notifications
-- **Firebase Storage**: Object storage for avatars and post media
-- **Realtime Database**: Real-time sync for messaging and calls
-- **Hosting Domain**: chatapp-d92e7.firebaseapp.com
-
-**Critical Setup Required**: Firebase security rules must be manually deployed via Firebase Console for both Firestore and Storage, otherwise permission-denied errors will occur. Rules files are included in repository (`firestore.rules`, `storage.rules`).
-
-### Third-Party APIs and Services
-
-**Google Fonts**: Inter (sans-serif, weights 300-700) and Grand Hotel (cursive) loaded from Google Fonts CDN for typography.
-
-**Dicebear API**: Used for generating avatar placeholders (`https://api.dicebear.com/7.x/avataaars/svg?seed={id}`).
-
-**Unsplash**: Stock images used for avatar selection options in EditProfile component.
-
-### UI Component Libraries
-
-**Radix UI**: Accessible component primitives for accordion, alert-dialog, avatar, checkbox, dialog, dropdown-menu, popover, select, tabs, toast, tooltip, and more.
-
-**Lucide React**: Icon library for UI icons throughout the application.
-
-**Embla Carousel**: Carousel component for potential gallery/story features.
-
-**React Hook Form**: Form state management with Zod schema validation.
-
-**Sonner**: Toast notification system for user feedback.
-
-### Development Tools
-
-**Replit-Specific Plugins**: 
-- `@replit/vite-plugin-runtime-error-modal`: Runtime error overlay
-- `@replit/vite-plugin-cartographer`: Development mapping tool
-- `@replit/vite-plugin-dev-banner`: Development environment banner
-
-**Meta Images Plugin**: Custom Vite plugin (`vite-plugin-meta-images.ts`) that updates OpenGraph and Twitter card meta tags with the correct Replit deployment URL.
-
-### Database Consideration
-
-The project includes Drizzle ORM configuration (`drizzle.config.ts`) and references to PostgreSQL in package dependencies, but these are currently unused. Firebase serves as the primary database. If PostgreSQL is added later, migration from Firebase to a hybrid architecture would be required.
+**Mobile-First Responsive Design**
+- Viewport meta tag prevents zooming on mobile
+- Bottom navigation bar for mobile ergonomics
+- Touch-friendly UI elements (min-height: 44px for buttons)
+- CSS safe area insets for notched devices (`pb-safe`)
