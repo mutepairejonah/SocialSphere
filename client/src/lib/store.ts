@@ -457,5 +457,4 @@ export const useStore = create<StoreState>((set, get) => {
       return { bookmarkedPosts: newBookmarks };
     });
   },
-  };
 }));
