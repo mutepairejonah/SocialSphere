@@ -2,13 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Replace these with your actual Firebase credentials from Firebase Console
 const firebaseConfig = {
-  apiKey: "AIzaSyBGI8q_X4t7TljD3Gp_dR8X5pKzHE8HjKk",
-  authDomain: "instaclone-connect.firebaseapp.com",
-  projectId: "instaclone-connect",
-  storageBucket: "instaclone-connect.firebasestorage.app",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "YOUR_AUTH_DOMAIN_HERE",
+  projectId: "YOUR_PROJECT_ID_HERE",
+  storageBucket: "YOUR_STORAGE_BUCKET_HERE",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
+  appId: "YOUR_APP_ID_HERE"
 };
 
 const app = initializeApp(firebaseConfig);
