@@ -10,9 +10,11 @@ Get your app live on Vercel in 3 minutes! ⚡
 
 ## Easiest Way: Deploy Button
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmutepairejonah%2FSocialSphere&env=VITE_INSTAGRAM_ACCESS_TOKEN&project-name=instaclone)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmutepairejonah%2FSocialSphere&env=VITE_INSTAGRAM_ACCESS_TOKEN)
 
 **Just click the button and follow the steps!**
+
+> **Note:** Vercel will ask for a project name. Use only letters, digits, and underscores. Examples: `instaclone`, `insta_clone`, `socialsphere`, `socialsphere_app`
 
 ## Manual Deployment (5 minutes)
 
@@ -25,7 +27,9 @@ Get your app live on Vercel in 3 minutes! ⚡
 
 ### Step 2: Configure Project
 
-- **Project Name**: `instaclone` (or your choice)
+- **Project Name**: Use only **letters, digits, and underscores** (no hyphens!)
+  - ✅ Valid: `instaclone`, `insta_clone`, `socialsphere`, `my_app_123`
+  - ❌ Invalid: `insta-clone`, `insta.clone`, `123app`, `insta@clone`
 - **Framework**: Auto-detected as Node.js ✓
 - **Root Directory**: `./` (default)
 
