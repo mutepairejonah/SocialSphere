@@ -7,7 +7,7 @@
     "dev:client": "vite dev --port 5000",
     "dev": "vite dev --port 5000",
     "build": "vite build",
-    "check": "tsc",
+    "check": "tsc"
   },
   "notes": "removed framer motion dependency",
   "dependencies": {
