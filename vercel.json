@@ -1,13 +1,5 @@
 {
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "outputDirectory": "dist",
-  "env": {
-    "VITE_INSTAGRAM_ACCESS_TOKEN": "@vite_instagram_access_token"
-  },
-  "functions": {
-    "server/index-prod.ts": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  "outputDirectory": "dist"
 }

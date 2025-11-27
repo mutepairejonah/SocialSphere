@@ -35,16 +35,25 @@ Get your app live on Vercel in 3 minutes! ⚡
 
 ### Step 3: Set Environment Variables
 
-Click "Environment Variables" and add:
+**IMPORTANT:** You must add your Instagram access token in the Vercel dashboard AFTER deployment:
 
-```
-VITE_INSTAGRAM_ACCESS_TOKEN = your_token_here
-```
+1. Go to https://vercel.com/dashboard
+2. Select your project
+3. Click **Settings** → **Environment Variables**
+4. Add a new variable:
+   - **Name**: `VITE_INSTAGRAM_ACCESS_TOKEN`
+   - **Value**: Your Instagram access token
+   - **Environment**: Select all (Production, Preview, Development)
+5. Click **Add**
+6. Redeploy: Go to **Deployments** → click on latest deployment → click **Redeploy**
 
 **Get your Instagram token:**
 1. Go to https://developers.instagram.com
-2. Create an app or use existing
-3. Generate an access token with: `instagram_basic`, `instagram_graph_user_media`
+2. Create an app or use existing one (e.g., "instaclone-app")
+3. Go to **Settings** → **Basic**
+4. Under **App Roles**, find your account and generate an access token
+5. Permissions needed: `instagram_basic`, `instagram_graph_user_media`
+6. Copy the long token string and paste it into Vercel
 
 ### Step 4: Deploy!
 
