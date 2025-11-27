@@ -435,18 +435,27 @@ export const useStore = create<StoreState>((set, get) => {
   },
 
   toggleDarkMode: () => {
-    set(state => ({ darkMode: !state.darkMode }));
+    set(state => {
+      const newDarkMode = !state.darkMode;
+      saveToStorage(STORAGE_KEYS.DARK_MODE, newDarkMode);
+      return { darkMode: newDarkMode };
+    });
   },
 
   bookmarkPost: (postId: string) => {
-    set(state => ({
-      bookmarkedPosts: [...state.bookmarkedPosts, postId]
-    }));
+    set(state => {
+      const newBookmarks = [...state.bookmarkedPosts, postId];
+      saveToStorage(STORAGE_KEYS.BOOKMARKED_POSTS, newBookmarks);
+      return { bookmarkedPosts: newBookmarks };
+    });
   },
 
   removeBookmark: (postId: string) => {
-    set(state => ({
-      bookmarkedPosts: state.bookmarkedPosts.filter(id => id !== postId)
-    }));
+    set(state => {
+      const newBookmarks = state.bookmarkedPosts.filter(id => id !== postId);
+      saveToStorage(STORAGE_KEYS.BOOKMARKED_POSTS, newBookmarks);
+      return { bookmarkedPosts: newBookmarks };
+    });
   },
+  };
 }));
