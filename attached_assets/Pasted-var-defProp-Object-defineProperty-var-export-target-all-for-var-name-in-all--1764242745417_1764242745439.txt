@@ -1,0 +1,272 @@
+var __defProp = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// server/index-prod.ts
+import fs from "node:fs";
+import path from "node:path";
+import express2 from "express";
+
+// server/app.ts
+import express from "express";
+
+// server/routes.ts
+import { createServer } from "http";
+
+// shared/db.ts
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+
+// shared/schema.ts
+var schema_exports = {};
+__export(schema_exports, {
+  insertInstagramAccountSchema: () => insertInstagramAccountSchema,
+  insertUserSchema: () => insertUserSchema,
+  instagramAccounts: () => instagramAccounts,
+  users: () => users
+});
+import { pgTable, varchar, text, timestamp, integer, serial } from "drizzle-orm/pg-core";
+import { z } from "zod";
+var users = pgTable("users", {
+  id: varchar("id").primaryKey(),
+  username: varchar("username", { length: 30 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  fullName: varchar("full_name", { length: 100 }),
+  avatar: text("avatar"),
+  bio: text("bio"),
+  website: varchar("website", { length: 500 }),
+  activeInstagramAccountId: integer("active_instagram_account_id"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+var insertUserSchema = z.object({
+  id: z.string(),
+  username: z.string().min(3).max(30),
+  email: z.string().email(),
+  fullName: z.string().max(100).optional(),
+  avatar: z.string().optional(),
+  bio: z.string().max(500).optional(),
+  website: z.string().max(500).optional()
+});
+var instagramAccounts = pgTable("instagram_accounts", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  token: text("token").notNull(),
+  accountName: varchar("account_name", { length: 100 }),
+  instagramUsername: varchar("instagram_username", { length: 100 }),
+  instagramEmail: varchar("instagram_email", { length: 255 }),
+  instagramPhone: varchar("instagram_phone", { length: 20 }),
+  createdAt: timestamp("created_at").defaultNow()
+});
+var insertInstagramAccountSchema = z.object({
+  userId: z.string(),
+  token: z.string(),
+  accountName: z.string().max(100).optional(),
+  instagramUsername: z.string().max(100).optional(),
+  instagramEmail: z.string().email().optional(),
+  instagramPhone: z.string().max(20).optional()
+});
+
+// shared/db.ts
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set");
+}
+var client = postgres(process.env.DATABASE_URL);
+var db = drizzle(client, { schema: schema_exports });
+
+// server/storage.ts
+import { eq } from "drizzle-orm";
+var PostgresStorage = class {
+  async getUser(id) {
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
+  }
+  async createUser(user) {
+    const result = await db.insert(users).values(user).returning();
+    return result[0];
+  }
+  async updateUser(id, updates) {
+    const result = await db.update(users).set(updates).where(eq(users.id, id)).returning();
+    return result[0];
+  }
+};
+var storage = new PostgresStorage();
+
+// server/routes.ts
+async function registerRoutes(app2) {
+  const httpServer = createServer(app2);
+  app2.post("/api/users", async (req, res) => {
+    try {
+      const { id, username, email, fullName, avatar } = req.body;
+      if (!id || !username || !email) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      const existingUser = await storage.getUser(id);
+      let user;
+      if (existingUser) {
+        user = await storage.updateUser(id, {
+          username: username.toLowerCase(),
+          email,
+          fullName: fullName || existingUser.fullName,
+          avatar: avatar || existingUser.avatar
+        });
+      } else {
+        user = await storage.createUser({
+          id,
+          username: username.toLowerCase(),
+          email,
+          fullName: fullName || "",
+          avatar: avatar || ""
+        });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error syncing user:", error);
+      res.status(500).json({ error: "Failed to sync user" });
+    }
+  });
+  app2.get("/api/users/:id", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.id);
+      if (!user) return res.status(404).json({ error: "User not found" });
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+  app2.put("/api/users/:id", async (req, res) => {
+    try {
+      const { fullName, bio, website, avatar } = req.body;
+      const user = await storage.updateUser(req.params.id, {
+        fullName,
+        bio,
+        website,
+        avatar
+      });
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+  app2.post("/api/instagram-accounts", async (req, res) => {
+    try {
+      const { userId, token, accountName, instagramUsername, instagramEmail, instagramPhone } = req.body;
+      if (!userId || !token) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      res.json({ success: true, message: "Account added" });
+    } catch (error) {
+      console.error("Error adding Instagram account:", error);
+      res.status(500).json({ error: "Failed to add account" });
+    }
+  });
+  app2.get("/api/instagram-accounts/recommendations", async (req, res) => {
+    try {
+      const { email, phone } = req.query;
+      res.json({ recommendations: [] });
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      res.status(500).json({ error: "Failed to fetch recommendations" });
+    }
+  });
+  app2.delete("/api/instagram-accounts/:id", async (req, res) => {
+    try {
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error removing Instagram account:", error);
+      res.status(500).json({ error: "Failed to remove account" });
+    }
+  });
+  return httpServer;
+}
+
+// server/app.ts
+function log(message, source = "express") {
+  const formattedTime = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+var app = express();
+app.use(express.json({
+  verify: (req, _res, buf) => {
+    req.rawBody = buf;
+  },
+  limit: "50mb"
+}));
+app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy-Report-Only",
+    "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src * 'unsafe-inline'; media-src *; object-src 'none'"
+  );
+  next();
+});
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path2 = req.path;
+  let capturedJsonResponse = void 0;
+  const originalResJson = res.json;
+  res.json = function(bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path2.startsWith("/api")) {
+      let logLine = `${req.method} ${path2} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "\u2026";
+      }
+      log(logLine);
+    }
+  });
+  next();
+});
+async function runApp(setup) {
+  const server = await registerRoutes(app);
+  app.use((err, _req, res, _next) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    throw err;
+  });
+  await setup(app, server);
+  const port = parseInt(process.env.PORT || "5000", 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+}
+
+// server/index-prod.ts
+async function serveStatic(app2, server) {
+  const distPath = path.resolve(import.meta.dirname, "public");
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`
+    );
+  }
+  app2.use(express2.static(distPath));
+  app2.use("*", (_req, res) => {
+    res.sendFile(path.resolve(distPath, "index.html"));
+  });
+}
+(async () => {
+  await runApp(serveStatic);
+})();
+export {
+  serveStatic
+};

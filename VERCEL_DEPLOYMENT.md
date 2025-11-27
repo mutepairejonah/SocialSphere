@@ -32,12 +32,14 @@ Get your app live on Vercel in 3 minutes! ⚡
   - ❌ Invalid: `insta-clone`, `insta.clone`, `123app`, `insta@clone`
 - **Framework**: Auto-detected as Node.js ✓
 - **Root Directory**: `./` (default)
+- **Build Command**: `npm run build` (pre-filled)
+- **Output Directory**: `dist` (pre-filled)
 
 ### Step 3: Set Environment Variables
 
-**IMPORTANT:** You must add your Instagram access token in the Vercel dashboard AFTER deployment:
+**IMPORTANT:** You must add your Instagram access token AFTER deployment:
 
-1. Go to https://vercel.com/dashboard
+1. After your project is created, go to https://vercel.com/dashboard
 2. Select your project
 3. Click **Settings** → **Environment Variables**
 4. Add a new variable:
@@ -57,9 +59,17 @@ Get your app live on Vercel in 3 minutes! ⚡
 
 ### Step 4: Deploy!
 
-Click "Deploy" and wait ~2 minutes
+Click "Deploy" and wait ~2-3 minutes
 
-Your app will be live at: `https://instaclone.vercel.app` 🎉
+Your app will be live at: `https://your-project-name.vercel.app` 🎉
+
+## After First Deployment
+
+If you see code instead of your app:
+1. Check the **Deployments** tab → view the latest deployment
+2. Check the **Build Logs** - look for errors
+3. Go to **Settings** → **Environment Variables** and make sure `VITE_INSTAGRAM_ACCESS_TOKEN` is set
+4. Click **Redeploy** on the latest deployment
 
 ## Automatic Deployments
 
@@ -70,21 +80,12 @@ git push origin main
 # Vercel detects changes and redeploys automatically
 ```
 
-## Using Vercel CLI (Advanced)
+## Update Code & Redeploy
 
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy from local machine
-vercel
-
-# Deploy to production
-vercel --prod
-
-# View logs
-vercel logs
-```
+1. Make changes locally
+2. Push to GitHub: `git push origin main`
+3. Vercel automatically redeploys within 1-2 minutes
+4. Check the **Deployments** tab to monitor
 
 ## Update Environment Variables
 
@@ -92,37 +93,48 @@ vercel logs
 1. Go to https://vercel.com/dashboard
 2. Select your project
 3. Settings → Environment Variables
-4. Add/update variables
-5. Redeploy
+4. Update the token value
+5. Go to **Deployments** → click latest → **Redeploy**
 
-### Using CLI
-```bash
-vercel env add VITE_INSTAGRAM_ACCESS_TOKEN
-# Follow prompts to add value
-vercel --prod  # Redeploy with new variables
-```
+### If Token Expires
+Instagram access tokens can expire. When yours does:
+1. Generate a new token from https://developers.instagram.com
+2. Update it in Vercel dashboard (Settings → Environment Variables)
+3. Redeploy
 
 ## Troubleshooting
 
 ### Build Failed
 
-Check build logs in Vercel dashboard:
-1. Dashboard → Your Project
-2. Click on failed deployment
+Check build logs:
+1. Dashboard → Your Project → **Deployments**
+2. Click on the failed deployment
 3. View build logs
 4. Fix errors and push to GitHub (auto-redeploys)
 
-### App is Blank
+**Common errors:**
+- `DATABASE_URL is not set` - This is normal, your app doesn't need it
+- `Module not found` - Run `npm install` locally and push again
 
-- Check browser console for errors
-- Verify environment variables are set
-- Check Vercel Function logs (Deployments → Logs)
+### App Shows Code Instead of UI
+
+This means the build ran but the server isn't starting. Try:
+1. Settings → Environment Variables
+2. Make sure `VITE_INSTAGRAM_ACCESS_TOKEN` is set
+3. Click **Redeploy**
 
 ### Instagram API Not Working
 
-1. Verify `VITE_INSTAGRAM_ACCESS_TOKEN` is set
+1. Verify `VITE_INSTAGRAM_ACCESS_TOKEN` is in Environment Variables
 2. Check token has correct permissions
 3. Get a fresh token from Meta Developers
+4. Update in Vercel and redeploy
+
+### 404 Errors
+
+If you see 404 pages, it's normal for API routes. The app is working! Just make sure:
+1. Environment variable is set correctly
+2. App has fully loaded in browser (check Network tab in DevTools)
 
 ## Custom Domain (Free!)
 
@@ -131,7 +143,7 @@ Check build logs in Vercel dashboard:
 3. Enter your custom domain (e.g., `instaclone.com`)
 4. Follow DNS setup instructions
 
-## Monitoring
+## Monitoring & Logs
 
 Vercel provides free monitoring:
 - Real-time analytics
@@ -148,27 +160,26 @@ Go to: Dashboard → Your Project → Analytics
 - ✅ Custom domains
 - ✅ Auto SSL certificates
 - ✅ Edge caching
+- ✅ Serverless functions
 
-**Upgrade later** if you need more resources (Pro/Pro+)
+**Upgrade later** if you need more (Pro/Pro+)
 
 ## Rollback (Undo a Deployment)
 
-1. Dashboard → Deployments
+1. Dashboard → **Deployments**
 2. Find previous working deployment
 3. Click three dots → "Promote to Production"
 4. Done! ✨
 
 ## View Live App
 
-```bash
-# After deployment
-vercel --prod
-
-# Or find URL in dashboard
-```
+After deployment:
+1. Go to Dashboard
+2. Click your project
+3. Visit the URL shown at the top
 
 ---
 
-**Your app is live on Vercel!** It's faster and easier than any other platform 🚀
+**Your app is live on Vercel!** It's the easiest way to deploy 🚀
 
 For more: https://vercel.com/docs
