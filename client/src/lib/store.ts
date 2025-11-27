@@ -51,14 +51,41 @@ interface StoreState {
   removeBookmark: (postId: string) => void;
 }
 
-export const useStore = create<StoreState>((set, get) => ({
-  currentUser: null,
-  pendingGoogleUser: null,
-  isAuthenticated: false,
-  darkMode: false,
-  bookmarkedPosts: [],
+// localStorage helper functions
+const STORAGE_KEYS = {
+  DARK_MODE: 'instaclone_dark_mode',
+  BOOKMARKED_POSTS: 'instaclone_bookmarked_posts',
+};
 
-  initializeAuth: () => {
+const loadFromStorage = () => {
+  try {
+    const darkMode = localStorage.getItem(STORAGE_KEYS.DARK_MODE) === 'true';
+    const bookmarkedPosts = JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKMARKED_POSTS) || '[]');
+    return { darkMode, bookmarkedPosts };
+  } catch (error) {
+    return { darkMode: false, bookmarkedPosts: [] };
+  }
+};
+
+const saveToStorage = (key: string, value: any) => {
+  try {
+    localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+  } catch (error) {
+    console.warn('Failed to save to localStorage:', error);
+  }
+};
+
+export const useStore = create<StoreState>((set, get) => {
+  const { darkMode: initialDarkMode, bookmarkedPosts: initialBookmarks } = loadFromStorage();
+  
+  return {
+    currentUser: null,
+    pendingGoogleUser: null,
+    isAuthenticated: false,
+    darkMode: initialDarkMode,
+    bookmarkedPosts: initialBookmarks,
+
+    initializeAuth: () => {
     onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
