@@ -1,0 +1,36 @@
+{
+  "name": "InstaClone",
+  "description": "Instagram clone with Instagram Graph API integration",
+  "repository": "https://github.com/mutepairejonah/SocialSphere",
+  "keywords": ["instagram", "clone", "react", "node", "vite"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "description": "Node environment",
+      "value": "production"
+    },
+    "VITE_INSTAGRAM_ACCESS_TOKEN": {
+      "description": "Your Instagram Graph API access token",
+      "required": true
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL database URL (auto-generated if using Heroku Postgres)",
+      "required": false
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:mini",
+      "options": {
+        "version": "15"
+      }
+    }
+  ],
+  "scripts": {
+    "postbuild": "npm run db:push || true"
+  }
+}
