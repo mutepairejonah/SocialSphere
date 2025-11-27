@@ -2,14 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Replace these with your actual Firebase credentials from Firebase Console
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY_HERE",
-  authDomain: "YOUR_AUTH_DOMAIN_HERE",
-  projectId: "YOUR_PROJECT_ID_HERE",
-  storageBucket: "YOUR_STORAGE_BUCKET_HERE",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
-  appId: "YOUR_APP_ID_HERE"
+  apiKey: "AIzaSyAYc4hqiWsrzIYvoybXUK_2HglHj_Ut1Mo",
+  authDomain: "chatapp-d92e7.firebaseapp.com",
+  projectId: "chatapp-d92e7",
+  storageBucket: "chatapp-d92e7.firebasestorage.app",
+  messagingSenderId: "312092844552",
+  appId: "1:312092844552:web:c916c4839833d6c0e867bd"
 };
 
 const app = initializeApp(firebaseConfig);
